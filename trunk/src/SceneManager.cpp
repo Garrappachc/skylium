@@ -2,7 +2,7 @@
  * File:   SceneManager.cpp
  * Author: Michał Garapich
  * 
- * Created on 2 kwiecień 2011, 18:05
+ * Created on 2 april 2011, 18:05
  */
 
 #include "../include/SceneManager.h"

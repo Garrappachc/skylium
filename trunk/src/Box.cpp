@@ -2,7 +2,7 @@
  * File:   Box.cpp
  * Author: Michał Garapich
  * 
- * Created on 3 kwiecień 2011, 17:59
+ * Created on 3 april 2011, 17:59
  */
 
 #include "../include/Box.h"

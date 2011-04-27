@@ -1,8 +1,8 @@
 /* 
  * File:   SceneManager.h
- * Author: kist
+ * Author: Michał Garapich
  *
- * Created on 2 kwiecień 2011, 18:05
+ * Created on 2 april 2011, 18:05
  */
 
 #ifndef SCENEMANAGER_H
@@ -21,7 +21,7 @@
 class SceneManager : public Singleton < SceneManager > {
 public:
 	SceneManager();
-	virtual ~SceneManager();
+	~SceneManager();
 
 	/**
 	 * Tworzy nową scenę. Parametry użytkownik sobie ustawi później,

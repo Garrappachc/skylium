@@ -1,13 +1,8 @@
 /* 
  * File:   Camera.h
- * Author: garrappachc
+ * Author: Michał Garapich
  *
- * Created on 1 kwiecień 2011, 18:13
- *
- ******
- * Tworzy nową klasę, której instancjami będą kamery.
- *
- ******
+ * Created on 1 april 2011, 18:13
  */
 
 #ifndef CAMERA_H

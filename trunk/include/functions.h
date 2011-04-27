@@ -2,7 +2,7 @@
  * File:   functions.h
  * Author: Michał Garapich, Eryk Dykiel
  *
- * Created on 1 kwiecień 2011, 19:54
+ * Created on 1 april 2011, 19:54
  */
 
 #ifndef FUNCTIONS_H

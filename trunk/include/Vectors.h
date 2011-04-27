@@ -1,8 +1,8 @@
 /* 
  * File:   Vectors.h
- * Author: garrappachc
+ * Author: Michał Garapich
  *
- * Created on 21 kwiecień 2011, 23:01
+ * Created on 21 april 2011, 23:01
  */
 
 #ifndef VECTORS_H

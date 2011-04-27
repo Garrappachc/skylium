@@ -2,7 +2,7 @@
  * File:   Skylium.cpp
  * Author: Michał Garapich
  * 
- * Created on 1 kwiecień 2011, 20:51
+ * Created on 1 april 2011, 20:51
  */
 
 #include <cstdlib>
@@ -31,8 +31,6 @@ static const int KEY_D = 100;
 static const int KEY_S = 115;
 static const int KEY_W = 119;
 
-Skylium* Skylium::instance_ = 0;
-
 Skylium::Skylium() {
 	sceneManagement_ = new SceneManager();
 	lastMousePositionX_ = 0;
@@ -43,14 +41,6 @@ Skylium::Skylium() {
 
 Skylium::~Skylium() {
 	delete sceneManagement_;
-}
-
-Skylium*
-Skylium::instance() {
-	if (Skylium::instance_ == 0)
-		Skylium::instance_ = new Skylium();
-	atexit(Skylium::clean);
-	return Skylium::instance_;
 }
 
 bool
@@ -175,10 +165,4 @@ Scene *
 Skylium::createScene(const string &name) {
 	Scene *newScene = sceneManagement_ -> createScene(name);
 	return newScene;
-}
-
-void
-Skylium::clean() {
-	delete Skylium::instance_;
-	Skylium::instance_ = 0;
 }

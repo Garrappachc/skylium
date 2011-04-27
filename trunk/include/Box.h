@@ -2,13 +2,11 @@
  * File:   Box.h
  * Author: Michał Garapich
  *
- * Created on 3 kwiecień 2011, 17:59
+ * Created on 3 april 2011, 17:59
  */
 
 #ifndef BOX_H
 #define	BOX_H
-
-#include <SDL/SDL.h>
 
 #include "Object.h"
 
