@@ -1,8 +1,8 @@
 /* 
  * File:   Camera.cpp
- * Author: garrappachc
+ * Author: Michał Garapich
  * 
- * Created on 1 kwiecień 2011, 18:13
+ * Created on 1 april 2011, 18:13
  */
 
 #include <iostream>

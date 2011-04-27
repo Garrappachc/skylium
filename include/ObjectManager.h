@@ -1,8 +1,8 @@
 /* 
  * File:   ObjectManager.h
- * Author: kist
+ * Author: Michał Garapich
  *
- * Created on 2 kwiecień 2011, 12:10
+ * Created on 2 april 2011, 12:10
  */
 
 #ifndef OBJECTMANAGER_H
@@ -22,7 +22,7 @@
 class ObjectManager {
 public:
 	ObjectManager();
-	virtual ~ObjectManager();
+	~ObjectManager();
 
 	/**
 	 * Tworzy nowy oiekt.

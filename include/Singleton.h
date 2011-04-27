@@ -2,7 +2,7 @@
  * File:   Singleton.h
  * Author: Michał Garapich
  *
- * Created on 3 kwiecień 2011, 17:09
+ * Created on 3 april 2011, 17:09
  */
 
 #ifndef SINGLETON_H

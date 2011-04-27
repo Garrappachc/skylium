@@ -2,7 +2,7 @@
  * File:   ObjectManager.cpp
  * Author: Michał Garapich
  * 
- * Created on 2 kwiecień 2011, 12:10
+ * Created on 2 april 2011, 12:10
  */
 
 #include <iterator>

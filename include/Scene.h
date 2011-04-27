@@ -2,7 +2,7 @@
  * File:   Scene.h
  * Author: Michał Garapich
  *
- * Created on 2 kwiecień 2011, 18:07
+ * Created on 2 april 2011, 18:07
  */
 
 #ifndef SCENE_H
@@ -32,7 +32,7 @@ public:
 	/**
 	 * Destruktor, który powinien zniszczyć wszystkie obiekty i ObjectManagera.
 	 */
-	virtual ~Scene();
+	~Scene();
 
 	/**
 	 * Nakazuje ObjectManagerowi pokazać wszystkie obiekty.

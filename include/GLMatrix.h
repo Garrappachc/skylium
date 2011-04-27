@@ -2,7 +2,7 @@
  * File:   GLMatrix.h
  * Author: Michał Garapich
  *
- * Created on 13 kwiecień 2011, 00:07
+ * Created on 13 april 2011, 00:07
  */
 
 #ifndef GLMATRIX_H

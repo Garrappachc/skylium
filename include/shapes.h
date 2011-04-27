@@ -1,8 +1,8 @@
 /* 
  * File:   shapes.h
- * Author: garrappachc
+ * Author: Michał Garapich
  *
- * Created on 14 kwiecień 2011, 21:48
+ * Created on 14 april 2011, 21:48
  */
 
 #ifndef SHAPES_H

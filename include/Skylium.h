@@ -2,7 +2,7 @@
  * File:   Skylium.h
  * Author: Michał Garapich
  *
- * Created on 1 kwiecień 2011, 20:51
+ * Created on 1 april 2011, 20:51
  *
  ******
  * Klasa-matka.
@@ -17,14 +17,17 @@
 #include "SceneManager.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Singleton.h"
 
-class Skylium {
+class Skylium : public Singleton < Skylium > {
 
 public:
+	/**
+	 * Konstruktor tworzy nowego SceneManagera.
+     */
+	Skylium();
 
-	static Skylium* instance();
-
-	static void clean();
+	virtual ~Skylium();
 
 	/**************************************************************************/
 	/*                           OBSŁUGA    SDL                               */
@@ -57,17 +60,9 @@ public:
 	Scene * createScene(const std::string&);
 	
 private:
-	/**
-	 * Konstruktor tworzy nowego SceneManagera.
-     */
-	Skylium();
-
-	virtual ~Skylium();
 
 	/* Jedyna instancja SceneManagera. */
 	SceneManager * sceneManagement_;
-
-	static Skylium* instance_;
 
 	/* Przechowuje pozycję x i y myszy. */
 	int lastMousePositionX_;

@@ -1,8 +1,8 @@
 /* 
  * File:   Shader.h
- * Author: garrappachc
+ * Author: Michał Garapich
  *
- * Created on 20 kwiecień 2011, 20:34
+ * Created on 20 april 2011, 20:34
  */
 
 #ifndef SHADER_H

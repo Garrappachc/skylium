@@ -2,7 +2,7 @@
  * File:   main.cpp
  * Authors: Michał Garapich, Eryk Dykiel
  *
- * Created on 1 kwiecień 2011, 18:04
+ * Created on 1 april 2011, 18:04
  */
 
 #include <cstdlib>
@@ -57,9 +57,9 @@ GLfloat boxTex[] = {
 int
 main() {
 
-	Skylium *ikatka = Skylium::instance();
+	Skylium *s_main = new Skylium();
 
-	if (!ikatka -> init()) {
+	if (!s_main -> init()) {
 		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
 	}
@@ -68,7 +68,7 @@ main() {
 	if (!cienie -> make())
 		exit(1);
 
-	Scene *scenka = ikatka -> createScene("Scenka");
+	Scene *scenka = s_main -> createScene("Scenka");
 	//scenka -> setSpecularLight(0.99, 0.99, 0.99, 1.0);
 	//scenka -> setDiffuseLight(0.9, 0.9, 0.9, 1.0);
 	scenka -> setAmbientLight(0.5, 0.5, 0.5, 1.0);
@@ -91,15 +91,6 @@ main() {
 	malpka -> rotate(90, 0, -90);
 	malpka -> setColor(126, 54, 25, 1);
 	
-	//Object *kulka = scenka -> createObject("kulka");
-	//kulka->loadFromObj("objects/sphere.obj", "objects/sphere.mtl", GET_VERTICES | GET_NORMALS);
-	//if (!kulka) {
-	//	cout << "Kulka nie działa.\n";
-	//}
-	//kulka -> move(-5, 2, 0);
-	//kulka -> scale(-2, -2, -2);
-	//kulka -> setColor(0, 56, 109, 1);
-	
 	Camera* kamerka = scenka -> createCamera(5.0, 6.0, 0.0);
 	kamerka -> lookAt(1, 4, -1);
 	
@@ -108,7 +99,7 @@ main() {
 	pudelko ->showStats();
 	malpka ->showStats();
 	
-	ikatka -> execute();
+	s_main -> execute();
 
 	return 0;
 }

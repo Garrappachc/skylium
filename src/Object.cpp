@@ -2,7 +2,7 @@
  * File:   Object.cpp
  * Author: Michał Garapich
  * 
- * Created on 2 kwiecień 2011, 11:17
+ * Created on 2 april 2011, 11:17
  */
 
 #include <SOIL/SOIL.h>

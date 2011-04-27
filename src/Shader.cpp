@@ -1,8 +1,8 @@
 /* 
  * File:   Shader.cpp
- * Author: garrappachc
+ * Author: Michał Garapich
  * 
- * Created on 20 kwiecień 2011, 20:34
+ * Created on 20 april 2011, 20:34
  */
 
 #ifdef _WIN32
