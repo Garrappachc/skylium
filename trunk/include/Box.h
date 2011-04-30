@@ -21,7 +21,7 @@ public:
 	/**
 	 * Zastępuje metodę show() z klasy Object. Wyświetla pudełko.
 	 */
-	bool show();
+	void show();
 };
 
 #endif	/* BOX_H */

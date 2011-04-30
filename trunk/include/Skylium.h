@@ -33,9 +33,8 @@ public:
 	/*                           OBSŁUGA    SDL                               */
 	/**
 	 * Ustawienie rozmiarów okna i różnych innych dziwnych opcji.
-     * @return true, jeżeli wszystko działa, false, jeżeli coś poszło nie tak.
      */
-	bool execute();
+	void execute();
 
 	/**
 	 * Inicjacja okna.
@@ -43,13 +42,13 @@ public:
      */
 	bool init();
 
-	bool event(SDL_Event *event);
+	void event(SDL_Event *event);
 
-	bool loop();
+	void loop();
 
-	bool render();
+	void render();
 
-	bool cleanup();
+	void cleanup();
 
 	/**************************************************************************/
 

@@ -23,6 +23,8 @@
 #include "../include/functions.h"
 #include "../include/Shader.h"
 
+#include "../include/defines.h"
+
 using namespace std;
 
 Object::Object (const string &_name, const GLfloat *vertex, const int &_size) :
@@ -99,7 +101,7 @@ Object::~Object() {
 	}
 }
 
-bool
+void
 Object::show() {
 	glPushMatrix();
 	if (!texture_)
@@ -153,14 +155,11 @@ Object::show() {
 		shader_ -> toggle();
 
 	glPopMatrix();
-
-	return true;
 }
 
 bool
 Object::move(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 	mov_ += sVec3D< GLdouble >(_x, _y, _z);
-	cout << "Nowa pozycja obiektu \"" << name << "\": " << mov_[0] << ", " << mov_[1] << ", " << mov_[2] << "\n";
 	return true;
 }
 
@@ -182,7 +181,9 @@ Object::loadTexture(const string &_textureFile, const GLfloat *_texturePointers,
 		return false;
 
 	if (!fileExists(_textureFile)) {
-		cout << "Plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+#ifdef __DEBUG__
+		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+#endif
 		return false;
 	}
 
@@ -195,7 +196,9 @@ Object::loadTexture(const string &_textureFile, const GLfloat *_texturePointers,
 	if (!texture_)
 		return false;
 
-	cout << "Teksturę załadowano pomyślnie.\n";
+#ifdef __DEBUG__
+	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie.\n";
+#endif
 
 	texCoords_.resize(_size);
 	for (int i = 0; i < _size; i++) {
@@ -212,7 +215,9 @@ Object::loadTexture(const string &_textureFile, const sArray &_texturePointers) 
 		return false;
 
 	if (!fileExists(_textureFile)) {
-		cout << "Plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+#ifdef __DEBUG__
+		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+#endif
 		return false;
 	}
 
@@ -227,7 +232,9 @@ Object::loadTexture(const string &_textureFile, const sArray &_texturePointers) 
 
 	texCoords_ = _texturePointers;
 
-	cout << "Teksturę załadowano pomyślnie.\n";
+#ifdef __DEBUG__
+	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie.\n";
+#endif
 	return true;
 }
 
@@ -237,7 +244,9 @@ Object::loadTexture(const string &_textureFile) {
 		return false;
 
 	if (!fileExists(_textureFile)) {
-		cout << "Plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+#ifdef __DEBUG__
+		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+#endif
 		return false;
 	}
 	texture_ = SOIL_load_OGL_texture(
@@ -249,21 +258,25 @@ Object::loadTexture(const string &_textureFile) {
 	if (!texture_)
 		return false;
 
-	cout << "Texturę załadowano pomyślnie.\n";
+#ifdef __DEBUG__
+	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie.\n";
+#endif
 	return true;
 
 }
 
 bool
-Object::setColor(const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_T) {
-	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _T < 0 || _T > 1)
+Object::setColor(const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
+	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1)
 		return false;
 	defColor_[0] = _R;
 	defColor_[1] = _G;
 	defColor_[2] = _B;
-	defColor_[3] = _T;
+	defColor_[3] = _A;
 	
-	cout << "Nowy kolor (" << name << "): " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << endl;
+#ifdef __DEBUG__
+	cout << LOG_INFO << name << ": nowy kolor: " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << ", " << defColor_[3] << endl;
+#endif
 	
 	return true;
 }
@@ -275,7 +288,9 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_T)
 	
 	defColor_ = sColor((GLfloat)_R/255, (GLfloat)_G/255, (GLfloat)_B/255, _T);
 	
-	cout << "Nowy kolor (" << name << "): " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << endl;
+#ifdef __DEBUG__
+	cout << LOG_INFO << name << ": nowy kolor: " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << endl;
+#endif
 	
 	return true;
 	
@@ -283,11 +298,21 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_T)
 
 bool
 Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsigned int &_whatToLoad) {
-	cout << "Wczytywanie obiektu: " << name << "... ";
-        if (!fileExists(_objFile))
-                cout << "Nie znalazłem pliku: " << _objFile << endl;
-        if (!fileExists(_mtlFile))
-                cout << "Nie znalazłem pliku: " << _mtlFile << endl;
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Wczytywanie obiektu: " << name << "... ";
+#endif
+	if (!fileExists(_objFile)) {
+#ifdef __DEBUG__
+		cout << LOG_WARN << name << ": nie znalazłem pliku: " << _objFile << endl;
+#endif
+		return false;
+	}
+	if (!fileExists(_mtlFile)) {
+#ifdef __DEBUG__
+		cout << LOG_WARN << name << ": nie znalazłem pliku: " << _mtlFile << endl;
+#endif
+		return false;
+	}
 
 	vector < sVertex > vertices; // tymczasowy wektor współrzędnych wierzchołków
 	vector < sCoords > texture; // tymczasowy wektor współrzędnych tekstury
@@ -448,7 +473,9 @@ Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsign
 				line >> temp >> pic;
 				string picLoc = "texture/" + pic;
 				if (!this -> loadTexture(picLoc)) {
-					cout << "Nie udało się załadować tekstury!";
+#ifdef __DEBUG__
+					cout << LOG_WARN << name << ": nie udało się załadować tekstury!";
+#endif
 					return false;
 				}
 			}
@@ -458,12 +485,14 @@ Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsign
 
 	if (_whatToLoad & GET_NORMALS)
 		hasNormals_ = true;
-
+	
+#ifdef __DEBUG__
 	cout << "wczytano " << (int)(pointers_.size() / 3) << " poligonów";
 	if (_whatToLoad & GET_NORMALS)
 		cout << ", " << normals_.size() << " normalnych";
 	cout << ".\n";
 	cout.flush();
+#endif
 	
 	return true;
 

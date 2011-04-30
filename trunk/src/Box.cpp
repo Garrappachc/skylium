@@ -23,7 +23,7 @@ Box::~Box() {
 	
 }
 
-bool
+void
 Box::show() {
 	glPushMatrix();
 	if (!texture_)
@@ -72,6 +72,4 @@ Box::show() {
 		shader_ -> toggle();
 
 	glPopMatrix();
-
-	return true;
 }
