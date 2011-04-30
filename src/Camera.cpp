@@ -10,6 +10,7 @@
 #include <SDL/SDL.h>
 
 #include "../include/Camera.h"
+#include "../include/defines.h"
 
 static const double PI = 3.1415265359;
 static const double PIdiv180 = PI/180.0;
@@ -104,9 +105,10 @@ Camera::resetCameraPosition() {
 	mov_ = sVec3D< GLdouble >(0, 0, 0);
 }
 
-bool
+void
 Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 	center_ = sVec3D< GLdouble >(x, y, z);
-	cout << "LookAt: " << center_[0] << ", " << center_[1] << ", " << center_[2] << endl;
-	return true;
+#ifdef __DEBUG__
+	cout << LOG_INFO << "LookAt: " << center_[0] << ", " << center_[1] << ", " << center_[2] << endl;
+#endif
 }

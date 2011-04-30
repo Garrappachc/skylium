@@ -21,6 +21,7 @@
 #include "../include/Object.h"
 
 #include "../include/functions.h"
+#include "../include/defines.h"
 
 
 using namespace std;
@@ -37,26 +38,25 @@ Skylium::Skylium() {
 	lastMousePositionY_ = 0;
 	surfDisplay_ = NULL;
 	isRunning_ = true;
+	cout << LOG_INFO << "Utworzono instancję klasy Skylium...\n";
 }
 
 Skylium::~Skylium() {
+	cout << LOG_INFO << "Czyszczenie... ";
 	delete sceneManagement_;
+	cleanup();
+	cout << "C'ya!\n";
 }
 
-bool
+void
 Skylium::execute() {
-	
 	SDL_Event tempEvent;
 	while (isRunning_) {
 		while (SDL_PollEvent(&tempEvent))
 			event(&tempEvent);
-		loop();
+//		loop();
 		render();
 	}
-	
-	cleanup();
-	
-	return true;
 }
 
 bool
@@ -95,7 +95,7 @@ Skylium::init() {
 	return true;
 }
 
-bool
+void
 Skylium::event(SDL_Event *tempEvent) {
 	switch (tempEvent->type) {
 		case SDL_KEYDOWN:
@@ -129,15 +129,14 @@ Skylium::event(SDL_Event *tempEvent) {
 			lastMousePositionY_ = y;
 			break;
 	}
-	return true;
 }
 
-bool
+void
 Skylium::loop() {
-	return true;
+	
 }
 
-bool
+void
 Skylium::render() {
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_COLOR_MATERIAL);
@@ -150,15 +149,12 @@ Skylium::render() {
 	sceneManagement_ -> displayActiveScene();
 
 	SDL_GL_SwapBuffers();
-
-	return true;
 }
 
-bool
+void
 Skylium::cleanup() {
 	SDL_FreeSurface(surfDisplay_);
 	SDL_Quit();
-	return true;
 }
 
 Scene *

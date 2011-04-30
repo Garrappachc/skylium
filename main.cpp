@@ -69,11 +69,6 @@ main() {
 		exit(1);
 
 	Scene *scenka = s_main -> createScene("Scenka");
-	//scenka -> setSpecularLight(0.99, 0.99, 0.99, 1.0);
-	//scenka -> setDiffuseLight(0.9, 0.9, 0.9, 1.0);
-	scenka -> setAmbientLight(0.5, 0.5, 0.5, 1.0);
-	//scenka -> setLightPosition(6.0, 6.0, 0.0);
-	//scenka -> toggleLight();
 
 	Object *pudelko = scenka -> createBox("Pudelko");
 	pudelko -> scale(-3, -3, -3);
@@ -96,10 +91,13 @@ main() {
 	
 	cienie -> bind(malpka);
 
-	pudelko ->showStats();
-	malpka ->showStats();
+	int swiatelko = scenka -> createLight(6.0, 6.0, 0.0);
+	scenka ->setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0);
+	scenka ->toggleLight();
 	
 	s_main -> execute();
+	
+	delete s_main;
 
 	return 0;
 }

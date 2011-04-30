@@ -71,9 +71,8 @@ public:
 
 	/**
 	 * Renderuje obiekt.
-     * @return false, jeżeli coś poszło nie tak.
      */
-	virtual bool show();
+	virtual void show();
 
 	/**
 	 * Przesuwa obiekt o dany wektor.

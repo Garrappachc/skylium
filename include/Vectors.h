@@ -8,6 +8,9 @@
 #ifndef VECTORS_H
 #define	VECTORS_H
 
+#include <GL/gl.h>
+#include <cstring>
+
 template < typename T >
 class sVec3D {
 private:

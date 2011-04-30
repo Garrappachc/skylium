@@ -18,7 +18,7 @@ class Camera {
 public:
 	Camera();
 	Camera(const GLdouble&, const GLdouble&, const GLdouble&);
-
+	
 	/**
 	 * GL_PROJECTION;
 	 * gluPerspective.
@@ -57,11 +57,11 @@ public:
 	 * Ustawia punkt, na który patrzy się kamera.
 	 * Jako argument przyjmuje albo trzy GLdouble, które definiują punkt (x, y, z),
 	 * albo tablicę GLdouble (p[0], p[1], p[2]).
-     * @param x;
-     * @param y;
-     * @param z.
+     * @param x Pozycja X.
+     * @param y Pozycja Y.
+     * @param z Pozycja Z.
      */
-	bool lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
+	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
 	
 	/**
 	 * Ustawia kamerę w pozycji początkowej.
@@ -82,16 +82,16 @@ private:
 	GLdouble Yaxis_;
 	
 	/* Punkt, w którym znajduje się kamera */
-	sVec3D <GLdouble> eye_;
+	sVec3D< GLdouble > eye_;
 
 	/* Punkt, na który patrzy się kamera */
-	sVec3D <GLdouble> center_;
+	sVec3D< GLdouble > center_;
 
 	/* Wektor zmiany kierunku patrzenia kamery */
-	sVec3D <GLdouble> up_;
+	sVec3D< GLdouble > up_;
 	/* Wartości, którymi będziemy zmieniać położenie kamery; */
 	/* będzie jeździła. */
-	sVec3D <GLdouble> mov_;
+	sVec3D< GLdouble > mov_;
 
 	/*** Inne ***/
 	int windowWidth_;

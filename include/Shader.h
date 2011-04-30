@@ -34,14 +34,14 @@ public:
 	 * Włącza program, jeżeli jest wyłączony i wyłącza, jeżeli jest włączony.
      * @return Zawsze true.
      */
-	bool toggle();
+	void toggle();
 	
 	/**
 	 * Przypina shadera do danego obiektu.
      * @param dest Wskaźnik obiektu, do którego ma być przypięty shader.
      * @return false, jeżeli coś poszło nie tak.
      */
-	bool bind(Object*);
+	void bind(Object*);
 
 private:
 	std::string vertFile_;

@@ -10,19 +10,18 @@
 
 using namespace std;
 
-SceneManager::SceneManager() { // nad tym będziemy mysleć
-}
+SceneManager::SceneManager() :
+		sceneList_(0),
+		activeScene_(NULL) {}
 
 SceneManager::~SceneManager() {
-	for (int i = sceneList_.size() - 1; i >= 0; i--) {
-		delete sceneList_[i];
-		sceneList_.pop_back();
-	}
+	while (!sceneList_.empty())
+		delete sceneList_.back(), sceneList_.pop_back();
 }
 
 Scene *
-SceneManager::createScene(const string &newSceneName) {
-	Scene *newScene = new Scene(newSceneName);
+SceneManager::createScene(const string &_newSceneName) {
+	Scene *newScene = new Scene(_newSceneName);
 	sceneList_.push_back(newScene);
 	if (sceneList_.size() == 1) {
 		activeScene_ = newScene;
@@ -34,24 +33,23 @@ bool
 SceneManager::displayActiveScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-#ifdef _DEBUG_STRONG
+#ifdef __DEBUG_STRONG__
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
-	//glEnable(GL_COLOR_MATERIAL);
 
 	if (activeScene_) {
-		activeScene_ -> showAllObjects();
+		activeScene_ -> show();
 		return true;
 	}
 	return false;
 }
 
 bool
-SceneManager::setActive(const std::string& sceneName) {
+SceneManager::setActive(const string &_sceneName) {
 	if (sceneList_.size() == 0)
 		return false;
 	for (int i = 0; i < (int)sceneList_.size(); i++) {
-		if (sceneList_[i] -> name == sceneName) {
+		if (sceneList_[i] -> name == _sceneName) {
 			activeScene_ = sceneList_[i];
 			return true;
 		}
@@ -60,11 +58,11 @@ SceneManager::setActive(const std::string& sceneName) {
 }
 
 bool
-SceneManager::setActive(const Scene* scenePointer) {
+SceneManager::setActive(const Scene *_scenePointer) {
 	if (sceneList_.size() == 0)
 		return false;
 	for (int i = 0; i < (int)sceneList_.size(); i++) {
-		if (sceneList_[i] == scenePointer) {
+		if (sceneList_[i] == _scenePointer) {
 			activeScene_ = sceneList_[i];
 			return true;
 		}
@@ -73,11 +71,11 @@ SceneManager::setActive(const Scene* scenePointer) {
  }
 
 Scene *
-SceneManager::getSceneByName(const std::string& sceneName) {
+SceneManager::getSceneByName(const string &_sceneName) {
 	if (sceneList_.size() == 0)
 		return 0;
 	for (int i = 0; i < (int)sceneList_.size(); i++) {
-		if (sceneList_[i] -> name == sceneName)
+		if (sceneList_[i] -> name == _sceneName)
 			return sceneList_[i];
 	}
 	return 0;

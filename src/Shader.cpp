@@ -17,39 +17,46 @@
 #include <sys/stat.h>
 
 #include "../include/Shader.h"
+#include "../include/defines.h"
 
 using namespace std;
 
 static const unsigned int MAX_LOG_SIZE = 4096;
 
 Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileName) : vertFile_(_vertFileName), fragFile_(_fragFileName), isRunning_(false) {
-	vertexShader_ = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	fragmentShader_ = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	vertexShader_ = glCreateShader(GL_VERTEX_SHADER_ARB);
+	fragmentShader_ = glCreateShader(GL_FRAGMENT_SHADER_ARB);
 }
 
 Shader::~Shader() {
-	glDetachObjectARB(shaderProgram_, vertexShader_);
-	glDetachObjectARB(shaderProgram_, fragmentShader_);
+	glDetachShader(shaderProgram_, vertexShader_);
+	glDetachShader(shaderProgram_, fragmentShader_);
 
 	glDeleteProgram(shaderProgram_);
 
-	glDeleteObjectARB(vertexShader_);
-	glDeleteObjectARB(fragmentShader_);
+	glDeleteShader(vertexShader_);
+	glDeleteShader(fragmentShader_);
 
 }
 
 bool
 Shader::make() {
 	if (!fileExists(vertFile_)) {
-		cout << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << vertFile_ << ".\n";
+#ifdef __DEBUG__
+		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << vertFile_ << ".\n";
+#endif
 		return false;
 	}
 	if (!fileExists(fragFile_)) {
-		cout << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << fragFile_ << ".\n";
+#ifdef __DEBUG__
+		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << fragFile_ << ".\n";
+#endif
 		return false;
 	}
-
-	cout << "Odczytywanie źródeł shaderów... ";
+	
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Odczytywanie źródeł shaderów... ";
+#endif
 	ifstream vertFile(vertFile_.c_str());
 	string vertData = "";
 	while (!vertFile.eof()) {
@@ -67,8 +74,9 @@ Shader::make() {
 		fragData += temp;
 	}
 	fragFile.close();
-
-	cout << "Odczytano.\nKompilowanie programów shaderów... ";
+#ifdef __DEBUG__
+	cout << "Odczytano.\n" << LOG_INFO << "Kompilowanie programów shaderów... ";
+#endif
 
 	const char *vert = vertData.c_str();
 	const char *frag = fragData.c_str();
@@ -76,17 +84,19 @@ Shader::make() {
 	GLint vlength = vertData.length();
 	GLint flength = fragData.length();
 	
-	glShaderSourceARB(vertexShader_, 1, (const GLchar**)&vert, &vlength);
-	glShaderSourceARB(fragmentShader_, 1, (const GLchar**)&frag, &flength);
+	glShaderSource(vertexShader_, 1, (const GLchar**)&vert, &vlength);
+	glShaderSource(fragmentShader_, 1, (const GLchar**)&frag, &flength);
 
 	int result;
 
-	glCompileShaderARB(vertexShader_);
+	glCompileShader(vertexShader_);
 	glGetShaderiv(vertexShader_, GL_COMPILE_STATUS, &result);
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
 		glGetShaderInfoLog(vertexShader_, MAX_LOG_SIZE, NULL, msg);
-		cout << "\n   Błąd kompilacji vertex shadera! Log kompilacji:\n" << msg << endl;
+#ifdef __DEBUG__
+		cout << endl << LOG_ERROR << "Błąd kompilacji vertex shadera! Log kompilacji:\n" << msg << endl;
+#endif
 		return 0;
 	}
 
@@ -95,21 +105,25 @@ Shader::make() {
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
 		glGetShaderInfoLog(fragmentShader_, MAX_LOG_SIZE, NULL, msg);
-		cout << "\n   Błąd kompilacji fragment shadera! Log kompilacji:\n" << msg << endl;
+#ifdef __DEBUG__
+		cout << endl << LOG_ERROR << "Błąd kompilacji fragment shadera! Log kompilacji:\n" << msg << endl;
+#endif
 		return 0;
 	}
 
 	shaderProgram_ = glCreateProgram();
-	glAttachObjectARB(shaderProgram_, vertexShader_);
-	glAttachObjectARB(shaderProgram_, fragmentShader_);
+	glAttachShader(shaderProgram_, vertexShader_);
+	glAttachShader(shaderProgram_, fragmentShader_);
 
-	glLinkProgramARB(shaderProgram_);
+	glLinkProgram(shaderProgram_);
 
 	glGetProgramiv(shaderProgram_, GL_LINK_STATUS, &result);
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
 		glGetProgramInfoLog(shaderProgram_, MAX_LOG_SIZE, NULL, msg);
-		cout << "\n   Błąd przy linkowaniu shadera! Log linkera:\n" << msg << endl;
+#ifdef __DEBUG__
+		cout << endl << LOG_ERROR << "Błąd przy linkowaniu shadera! Log linkera:\n" << msg << endl;
+#endif
 		return false;
 	}
 
@@ -118,7 +132,7 @@ Shader::make() {
 
 }
 
-bool
+void
 Shader::toggle() {
 	if (!isRunning_) {
 		glUseProgram(shaderProgram_);
@@ -127,13 +141,11 @@ Shader::toggle() {
 		glUseProgram(0);
 		isRunning_ = false;
 	}
-	return true;
 }
 
-bool
+void
 Shader::bind(Object *_dest) {
 	_dest -> shader_ = this;
-	return true;
 }
 
 bool
