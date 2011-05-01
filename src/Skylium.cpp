@@ -38,14 +38,20 @@ Skylium::Skylium() {
 	lastMousePositionY_ = 0;
 	surfDisplay_ = NULL;
 	isRunning_ = true;
+#ifdef __DEBUG__
 	cout << LOG_INFO << "Utworzono instancję klasy Skylium...\n";
+#endif
 }
 
 Skylium::~Skylium() {
+#ifdef __DEBUG__
 	cout << LOG_INFO << "Czyszczenie... ";
+#endif
 	delete sceneManagement_;
 	cleanup();
+#ifdef __DEBUG__
 	cout << "C'ya!\n";
+#endif
 }
 
 void

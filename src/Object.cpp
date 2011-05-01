@@ -27,7 +27,12 @@
 
 using namespace std;
 
-Object::Object (const string &_name, const GLfloat *vertex, const int &_size) :
+material::material() :
+		ambient(0.2, 0.2, 0.2, 1.0),
+		diffuse(0.8, 0.8, 0.8, 1.0),
+		specular(0.0, 0.0, 0.0, 1.0) {}
+
+Object::Object (const string &_name, const GLfloat *_pointers, const int &_size) :
 		name(_name),
 		texCoords_(0),
 		texture_(0),
@@ -36,13 +41,14 @@ Object::Object (const string &_name, const GLfloat *vertex, const int &_size) :
 		colors_(0),
 		hasColors_(false),
 		defColor_(1.0, 1.0, 1.0, 1.0),
+		usedMtl_(),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
 		scale_(0, 0, 0),
 		shader_(0) {
 	
 	for (int i = 0; i < _size; i++) {
-		pointers_[i] = vertex[i];
+		pointers_[i] = _pointers[i];
 	}
 }
 
@@ -55,6 +61,7 @@ Object::Object(const string &_name, const sArray &_pointers) :
 		colors_(0),
 		hasColors_(false),
 		defColor_(1.0, 1.0, 1.0, 1.0),
+		usedMtl_(),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
 		scale_(0, 0, 0),
@@ -73,6 +80,7 @@ Object::Object(const string &_name) :
 		colors_(0),
 		hasColors_(false),
 		defColor_(1.0, 1.0, 1.0, 1.0),
+		usedMtl_(),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
 		scale_(0, 0, 0),
@@ -89,6 +97,7 @@ Object::Object() :
 		colors_(0),
 		hasColors_(false),
 		defColor_(1.0, 1.0, 1.0, 1.0),
+		usedMtl_(),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
 		scale_(0, 0, 0),
@@ -126,6 +135,10 @@ Object::show() {
 		glEnable(GL_TEXTURE_2D);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
+	
+	glMaterialfv(GL_FRONT, GL_AMBIENT, &usedMtl_.ambient[0]);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, &usedMtl_.diffuse[0]);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, &usedMtl_.specular[0]);
 
 	glTranslated(mov_[0], mov_[1], mov_[2]);
 
@@ -297,9 +310,10 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_T)
 }
 
 bool
-Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsigned int &_whatToLoad) {
+Object::loadFromObj(const string &_objFile, const unsigned int &_whatToLoad) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Wczytywanie obiektu: " << name << "... ";
+	cout.flush();
 #endif
 	if (!fileExists(_objFile)) {
 #ifdef __DEBUG__
@@ -307,12 +321,13 @@ Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsign
 #endif
 		return false;
 	}
-	if (!fileExists(_mtlFile)) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znalazłem pliku: " << _mtlFile << endl;
-#endif
-		return false;
+	
+	unsigned int lastSlash = 0;
+	while (_objFile.find('/', lastSlash+1) != string::npos) {
+		lastSlash = _objFile.find('/', lastSlash+1);
 	}
+	
+	string loc = _objFile.substr(0, lastSlash+1);
 
 	vector < sVertex > vertices; // tymczasowy wektor współrzędnych wierzchołków
 	vector < sCoords > texture; // tymczasowy wektor współrzędnych tekstury
@@ -321,13 +336,14 @@ Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsign
 	/* Jeszcze kilka zmiennych tymczasowych */
 	string buffer = "";
 	string temp = "";
-	string tbl[3];
 
 	sVertex v(3);
 	sCoords t(2);
 	sVertex n(3);
 
 	int i = 0, j = 0;
+	
+	string mtlFileName;
 
 	fstream objFile(_objFile.c_str(), ios::in);
 	
@@ -337,121 +353,140 @@ Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsign
 					continue;
 				
 				istringstream line(buffer);
-				string ch = buffer.substr(0, 2);
 
-				if (ch == "v ") {
-					line >> temp >> tbl[0] >> tbl[1] >> tbl[2];
-					v[0] = strToNum< GLfloat >(tbl[0]);
-					v[1] = strToNum< GLfloat >(tbl[1]);
-					v[2] = strToNum< GLfloat >(tbl[2]);
+				if (buffer.substr(0, 6) == "mtllib") {
+					line >> temp >> mtlFileName;
+					continue;
+				} else if (buffer.substr(0, 2) == "v ") {
+					line >> temp >> v[0] >> v[1] >> v[2];
 					vertices.push_back(v);
-				} else if (ch == "vt") {
-					line >> temp >> tbl[0] >> tbl[1];
-					t[0] = strToNum< int >(tbl[0]);
-					t[1] = strToNum< int >(tbl[1]);
+					continue;
+				} else if (buffer.substr(0, 2) == "vt") {
+					line >> temp >> t[0] >> t[1];
 					texture.push_back(t);
-				} else if (ch == "vn") {
-					line >> temp >> tbl[0] >> tbl[1] >> tbl[2];
-					n[0] = strToNum< GLfloat >(tbl[0]);
-					n[1] = strToNum< GLfloat >(tbl[1]);
-					n[2] = strToNum< GLfloat >(tbl[2]);
+					continue;
+				} else if (buffer.substr(0, 2) == "vn") {
+					line >> temp >> n[0] >> n[1] >> n[2];
 					normals.push_back(n);
-				} else if (ch[0] == 'f') {
-					if (_whatToLoad == (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) {
-						line >> temp >> tbl[0] >> tbl[1] >> tbl[2];
-						int slashPos1 = tbl[0].find('/');
-						int slashPos2 = tbl[0].find('/', slashPos1 + 1);
-						int vx = strToNum< int >(tbl[0].substr(0, slashPos1)) - 1;
-						int tx = strToNum< int >(tbl[0].substr(slashPos1+1, slashPos2 - slashPos1 - 1)) - 1;
-						int nx = strToNum< int >(tbl[0].substr(slashPos2 + 1)) - 1;
-
-						slashPos1 = tbl[1].find('/');
-						slashPos2 = tbl[1].find('/', slashPos1 + 1);
-						int vy = strToNum< int >(tbl[1].substr(0, slashPos1)) - 1;
-						int ty = strToNum< int >(tbl[1].substr(slashPos1+1, slashPos2 - slashPos1 - 1)) - 1;
-						int ny = strToNum< int >(tbl[1].substr(slashPos2+1)) - 1;
-
-						slashPos1 = tbl[2].find('/');
-						slashPos2 = tbl[2].find('/', slashPos1 + 1);
-						int vz = strToNum< int >(tbl[2].substr(0, slashPos1)) - 1;
-						int tz = strToNum< int >(tbl[2].substr(slashPos1+1, slashPos2 - slashPos1 - 1)) - 1;
-						int nz = strToNum< int >(tbl[2].substr(slashPos2+1)) - 1;
+					continue;
+				} else if (buffer[0] == 'f') {
+					if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) == (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) {
+						
+						char d;
+						int vx, nx, tx, vy, ny, ty, vz, nz, tz;
+						
+						line >> temp >>
+								vx >> d >> tx >> d >> nx >>
+								vy >> d >> ty >> d >> ny >>
+								vz >> d >> tz >> d >> nz;
 
 						pointers_.resize(i + 9);
 						texCoords_.resize(j + 6);
 						normals_.resize(i + 9);
 
-						pointers_[i] = vertices[vx][0];
-						normals_[i++] = normals[nx][0];
+						pointers_[i] = vertices[--vx][0];
+						normals_[i++] = normals[--nx][0];
 						pointers_[i] = vertices[vx][1];
 						normals_[i++] = normals[nx][1];
 						pointers_[i] = vertices[vx][2];
 						normals_[i++] = normals[nx][2];
 
-						pointers_[i] = vertices[vy][0];
-						normals_[i++] = normals[ny][0];
+						pointers_[i] = vertices[--vy][0];
+						normals_[i++] = normals[--ny][0];
 						pointers_[i] = vertices[vy][1];
 						normals_[i++] = normals[ny][1];
 						pointers_[i] = vertices[vy][2];
 						normals_[i++] = normals[ny][2];
 
-						pointers_[i] = vertices[vz][0];
-						normals_[i++] = normals[nz][0];
+						pointers_[i] = vertices[--vz][0];
+						normals_[i++] = normals[--nz][0];
 						pointers_[i] = vertices[vz][1];
 						normals_[i++] = normals[nz][1];
 						pointers_[i] = vertices[vz][2];
 						normals_[i++] = normals[nz][2];
 
-						texCoords_[j++] = texture[tx][0];
+						texCoords_[j++] = texture[--tx][0];
 						texCoords_[j++] = texture[tx][1];
-						texCoords_[j++] = texture[ty][0];
+						texCoords_[j++] = texture[--ty][0];
 						texCoords_[j++] = texture[ty][1];
-						texCoords_[j++] = texture[tz][0];
+						texCoords_[j++] = texture[--tz][0];
 						texCoords_[j++] = texture[tz][1];
+						
+						continue;
 
+					} else if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE)) == (GET_VERTICES | GET_TEXTURE)) {
+						
+						char d;
+						int vx, vy, vz, tx, ty, tz;
+						
+						line >> temp >>
+								vx >> d >> tx >>
+								vy >> d >> ty >>
+								vz >> d >> tz;
 
-					} else if (_whatToLoad == (GET_VERTICES | GET_TEXTURE)) {
+						pointers_.resize(i + 9);
+						texCoords_.resize(j + 6);
 
-					} else if (_whatToLoad == (GET_VERTICES | GET_NORMALS)) {
-						line >> temp >> tbl[0] >> tbl[1] >> tbl[2];
-						int slashPos1 = tbl[0].find('/');
-						int slashPos2 = tbl[0].find('/', slashPos1 + 1);
-						int vx = strToNum< int >(tbl[0].substr(0, slashPos1)) - 1;
-						int nx = strToNum< int >(tbl[0].substr(slashPos2 + 1)) - 1;
+						pointers_[i] = vertices[--vx][0];
+						pointers_[i] = vertices[vx][1];
+						pointers_[i] = vertices[vx][2];
 
-						slashPos1 = tbl[1].find('/');
-						slashPos2 = tbl[1].find('/', slashPos1 + 1);
-						int vy = strToNum< int >(tbl[1].substr(0, slashPos1)) - 1;
-						int ny = strToNum< int >(tbl[1].substr(slashPos2+1)) - 1;
+						pointers_[i] = vertices[--vy][0];
+						pointers_[i] = vertices[vy][1];
+						pointers_[i] = vertices[vy][2];
 
-						slashPos1 = tbl[2].find('/');
-						slashPos2 = tbl[2].find('/', slashPos1 + 1);
-						int vz = strToNum< int >(tbl[2].substr(0, slashPos1)) - 1;
-						int nz = strToNum< int >(tbl[2].substr(slashPos2+1)) - 1;
+						pointers_[i] = vertices[--vz][0];
+						pointers_[i] = vertices[vz][1];
+						pointers_[i] = vertices[vz][2];
+
+						texCoords_[j++] = texture[--tx][0];
+						texCoords_[j++] = texture[tx][1];
+						texCoords_[j++] = texture[--ty][0];
+						texCoords_[j++] = texture[ty][1];
+						texCoords_[j++] = texture[--tz][0];
+						texCoords_[j++] = texture[tz][1];
+						
+						continue;
+
+					} else if ((_whatToLoad & (GET_VERTICES | GET_NORMALS)) == (GET_VERTICES | GET_NORMALS)) {
+						
+						char d;
+						int vx, nx, vy, ny, vz, nz;
+						
+						/* example:
+						 f 5521//1950 1296//1869 3589//1872
+						 */
+						
+						line >> temp >>
+								vx >> d >> d >> nx >>
+								vy >> d >> d >> ny >>
+								vz >> d >> d >> nz;
 
 						pointers_.resize(i + 9);
 						normals_.resize(i + 9);
 
-						pointers_[i] = vertices[vx][0];
-						normals_[i++] = normals[nx][0];
+						pointers_[i] = vertices[--vx][0];
+						normals_[i++] = normals[--nx][0];
 						pointers_[i] = vertices[vx][1];
 						normals_[i++] = normals[nx][1];
 						pointers_[i] = vertices[vx][2];
 						normals_[i++] = normals[nx][2];
 
-						pointers_[i] = vertices[vy][0];
-						normals_[i++] = normals[ny][0];
+						pointers_[i] = vertices[--vy][0];
+						normals_[i++] = normals[--ny][0];
 						pointers_[i] = vertices[vy][1];
 						normals_[i++] = normals[ny][1];
 						pointers_[i] = vertices[vy][2];
 						normals_[i++] = normals[ny][2];
 
-						pointers_[i] = vertices[vz][0];
-						normals_[i++] = normals[nz][0];
+						pointers_[i] = vertices[--vz][0];
+						normals_[i++] = normals[--nz][0];
 						pointers_[i] = vertices[vz][1];
 						normals_[i++] = normals[nz][1];
 						pointers_[i] = vertices[vz][2];
 						normals_[i++] = normals[nz][2];
+						
+						continue;
 
 					}
 				}
@@ -459,25 +494,49 @@ Object::loadFromObj(const string &_objFile, const string &_mtlFile, const unsign
 	}
 
 	objFile.close();
-
-	fstream mtlFile(_mtlFile.c_str(), ios::in);
-
-	if (_whatToLoad & GET_TEXTURE) {
-		while(!mtlFile.eof()) {
-			getline(mtlFile, buffer);
-			if (buffer.substr(0, 4) != "map_") {
-				continue;
-			} else {
-				istringstream line(buffer);
-				string pic;
-				line >> temp >> pic;
-				string picLoc = "texture/" + pic;
-				if (!this -> loadTexture(picLoc)) {
+	
+	mtlFileName = loc + mtlFileName;
+	
+	if (!fileExists(mtlFileName)) {
 #ifdef __DEBUG__
-					cout << LOG_WARN << name << ": nie udało się załadować tekstury!";
+		cout << endl << LOG_WARN << name << ": nie znalazłem pliku: " << mtlFileName << endl;
 #endif
-					return false;
-				}
+		return false;
+	}
+
+	fstream mtlFile(mtlFileName.c_str(), ios::in);
+	
+	while(!mtlFile.eof()) {
+		getline(mtlFile, buffer);
+		istringstream line(buffer);
+		if (buffer[0] == '#') {
+			continue;
+		} else if (buffer.substr(0, 2) == "Ka") {
+			if (!(_whatToLoad & GET_MATERIAL))
+				continue;
+			line >> temp >> usedMtl_.ambient[0] >> usedMtl_.ambient[1] >> usedMtl_.ambient[2];
+			continue;
+		} else if (buffer.substr(0, 2) == "Kd") {
+			if (!(_whatToLoad & GET_MATERIAL))
+				continue;
+			line >> temp >> usedMtl_.diffuse[0] >> usedMtl_.diffuse[1] >> usedMtl_.diffuse[2];
+			continue;
+		} else if (buffer.substr(0, 2) == "Ks") {
+			if (!(_whatToLoad & GET_MATERIAL))
+				continue;
+			line >> temp >> usedMtl_.specular[0] >> usedMtl_.specular[1] >> usedMtl_.specular[2];
+			continue;
+		} else if (buffer.substr(0, 4) == "map_") {
+			if (!(_whatToLoad & GET_TEXTURE))
+				continue;
+			string pic;
+			line >> temp >> pic;
+			string picLoc = "texture/" + pic;
+			if (!this -> loadTexture(picLoc)) {
+#ifdef __DEBUG__
+				cout << LOG_WARN << name << ": nie udało się załadować tekstury!";
+#endif
+				return false;
 			}
 		}
 	}

@@ -305,7 +305,10 @@ Scene::setLights() {
 	lightIterator_ = lightList_.begin();
 	while (lightIterator_ != lightList_.end()) {
 		if (*lightIterator_ != 0) {
-			glEnable(lights[i]);
+			if ((*lightIterator_)->working_ )
+				glEnable(lights[i]);
+			else
+				glDisable(lights[i]);
 			glLightfv(lights[i], GL_AMBIENT, (*lightIterator_)->ambientLight_);
 			glLightfv(lights[i], GL_DIFFUSE, (*lightIterator_)->diffuseLight_);
 			glLightfv(lights[i], GL_SPECULAR, (*lightIterator_)->specularLight_);
