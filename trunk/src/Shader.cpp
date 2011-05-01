@@ -127,7 +127,9 @@ Shader::make() {
 		return false;
 	}
 
+#ifdef __DEBUG__
 	cout << "Zrobione!\n";
+#endif
 	return true;
 
 }

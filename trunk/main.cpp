@@ -77,7 +77,7 @@ main() {
 		cout << "Nie udało się załadować tekstury!";
 
 	Object *malpka = scenka -> createObject("malpka");
-	malpka->loadFromObj("objects/monkey.obj", "objects/monkey.mtl", GET_VERTICES | GET_NORMALS);
+	malpka->loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL);
 	if (!malpka) {
 		cout << "Malpka nie działa.\n";
 	}

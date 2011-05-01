@@ -29,6 +29,15 @@ typedef std::vector < int > sCoords;
 
 class Shader;
 
+/* Przechowujemy informacje o materiale */
+struct material {
+	sColor ambient;
+	sColor diffuse;
+	sColor specular;
+	
+	material();
+};
+
 /**
  * Klasa, której instancjami są osobne obiekty na scenie.
  * Każdym obiektem można przesuwać, obracać, etc, etc.
@@ -46,16 +55,16 @@ public:
 
 	/**
 	 * Konstruktor obiektu. Przymuje już gotowe tablice wierzchołków.
-     * @param name nazwa obiektu;
-     * @param vertex[] tablica wierzchołków;
-	 * @param size liczba współrzędnych wierzchołków.
+     * @param name Nazwa obiektu;
+     * @param pointers[] Tablica wierzchołków;
+	 * @param size Liczba współrzędnych wierzchołków.
      */
 	Object(const std::string&, const GLfloat*, const int&);
 
 	/**
 	 * Konstruktor obiektu. Przymuje już gotowe tablice wierzchołków.
      * @param name Nazwa obiektu.
-     * @param vertex[] Tablica wierzchołków.
+     * @param pointers Tablica wierzchołków.
      */
 	Object(const std::string&, const sArray&);
 
@@ -140,7 +149,6 @@ public:
 	/**
 	 * Wczytuje dane obiektu z pliku .obj i .mtl.
      * @param objFile Lokalizacja pliku .obj.
-     * @param mtlFile Lokalizacja pliku .mtl.
 	 * @param whatToLoad Definiuje, co ma się załadować. I tak:
 	 *		GET_VERTICES - ładuje tylko współrzędne wierzchołków. Jest to domyślna opcja, jeżeli nie zostanie nadmieniona, to i tak będzie dodana;
 	 *		GET_TEXTURE  - ładuje koordynaty tekstury oraz samą teksturę;
@@ -148,7 +156,7 @@ public:
 	 *		GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
      * @return false, jeżeli cokolwiek poszło nie tak.
      */
-	virtual bool loadFromObj(const std::string&, const std::string&, const unsigned int&);
+	virtual bool loadFromObj(const std::string&, const unsigned int&);
 	
 	/**
 	 * Pokazuje statystyki obiektu - przydatne przy debugowaniu.
@@ -191,6 +199,8 @@ protected:
 	 * Ogólny kolor obiektu.
 	 */
 	sColor defColor_;
+	
+	material usedMtl_;
 
 	/**
 	 * Wektor przesunięcia obiektu.
