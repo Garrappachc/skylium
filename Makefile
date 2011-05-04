@@ -2,7 +2,7 @@ CXX=g++
 CXXFLAGS=-g -Wall -ansi -pedantic
 LFLAGS=-lSOIL -lSDL -lglee -lGL -lGLU
 
-OBJS=Box.o Camera.o Light.o Material.cpp Object.o PolygonGroup.o Scene.o SceneManager.o Shader.o Skylium.o
+OBJS=Box.o Camera.o Light.o Material.o Object.o PolygonGroup.o Scene.o SceneManager.o Shader.o Skylium.o
 
 skylium: $(OBJS) main.o
 	$(CXX) -o $@ $(LFLAGS) $^
