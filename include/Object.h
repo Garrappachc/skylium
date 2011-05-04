@@ -1,8 +1,19 @@
 /* 
- * File:   Object.h
- * Author: Michał Garapich
+ * Object.h
+ * Copyright (C) 2011 Michał Garapich
  *
- * Created on 2 april 2011, 11:17
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
 #ifndef OBJECT_H
@@ -13,6 +24,7 @@
 #include <vector>
 
 #include "Vectors.h"
+#include "PolygonGroup.h"
 
 enum {
 	GET_VERTICES = 1,
@@ -21,22 +33,7 @@ enum {
 	GET_MATERIAL = 8
 };
 
-typedef std::vector < GLfloat > sArray;
-
-typedef std::vector < GLfloat > sVertex;
-
-typedef std::vector < int > sCoords;
-
 class Shader;
-
-/* Przechowujemy informacje o materiale */
-struct material {
-	sColor ambient;
-	sColor diffuse;
-	sColor specular;
-	
-	material();
-};
 
 /**
  * Klasa, której instancjami są osobne obiekty na scenie.
@@ -126,13 +123,6 @@ public:
      * @return false, jeżeli coś poszło nie tak.
      */
 	virtual bool loadTexture(const std::string&, const sArray&);
-
-	/**
-	 * Ładuje teksturę na obiekt.
-     * @param textureFile Lokalizacja w pliku z teksturą.
-     * @return false, jeżeli coś poszło nie tak.
-     */
-	virtual bool loadTexture(const std::string&);
 	
 	/**
 	 * Ustawia ogólny kolor obiektu.
@@ -150,75 +140,45 @@ public:
 	 * Wczytuje dane obiektu z pliku .obj i .mtl.
      * @param objFile Lokalizacja pliku .obj.
 	 * @param whatToLoad Definiuje, co ma się załadować. I tak:
-	 *		GET_VERTICES - ładuje tylko współrzędne wierzchołków. Jest to domyślna opcja, jeżeli nie zostanie nadmieniona, to i tak będzie dodana;
-	 *		GET_TEXTURE  - ładuje koordynaty tekstury oraz samą teksturę;
-	 *		GET_NORMALS  - ładuje normalne;
-	 *		GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
+	 *		&bull; GET_VERTICES - ładuje tylko współrzędne wierzchołków. Jest to domyślna opcja, jeżeli nie zostanie nadmieniona, to i tak będzie dodana;
+	 *		&bull; GET_TEXTURE  - ładuje koordynaty tekstury oraz samą teksturę;
+	 *		&bull; GET_NORMALS  - ładuje normalne;
+	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
      * @return false, jeżeli cokolwiek poszło nie tak.
      */
 	virtual bool loadFromObj(const std::string&, const unsigned int&);
-	
-	/**
-	 * Pokazuje statystyki obiektu - przydatne przy debugowaniu.
-     */
-	virtual void showStats();
 
 
 protected:
-
-	/**
-	 * Tablica wierzchołków. Wymiary 3 x X.
-	 */
-	sArray pointers_;
-
-	/**
-	 * Koordynaty tekstury.
-	 */
-	sArray texCoords_;
-
-	/**
-	 * Zmienna, która przechowuje wygenerowaną przez SOILa teksturę.
-	 */
-	GLuint texture_;
 	
-	/**
-	 * Tablica normalnych.
-	 */
-	sArray normals_;
+	/* Wektor grup poligonów */
+	std::vector< PolygonGroup* > pGroups_;
 	
-	bool hasNormals_;
-
-	/**
-	 * Tablica kolorów.
-	 */
-	sArray colors_;
-	
-	bool hasColors_;
+	/* Iterator */
+	std::vector< PolygonGroup* >::iterator pGroupsIterator_;
 	
 	/**
 	 * Ogólny kolor obiektu.
 	 */
 	sColor defColor_;
-	
-	material usedMtl_;
 
 	/**
 	 * Wektor przesunięcia obiektu.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glTranslate.xml
 	 */
-	sVec3D < GLdouble > mov_;
+	sVector mov_;
 
 	/**
 	 * Kąt obrotu obiektu.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glRotate.xml
 	 */
-	sVec3D < GLdouble > rot_;
+	sVector rot_;
 
 	/**
 	 * Wektor przybliżenia obiektu.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glScale.xml
 	 */
-	sVec3D < GLdouble > scale_;
+	sVector scale_;
 	
 	/**
 	 * Wskaźnik na shader, którego obiekt ma używać.
@@ -233,6 +193,26 @@ private:
      * @return True, jeżeli istnieje, w przeciwnym przypadku false.
      */
 	bool fileExists(const std::string&);
+	
+	/**
+	 * Parsuje plik .obj i zwraca true, jeżeli parsowanie się udało.
+     * @param fileName Nazwa pliku .obj.
+	 * @param whatToLoad Definiuje, co ma się załadować. I tak:
+	 *		&bull; GET_VERTICES - ładuje tylko współrzędne wierzchołków. Jest to domyślna opcja, jeżeli nie zostanie nadmieniona, to i tak będzie dodana;
+	 *		&bull; GET_TEXTURE  - ładuje koordynaty tekstury oraz samą teksturę;
+	 *		&bull; GET_NORMALS  - ładuje normalne;
+	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
+     */
+	void parseObj(const std::string&, const unsigned int&);
+	
+	/**
+	 * Parsuje plik .mtl i zwraca true, jeżeli parsowanie się udało.
+     * @param fileName Nazwa pliku .mtl.
+     */
+	void parseMtl(const std::string&);
+	
+	/* Wektor materiałów */
+	std::vector< Material* > materials_;
 
 };
 
