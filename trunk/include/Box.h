@@ -27,7 +27,6 @@ public:
 	 * @param name Name of the box (object).
 	*/
 	Box(const std::string&);
-	~Box();
 };
 
 #endif	/* BOX_H */

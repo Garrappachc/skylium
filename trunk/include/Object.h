@@ -73,12 +73,12 @@ public:
 	
 	Object();
 	
-	virtual ~Object();
+	~Object();
 
 	/**
 	 * Renderuje obiekt.
      */
-	virtual void show();
+	void show();
 
 	/**
 	 * Przesuwa obiekt o dany wektor.
@@ -87,7 +87,7 @@ public:
      * @param z;
 	 * @return zawsze true.
      */
-	virtual bool move(const GLdouble&, const GLdouble&, const GLdouble&);
+	bool move(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Skaluje obiekt o podane wartości.
@@ -96,7 +96,7 @@ public:
      * @param z;
      * @return zawsze true.
      */
-	virtual bool scale(const GLdouble&, const GLdouble&, const GLdouble&);
+	bool scale(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Obraca obiekt.
@@ -105,7 +105,7 @@ public:
      * @param rotZ Kąt obrotu wokół osi Z.
      * @return zawsze true.
      */
-	virtual bool rotate(const GLdouble&, const GLdouble&, const GLdouble&);
+	bool rotate(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Ładuje teksturę na obiekt.
@@ -114,7 +114,7 @@ public:
 	 * @param size liczba koordynat tekstury.
      * @return false, jeżeli coś poszło nie tak.
      */
-	virtual bool loadTexture(const std::string&, const GLfloat*, const int&);
+	bool loadTexture(const std::string&, const GLfloat*, const int&);
 
 	/**
 	 * Ładuje teksturę na obiekt.
@@ -122,7 +122,7 @@ public:
      * @param texturePointers Tablica koordynat tekstury;
      * @return false, jeżeli coś poszło nie tak.
      */
-	virtual bool loadTexture(const std::string&, const sArray&);
+	bool loadTexture(const std::string&, const sArray&);
 	
 	/**
 	 * Ustawia ogólny kolor obiektu.
@@ -132,9 +132,9 @@ public:
      * @param T Przezroczystość obiektu.
      * @return false, jeżeli wartość R, G lub B jest większa niż 255 i mniejsza niż 0 lub T jest spoza przedziału <0; 1>.
      */
-	virtual bool setColor(const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat&);
+	bool setColor(const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat&);
 	
-	virtual bool setColor(const int&, const int&, const int&, const GLfloat&);
+	bool setColor(const int&, const int&, const int&, const GLfloat&);
 
 	/**
 	 * Wczytuje dane obiektu z pliku .obj i .mtl.
@@ -146,7 +146,7 @@ public:
 	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
      * @return false, jeżeli cokolwiek poszło nie tak.
      */
-	virtual bool loadFromObj(const std::string&, const unsigned int&);
+	bool loadFromObj(const std::string&, const unsigned int&);
 
 
 protected:

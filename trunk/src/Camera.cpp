@@ -42,6 +42,9 @@ Camera::Camera() :
 	const SDL_VideoInfo *info = SDL_GetVideoInfo();
 	windowWidth_ = info -> current_w;
 	windowHeight_ = info -> current_h;
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Konstruktor: Camera()";
+#endif
 }
 
 Camera::Camera(const GLdouble& x, const GLdouble& y, const GLdouble& z) :
@@ -59,6 +62,15 @@ Camera::Camera(const GLdouble& x, const GLdouble& y, const GLdouble& z) :
 	const SDL_VideoInfo *info = SDL_GetVideoInfo();
 	windowWidth_ = info -> current_w;
 	windowHeight_ = info -> current_h;
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Konstruktor: Camera(const GLdouble&, const GLdouble&, const GLdouble&)";
+#endif
+}
+
+Camera::~Camera() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~Camera()";
+#endif
 }
 
 void
@@ -120,6 +132,6 @@ void
 Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 	center_ = sVec3D< GLdouble >(x, y, z);
 #ifdef __DEBUG__
-	cout << LOG_INFO << "LookAt: " << center_[0] << ", " << center_[1] << ", " << center_[2] << endl;
+	cout << LOG_INFO << "LookAt: " << center_[0] << ", " << center_[1] << ", " << center_[2];
 #endif
 }

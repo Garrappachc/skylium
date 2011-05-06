@@ -50,7 +50,7 @@ Skylium::Skylium() {
 	surfDisplay_ = NULL;
 	isRunning_ = true;
 #ifdef __DEBUG__
-	cout << LOG_INFO << "Utworzono instancję klasy Skylium...\n";
+	cout << LOG_INFO << "Utworzono instancję klasy Skylium...";
 #endif
 }
 
@@ -61,7 +61,7 @@ Skylium::~Skylium() {
 	delete sceneManagement_;
 	cleanup();
 #ifdef __DEBUG__
-	cout << "C'ya!\n";
+	cout << LOG_INFO << "C'ya!\n";
 #endif
 }
 

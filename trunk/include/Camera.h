@@ -30,6 +30,8 @@ public:
 	Camera();
 	Camera(const GLdouble&, const GLdouble&, const GLdouble&);
 	
+	~Camera();
+	
 	/**
 	 * GL_PROJECTION;
 	 * gluPerspective.

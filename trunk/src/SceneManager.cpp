@@ -18,6 +18,7 @@
 
 #include "../include/SceneManager.h"
 #include "../include/Scene.h"
+#include "../include/defines.h"
 
 using namespace std;
 
@@ -26,6 +27,9 @@ SceneManager::SceneManager() :
 		activeScene_(NULL) {}
 
 SceneManager::~SceneManager() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~SceneManager()";
+#endif
 	while (!sceneList_.empty())
 		delete sceneList_.back(), sceneList_.pop_back();
 }
@@ -34,7 +38,7 @@ Scene *
 SceneManager::createScene(const string &_newSceneName) {
 	Scene *newScene = new Scene(_newSceneName);
 	sceneList_.push_back(newScene);
-	if (sceneList_.size() == 1) {
+	if (!activeScene_) {
 		activeScene_ = newScene;
 	}
 	return newScene;

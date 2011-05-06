@@ -54,13 +54,13 @@ bool
 Shader::make() {
 	if (!fileExists(vertFile_)) {
 #ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << vertFile_ << ".\n";
+		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << vertFile_ << ".";
 #endif
 		return false;
 	}
 	if (!fileExists(fragFile_)) {
 #ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << fragFile_ << ".\n";
+		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << fragFile_ << ".";
 #endif
 		return false;
 	}
@@ -86,7 +86,7 @@ Shader::make() {
 	}
 	fragFile.close();
 #ifdef __DEBUG__
-	cout << "Odczytano.\n" << LOG_INFO << "Kompilowanie programów shaderów... ";
+	cout << "Odczytano." << LOG_INFO << "Kompilowanie programów shaderów... ";
 #endif
 
 	const char *vert = vertData.c_str();
@@ -106,7 +106,7 @@ Shader::make() {
 		char msg[MAX_LOG_SIZE];
 		glGetShaderInfoLog(vertexShader_, MAX_LOG_SIZE, NULL, msg);
 #ifdef __DEBUG__
-		cout << endl << LOG_ERROR << "Błąd kompilacji vertex shadera! Log kompilacji:\n" << msg << endl;
+		cout << LOG_ERROR << "Błąd kompilacji vertex shadera! Log kompilacji:\n" << msg << endl;
 #endif
 		return 0;
 	}
@@ -117,7 +117,7 @@ Shader::make() {
 		char msg[MAX_LOG_SIZE];
 		glGetShaderInfoLog(fragmentShader_, MAX_LOG_SIZE, NULL, msg);
 #ifdef __DEBUG__
-		cout << endl << LOG_ERROR << "Błąd kompilacji fragment shadera! Log kompilacji:\n" << msg << endl;
+		cout << LOG_ERROR << "Błąd kompilacji fragment shadera! Log kompilacji:\n" << msg << endl;
 #endif
 		return 0;
 	}
@@ -133,13 +133,13 @@ Shader::make() {
 		char msg[MAX_LOG_SIZE];
 		glGetProgramInfoLog(shaderProgram_, MAX_LOG_SIZE, NULL, msg);
 #ifdef __DEBUG__
-		cout << endl << LOG_ERROR << "Błąd przy linkowaniu shadera! Log linkera:\n" << msg << endl;
+		cout << LOG_ERROR << "Błąd przy linkowaniu shadera! Log linkera:\n" << msg << endl;
 #endif
 		return false;
 	}
 
 #ifdef __DEBUG__
-	cout << "Zrobione!\n";
+	cout << "Zrobione!";
 #endif
 	return true;
 
