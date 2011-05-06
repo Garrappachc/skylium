@@ -46,6 +46,8 @@ public:
      */
 	Light(const GLfloat&, const GLfloat&, const GLfloat&);
 	
+	~Light();
+	
 private:
 	void setAmbient(const sColor&);
 	

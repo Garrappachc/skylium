@@ -19,9 +19,9 @@
 #ifndef DEFINES_H
 #define	DEFINES_H
 
-#define LOG_INFO "\e[36m(II)\e[0m "
-#define LOG_ERROR "\e[31m(EE)\e[0m "
-#define LOG_WARN "\e[33m(WW)\e[0m "
+#define LOG_INFO "\n\e[36m(II)\e[0m "
+#define LOG_ERROR "\n\e[31m(EE)\e[0m "
+#define LOG_WARN "\n\e[33m(WW)\e[0m "
 
 #endif	/* DEFINES_H */
 

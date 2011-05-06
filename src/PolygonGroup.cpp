@@ -17,6 +17,7 @@
  */
 
 #include "../include/PolygonGroup.h"
+#include "../include/defines.h"
 
 using namespace std;
 
@@ -61,6 +62,9 @@ PolygonGroup::PolygonGroup(const string &_name, const sArray &_pointers) :
 		mode_(GL_TRIANGLES) {}
 
 PolygonGroup::~PolygonGroup() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~PolygonGroup() <" << name << ">";
+#endif
 }
 
 void

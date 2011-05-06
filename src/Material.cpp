@@ -50,6 +50,9 @@ Material::Material(const string &_name) :
 		tBump_(0) {}
 
 Material::~Material() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~Material() <" << name << ">";
+#endif
 	if (tAmbient_)
 		glDeleteTextures(1, &tAmbient_);
 	if (tDiffuse_)

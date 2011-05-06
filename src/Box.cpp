@@ -30,7 +30,3 @@ Box::Box(const string &_name) {
 	pGroups_[0] -> normals_ = vector < GLfloat >(boxNormals, boxNormals + sizeof(boxNormals) / sizeof(GLfloat));
 	pGroups_[0] -> mode_ = GL_QUADS;
 }
-
-Box::~Box() {
-	
-}

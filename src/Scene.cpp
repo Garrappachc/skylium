@@ -52,11 +52,14 @@ Scene::Scene(const string& _name) :
 		lightList_(8, NULL),
 		isLightOn_(false) {
 #ifdef __DEBUG__
-	cout << LOG_INFO << "Utworzono nową scenę: " << name << endl;
+	cout << LOG_INFO << "Utworzono nową scenę: " << name;
 #endif
 }
 
 Scene::~Scene() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~Scene() <" << name << ">";
+#endif
 	while (!objectList_.empty())
 		delete objectList_.back(), objectList_.pop_back();
 	while (!cameraList_.empty())
@@ -199,13 +202,13 @@ bool
 Scene::setAmbientLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
 	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
 #ifdef __DEBUG__
-		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")\n";
+		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
 #ifdef __DEBUG__
-		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")\n";
+		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 #endif
 		return false;
 	}
@@ -217,13 +220,13 @@ bool
 Scene::setDiffuseLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
 	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
 #ifdef __DEBUG__
-		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")\n";
+		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
 #ifdef __DEBUG__
-		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")\n";
+		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 #endif
 		return false;
 	}
@@ -235,13 +238,13 @@ bool
 Scene::setSpecularLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
 	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
 #ifdef __DEBUG__
-		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")\n";
+		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
 #ifdef __DEBUG__
-		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")\n";
+		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 #endif
 		return false;
 	}
@@ -253,7 +256,7 @@ bool
 Scene::setLightPosition(const int &_id, const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
 	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
 #ifdef __DEBUG__
-		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")\n";
+		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
@@ -267,9 +270,9 @@ Scene::toggleLight() {
 	isLightOn_ = !isLightOn_;
 #ifdef __DEBUG__
 	if (isLightOn_)
-		cout << LOG_INFO << "Światła włączone.\n";
+		cout << LOG_INFO << "Światła włączone.";
 	else
-		cout << LOG_INFO << "Światła wyłączone.\n";
+		cout << LOG_INFO << "Światła wyłączone.";
 #endif
 }
 
@@ -277,7 +280,7 @@ bool
 Scene::toggleLight(const int &_id) {
 	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
 #ifdef __DEBUG__
-		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")\n";
+		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
@@ -289,7 +292,7 @@ bool
 Scene::removeLight(const int &_id = -1) {
 	if (_id >= (int)lightList_.size() || lightList_[_id] == 0) {
 #ifdef __DEBUG__
-		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")\n";
+		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}

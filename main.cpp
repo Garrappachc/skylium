@@ -98,6 +98,7 @@ main() {
 	s_main -> execute();
 	
 	delete s_main;
+	delete cienie;
 
 	return 0;
 }

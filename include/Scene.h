@@ -47,7 +47,7 @@ public:
 	Scene(const std::string&);
 
 	/**
-	 * Destruktor, który powinien zniszczyć wszystkie obiekty i ObjectManagera.
+	 * Destruktor, który powinien zniszczyć wszystkie obiekty.
 	 */
 	~Scene();
 		

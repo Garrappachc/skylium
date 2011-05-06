@@ -49,6 +49,9 @@ Object::Object (const string &_name, const GLfloat *_pointers, const int &_size)
 		materials_(0) {
 	pGroups_.resize(1);
 	pGroups_[0] = new PolygonGroup("", _pointers, _size);
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Konstruktor: Object(const std::string&, const GLfloat&, const int&) <" << name << ">";
+#endif
 }
 
 Object::Object(const string &_name, const sArray &_pointers) : 
@@ -62,19 +65,24 @@ Object::Object(const string &_name, const sArray &_pointers) :
 		materials_(0) {
 	pGroups_.resize(1);
 	pGroups_[0] = new PolygonGroup("", _pointers);
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Konstruktor: Object(const std::string&, const std::vector< GLfloat >) <" << name << ">";
+#endif
 }
 
 Object::Object(const string &_name) : 
 		name(_name),
-		pGroups_(0),
+		pGroups_(1),
 		defColor_(1.0, 1.0, 1.0, 1.0),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
 		scale_(0, 0, 0),
 		shader_(NULL),
 		materials_(0) {
-	pGroups_.resize(1);
 	pGroups_[0] = new PolygonGroup("");
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Konstruktor: Object(const std::string&) <" << name << ">" ;
+#endif
 }
 
 Object::Object() : 
@@ -85,13 +93,21 @@ Object::Object() :
 		rot_(0, 0, 0), 
 		scale_(0, 0, 0),
 		shader_(NULL),
-		materials_(0) {}
+		materials_(0) {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Konstruktor: Object()";
+#endif
+}
 
 Object::~Object() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~Object() <" << name << ">";
+#endif
 	while (!pGroups_.empty())
 		delete pGroups_.back(), pGroups_.pop_back();
 	while (!materials_.empty())
 		delete materials_.back(), materials_.pop_back();
+	
 }
 
 void
@@ -149,7 +165,7 @@ Object::loadTexture(const string &_textureFile, const GLfloat *_texturePointers,
 
 	if (!fileExists(_textureFile)) {
 #ifdef __DEBUG__
-		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile;
 #endif
 		return false;
 	}
@@ -171,7 +187,7 @@ Object::loadTexture(const string &_textureFile, const GLfloat *_texturePointers,
 		
 
 #ifdef __DEBUG__
-	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie.\n";
+	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie.";
 #endif
 
 	pGroups_[0] -> texCoords_.resize(_size);
@@ -190,7 +206,7 @@ Object::loadTexture(const string &_textureFile, const sArray &_texturePointers) 
 
 	if (!fileExists(_textureFile)) {
 #ifdef __DEBUG__
-		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile << endl;
+		cout << LOG_WARN << name << ": plik z teksturą nie istnieje! Szukam: " << _textureFile;
 #endif
 		return false;
 	}
@@ -206,7 +222,7 @@ Object::loadTexture(const string &_textureFile, const sArray &_texturePointers) 
 	pGroups_[0] -> texCoords_ = _texturePointers;
 
 #ifdef __DEBUG__
-	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie.\n";
+	cout << LOG_INFO << name << ": teksturę załadowano pomyślnie";
 #endif
 	return true;
 }
@@ -221,7 +237,7 @@ Object::setColor(const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const 
 	defColor_[3] = _A;
 	
 #ifdef __DEBUG__
-	cout << LOG_INFO << name << ": nowy kolor: " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << ", " << defColor_[3] << endl;
+	cout << LOG_INFO << name << ": nowy kolor: " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << ", " << defColor_[3];
 #endif
 	
 	return true;
@@ -235,7 +251,7 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_T)
 	defColor_ = sColor((GLfloat)_R/255, (GLfloat)_G/255, (GLfloat)_B/255, _T);
 	
 #ifdef __DEBUG__
-	cout << LOG_INFO << name << ": nowy kolor: " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2] << endl;
+	cout << LOG_INFO << name << ": nowy kolor: " << defColor_[0] << ", " << defColor_[1] << ", " << defColor_[2];
 #endif
 	
 	return true;
@@ -250,7 +266,7 @@ Object::loadFromObj(const string &_objFile, const unsigned int &_whatToLoad) {
 #endif
 	if (!fileExists(_objFile)) {
 #ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znalazłem pliku: " << _objFile << endl;
+		cout << LOG_WARN << name << ": nie znalazłem pliku: " << _objFile;
 #endif
 		return false;
 	}
