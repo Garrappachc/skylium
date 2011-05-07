@@ -307,7 +307,7 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 	
 	string mtlFileName;
 	
-	unsigned long int i = 0, j = 0;
+	unsigned long int i = 0, j = 0, p = 0;
 	
 	fstream objFile(_fileName.c_str(), ios::in);
 	
@@ -334,9 +334,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				currentG++;
 			}
 			i = j = 0;
-			v.clear();
-			t.clear();
-			n.clear();
+			v.clear(); v.resize(3);
+			t.clear(); t.resize(2);
+			n.clear(); n.resize(3);
 			continue;
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!(_whatToLoad & GET_MATERIAL))
@@ -350,9 +350,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				}
 			}
 		} else if (buffer[0] == 's') {
-			int tf;
+			string tf;
 			line >> temp >> tf;
-			if (tf == 1)
+			if (tf != "off")
 				pGroups_[currentG] -> smooth_ = true;
 			else
 				pGroups_[currentG] -> smooth_ = false;
@@ -410,6 +410,8 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[currentG] -> texCoords_[j++] = texture[--tz][0];
 				pGroups_[currentG] -> texCoords_[j++] = texture[tz][1];
 				
+				p++;
+				
 				continue;
 			} else if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE)) == (GET_VERTICES | GET_TEXTURE)) {
 				char d;
@@ -441,6 +443,8 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[currentG] -> texCoords_[j++] = texture[ty][1];
 				pGroups_[currentG] -> texCoords_[j++] = texture[--tz][0];
 				pGroups_[currentG] -> texCoords_[j++] = texture[tz][1];
+				
+				p++;
 				
 				continue;
 			} else if ((_whatToLoad & (GET_VERTICES | GET_NORMALS)) == (GET_VERTICES | GET_NORMALS)) {
@@ -476,6 +480,8 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[currentG] -> pointers_[i] = vertices[vz][2];
 				pGroups_[currentG] -> normals_[i++] = normals[nz][2];
 				
+				p++;
+				
 				continue;
 			}
 		}
@@ -488,6 +494,10 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[y] -> hasNormals_ = true;
 		}
 	}
+	
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Załadowano " << p << " poligonów.";
+#endif
 }
 
 void
@@ -528,6 +538,10 @@ Object::parseMtl(const string &_fileName) {
 			GLint param;
 			line >> temp >> param;
 			current -> loadShininess(param);
+		} else if (buffer.substr(0, 6) == "map_Kd") {
+			string texfile;
+			line >> temp >>texfile;
+			current ->loadTexture("texture/" + texfile, TEXTURE_DIFFUSE);
 		}
 	}
 	
