@@ -147,6 +147,8 @@ public:
      * @return false, jeżeli cokolwiek poszło nie tak.
      */
 	bool loadFromObj(const std::string&, const unsigned int&);
+	
+	void printPointers();
 
 
 protected:

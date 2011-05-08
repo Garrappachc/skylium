@@ -67,6 +67,9 @@ Material::~Material() {
 
 bool
 Material::loadTexture(const string &_fileName, const unsigned int &_type) {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Ładowanie tekstury: " << _fileName;
+#endif
 	GLuint *texture;
 	if (_type & TEXTURE_AMBIENT)
 		texture = &tAmbient_;

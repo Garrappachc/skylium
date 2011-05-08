@@ -44,7 +44,7 @@ Object::Object (const string &_name, const GLfloat *_pointers, const int &_size)
 		defColor_(1.0, 1.0, 1.0, 1.0),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
-		scale_(0, 0, 0),
+		scale_(1, 1, 1),
 		shader_(NULL),
 		materials_(0) {
 	pGroups_.resize(1);
@@ -60,7 +60,7 @@ Object::Object(const string &_name, const sArray &_pointers) :
 		defColor_(1.0, 1.0, 1.0, 1.0),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
-		scale_(0, 0, 0),
+		scale_(1, 1, 1),
 		shader_(NULL),
 		materials_(0) {
 	pGroups_.resize(1);
@@ -76,7 +76,7 @@ Object::Object(const string &_name) :
 		defColor_(1.0, 1.0, 1.0, 1.0),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
-		scale_(0, 0, 0),
+		scale_(1, 1, 1),
 		shader_(NULL),
 		materials_(0) {
 	pGroups_[0] = new PolygonGroup("");
@@ -91,7 +91,7 @@ Object::Object() :
 		defColor_(1.0, 1.0, 1.0, 1.0),
 		mov_(0, 0, 0),
 		rot_(0, 0, 0), 
-		scale_(0, 0, 0),
+		scale_(1, 1, 1),
 		shader_(NULL),
 		materials_(0) {
 #ifdef __DEBUG__
@@ -148,7 +148,7 @@ Object::move(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 
 bool
 Object::scale(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
-	scale_ += sVec3D< GLdouble >(_x, _y, _z);
+	scale_ = sVec3D< GLdouble >(_x, _y, _z);
 	return true;
 }
 
@@ -180,6 +180,7 @@ Object::loadTexture(const string &_textureFile, const GLfloat *_texturePointers,
 	if (!pGroups_[0] -> material_) {
 		Material * tempMaterial = new Material();
 		pGroups_[0] -> material_ = tempMaterial;
+		materials_.push_back(tempMaterial);
 	}
 	
 	if (!pGroups_[0] -> material_ -> loadTexture(_textureFile, TEXTURE_DIFFUSE))
@@ -214,6 +215,7 @@ Object::loadTexture(const string &_textureFile, const sArray &_texturePointers) 
 	if (!pGroups_[0] -> material_) {
 		Material * tempMaterial = new Material();
 		pGroups_[0] -> material_ = tempMaterial;
+		materials_.push_back(tempMaterial);
 	}
 	
 	if (!pGroups_[0] -> material_ -> loadTexture(_textureFile, TEXTURE_DIFFUSE))
@@ -275,6 +277,21 @@ Object::loadFromObj(const string &_objFile, const unsigned int &_whatToLoad) {
 	return true;
 }
 
+void
+Object::printPointers() {
+	pGroupsIterator_ = pGroups_.begin();
+	while (pGroupsIterator_ != pGroups_.end()) {
+		for (unsigned int i = 0; i < (*pGroupsIterator_)->pointers_.size(); i++) {
+			cout << (*pGroupsIterator_)->pointers_[i] << " ";
+			if ((i+1) % 3 == 0)
+				cout << endl;
+		}
+		
+		
+		pGroupsIterator_++;
+	}
+}
+
 bool
 Object::fileExists(const string &_fileName) {
 	struct stat buf;
@@ -307,7 +324,10 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 	
 	string mtlFileName;
 	
-	unsigned long int i = 0, j = 0, p = 0;
+	unsigned long int i = 0, j = 0;
+#ifdef __DEBUG__
+	unsigned int p = 0;
+#endif
 	
 	fstream objFile(_fileName.c_str(), ios::in);
 	
@@ -410,7 +430,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[currentG] -> texCoords_[j++] = texture[--tz][0];
 				pGroups_[currentG] -> texCoords_[j++] = texture[tz][1];
 				
+#ifdef __DEBUG__
 				p++;
+#endif
 				
 				continue;
 			} else if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE)) == (GET_VERTICES | GET_TEXTURE)) {
@@ -444,7 +466,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[currentG] -> texCoords_[j++] = texture[--tz][0];
 				pGroups_[currentG] -> texCoords_[j++] = texture[tz][1];
 				
+#ifdef __DEBUG__
 				p++;
+#endif
 				
 				continue;
 			} else if ((_whatToLoad & (GET_VERTICES | GET_NORMALS)) == (GET_VERTICES | GET_NORMALS)) {
@@ -480,7 +504,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				pGroups_[currentG] -> pointers_[i] = vertices[vz][2];
 				pGroups_[currentG] -> normals_[i++] = normals[nz][2];
 				
+#ifdef __DEBUG__
 				p++;
+#endif
 				
 				continue;
 			}
@@ -489,7 +515,7 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 	
 	objFile.close();
 	
-	if (_whatToLoad & GET_NORMALS) {
+	if ((_whatToLoad & GET_NORMALS) == GET_NORMALS) {
 		for (unsigned int y = 0; y < pGroups_.size(); y++) {
 				pGroups_[y] -> hasNormals_ = true;
 		}
