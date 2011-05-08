@@ -37,18 +37,13 @@
 
 using namespace std;
 
-static const int KEY_ESC = 27;
-static const int KEY_A = 97;
-static const int KEY_D = 100;
-static const int KEY_S = 115;
-static const int KEY_W = 119;
-
 Skylium::Skylium() {
 	sceneManagement_ = new SceneManager();
 	lastMousePositionX_ = 0;
 	lastMousePositionY_ = 0;
 	surfDisplay_ = NULL;
 	isRunning_ = true;
+	isMouseMotionEnabled_ = false;
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Utworzono instancję klasy Skylium...";
 #endif
@@ -67,17 +62,11 @@ Skylium::~Skylium() {
 
 void
 Skylium::execute() {
-	SDL_Event tempEvent;
-	while (isRunning_) {
-		while (SDL_PollEvent(&tempEvent))
-			event(&tempEvent);
-//		loop();
-		render();
-	}
+	render();
 }
 
 bool
-Skylium::init() {
+Skylium::init(const string &_windowName) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		return false;
 	}
@@ -104,48 +93,14 @@ Skylium::init() {
     if((surfDisplay_ = SDL_SetVideoMode(windowWidth, windowHeight, bpp, SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER | SDL_OPENGL)) == NULL) {
         return false;
     }
+	
+	SDL_WM_SetCaption(_windowName.c_str(), NULL);
 
 	glClearColor(1, 1, 1, 1);
 	glViewport(0, 0, windowWidth, windowHeight);
 	glLoadIdentity();
 
 	return true;
-}
-
-void
-Skylium::event(SDL_Event *tempEvent) {
-	switch (tempEvent->type) {
-		case SDL_KEYDOWN:
-			switch(tempEvent -> key.keysym.sym) {
-				case SDLK_ESCAPE:
-					isRunning_ = false;
-					break;
-				case SDLK_w:
-					sceneManagement_->getActiveScene()->getActiveCamera()->moveCamera(-0.1, 0.0, 0.0);
-					break;
-				case SDLK_s:
-					sceneManagement_->getActiveScene()->getActiveCamera()->moveCamera(0.1, 0.0, 0.0);
-					break;
-				case SDLK_a:
-					sceneManagement_->getActiveScene()->getActiveCamera()->moveCamera(0.0, 0.0, 0.1);
-					break;
-				case SDLK_d:
-					sceneManagement_->getActiveScene()->getActiveCamera()->moveCamera(0.0, 0.0, -0.1);
-					break;
-				default:
-					break;
-			}
-			break;
-		case SDL_MOUSEMOTION:
-			int x = tempEvent -> motion.x;
-			int y = tempEvent -> motion.y;
-			const GLdouble moveX = (lastMousePositionX_ - x);
-			const GLdouble moveY = (lastMousePositionY_ - y);
-			sceneManagement_->getActiveScene()->getActiveCamera()->rotateCamera(moveX, moveY, 0.0);
-			lastMousePositionX_ = x;
-			lastMousePositionY_ = y;
-			break;
-	}
 }
 
 void
@@ -177,4 +132,59 @@ Scene *
 Skylium::createScene(const string &name) {
 	Scene *newScene = sceneManagement_ -> createScene(name);
 	return newScene;
+}
+
+sKey
+Skylium::sEvent() {
+	sKey result;
+	SDL_Event tempEvent;
+	while (SDL_PollEvent(&tempEvent)) {
+		switch (tempEvent.type) {
+			case SDL_KEYDOWN:
+				switch(tempEvent.key.keysym.sym) {
+					case SDLK_ESCAPE:
+						result = KEY_ESC;
+						break;
+					case SDLK_w:
+						result = KEY_UP;
+						break;
+					case SDLK_s:
+						result = KEY_DOWN;
+						break;
+					case SDLK_a:
+						result = KEY_LEFT;
+						break;
+					case SDLK_d:
+						result = KEY_RIGHT;
+						break;
+					default:
+						break;
+				}
+				break;
+			case SDL_MOUSEMOTION:
+				if (isMouseMotionEnabled_) {
+					int x = tempEvent.motion.x;
+					int y = tempEvent.motion.y;
+					const GLdouble moveX = (lastMousePositionX_ - x);
+					const GLdouble moveY = (lastMousePositionY_ - y);
+					sceneManagement_->getActiveScene()->getActiveCamera()->rotateCamera(moveX, moveY, 0.0);
+					lastMousePositionX_ = x;
+					lastMousePositionY_ = y;
+				}
+				break;
+			case SDL_QUIT:
+				cleanup();
+		}
+	}
+	return result;
+}
+
+void
+Skylium::enableMouseCamera() {
+	isMouseMotionEnabled_ = true;
+}
+
+void
+Skylium::disableMouseCmaera() {
+	isMouseMotionEnabled_ = false;
 }

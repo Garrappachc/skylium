@@ -26,6 +26,15 @@
 #include "Camera.h"
 #include "Singleton.h"
 
+typedef enum {
+	KEY_NOKEY = 0,
+	KEY_ESC = 1,
+	KEY_UP = 2,
+	KEY_DOWN = 4,
+	KEY_RIGHT = 8,
+	KEY_LEFT = 16
+} sKey;
+
 class Skylium : public Singleton < Skylium > {
 
 public:
@@ -45,11 +54,10 @@ public:
 
 	/**
 	 * Inicjacja okna.
+	 * @param windowName Nazwa okna.
 	 * @return false, jeżeli coś poszło nie tak.
 	 */
-	bool init();
-
-	void event(SDL_Event *event);
+	bool init(const std::string&);
 
 	void loop();
 
@@ -65,6 +73,17 @@ public:
 	 */
 	Scene * createScene(const std::string&);
 	
+	/**
+	 * Zwraca inta związanego z jakimś wydarzeniem, np. naciśnięciem klawisza,
+	 * czy ruchem myszki.
+     * @return Numer zdarzenia.
+     */
+	sKey sEvent();
+	
+	void enableMouseCamera();
+	
+	void disableMouseCmaera();
+	
 private:
 
 	/* Jedyna instancja SceneManagera. */
@@ -76,6 +95,9 @@ private:
 
 	/* Do pętli while. */
 	bool isRunning_;
+	
+	/* Do kamerki z myszką */
+	bool isMouseMotionEnabled_;
 
 	/* Taka tam zmienna, potrzebna SDL-owi. */
 	SDL_Surface * surfDisplay_;
