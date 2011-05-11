@@ -85,27 +85,24 @@ public:
      * @param x;
      * @param y;
      * @param z;
-	 * @return zawsze true.
      */
-	bool move(const GLdouble&, const GLdouble&, const GLdouble&);
+	void move(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Skaluje obiekt o podane wartości.
      * @param x;
      * @param y;
      * @param z;
-     * @return zawsze true.
      */
-	bool scale(const GLdouble&, const GLdouble&, const GLdouble&);
+	void scale(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Obraca obiekt.
      * @param rotX Kąt obrotu wokół osi X.
      * @param rotY Kąt obrotu wokół osi Y.
      * @param rotZ Kąt obrotu wokół osi Z.
-     * @return zawsze true.
      */
-	bool rotate(const GLdouble&, const GLdouble&, const GLdouble&);
+	void rotate(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Ładuje teksturę na obiekt.
@@ -147,8 +144,6 @@ public:
      * @return false, jeżeli cokolwiek poszło nie tak.
      */
 	bool loadFromObj(const std::string&, const unsigned int&);
-	
-	void printPointers();
 
 
 protected:

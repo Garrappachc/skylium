@@ -95,16 +95,16 @@ private:
 	GLdouble Yaxis_;
 	
 	/* Punkt, w którym znajduje się kamera */
-	sVec3D< GLdouble > eye_;
+	sVector eye_;
 
 	/* Punkt, na który patrzy się kamera */
-	sVec3D< GLdouble > center_;
+	sVector center_;
 
 	/* Wektor zmiany kierunku patrzenia kamery */
-	sVec3D< GLdouble > up_;
+	sVector up_;
 	/* Wartości, którymi będziemy zmieniać położenie kamery; */
 	/* będzie jeździła. */
-	sVec3D< GLdouble > mov_;
+	sVector mov_;
 
 	/*** Inne ***/
 	int windowWidth_;

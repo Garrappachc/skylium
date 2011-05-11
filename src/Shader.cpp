@@ -16,12 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifdef _WIN32
-#include <GL/GLee.h>
-#else
 #include <GLee.h>
-#endif
-
 #include <iostream>
 #include <string>
 #include <fstream>

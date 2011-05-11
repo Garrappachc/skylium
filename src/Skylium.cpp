@@ -19,12 +19,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <vector>
-
-#ifdef _WIN32
-#include <GL/GLee.h>
-#else
 #include <GLee.h>
-#endif
 #include <SDL/SDL.h>
 
 #include "../include/Skylium.h"
