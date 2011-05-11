@@ -17,13 +17,7 @@
  */
 
 #include <SOIL/SOIL.h>
-
-#ifdef _WIN32
-#include <GL/GLee.h>
-#else
 #include <GLee.h>
-#endif
-
 #include <sys/stat.h>
 #include <iostream>
 #include <fstream>
@@ -140,19 +134,19 @@ Object::show() {
 	glPopMatrix();
 }
 
-bool
+void
 Object::move(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 	mov_ += sVec3D< GLdouble >(_x, _y, _z);
 	return true;
 }
 
-bool
+void
 Object::scale(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 	scale_ = sVec3D< GLdouble >(_x, _y, _z);
 	return true;
 }
 
-bool
+void
 Object::rotate(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 	rot_ += sVec3D< GLdouble >(_x, _y, _z);
 	return true;
@@ -277,21 +271,6 @@ Object::loadFromObj(const string &_objFile, const unsigned int &_whatToLoad) {
 	return true;
 }
 
-void
-Object::printPointers() {
-	pGroupsIterator_ = pGroups_.begin();
-	while (pGroupsIterator_ != pGroups_.end()) {
-		for (unsigned int i = 0; i < (*pGroupsIterator_)->pointers_.size(); i++) {
-			cout << (*pGroupsIterator_)->pointers_[i] << " ";
-			if ((i+1) % 3 == 0)
-				cout << endl;
-		}
-		
-		
-		pGroupsIterator_++;
-	}
-}
-
 bool
 Object::fileExists(const string &_fileName) {
 	struct stat buf;
@@ -317,9 +296,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 	vector< sVertex > normals; // tymczasowy wektor normalnych
 	string buffer;
 	string temp;
-	sVertex v(3);
-	sCoords t(2);
-	sVertex n(3);
+	sVertex v;
+	sCoords t;
+	sVertex n;
 	unsigned int currentG = 0;
 	
 	string mtlFileName;
@@ -346,6 +325,8 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 			parseMtl(loc + mtlFileName);
 			continue;
 		} else if (buffer[0] == 'g') {
+			if (buffer.length() <= 2)
+				continue;
 			if (currentG == 0 && pGroups_[currentG] -> name == "") {
 				pGroups_[currentG] -> name = buffer.substr(2);
 			} else {
@@ -354,9 +335,9 @@ Object::parseObj(const string &_fileName, const unsigned int &_whatToLoad) {
 				currentG++;
 			}
 			i = j = 0;
-			v.clear(); v.resize(3);
-			t.clear(); t.resize(2);
-			n.clear(); n.resize(3);
+			vertices.clear();
+			normals.clear();
+			texture.clear();
 			continue;
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!(_whatToLoad & GET_MATERIAL))

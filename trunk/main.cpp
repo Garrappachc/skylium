@@ -7,11 +7,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#ifdef _WIN32
-#include <GL/GLee.h>
-#else
 #include <GLee.h>
-#endif
 #include <SDL/SDL.h>
 #include <SOIL/SOIL.h>
 
@@ -75,41 +71,40 @@ main() {
 	pudelko -> move(-10, 0, 0);
 	if (!pudelko -> loadTexture("texture/box.jpg", boxTex, 48))
 		cout << "Nie udało się załadować tekstury!";
-	/*Object *pudelko2 = scenka -> createBox("Pudelko2");
-	pudelko2 -> scale(-3, -3, -3);
-	pudelko2 -> move(-10, -2, 10);
-	if (!pudelko2 -> loadTexture("texture/box.jpg", boxTex, 48))
-		cout << "Nie udało się załadować tekstury!";
-	pudelko2 ->rotate(45, 45, 0);
 	
-	
-	Object *kula = scenka -> createObject("kula");
-	kula->loadFromObj("objects/sphere.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL);
-	kula -> move(-10, 7, 10);
-	kula -> scale(2.5, 2.5, 2.5);
-	kula -> setColor(0, 168, 255, 1);*/
+	Object *plane = scenka -> createObject("plane");
+	plane -> loadFromObj("objects/plane.obj", GET_VERTICES | GET_TEXTURE | GET_NORMALS);
+	plane -> move(-10, 5.1, 10);
+	plane -> scale (1.5, 1.5, 1.5);
+	plane -> setColor(0, 132, 200, 1);
+	plane -> rotate(0, 0, 20);
 
 	Object *malpka = scenka -> createObject("malpka");
 	malpka->loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL);
 	if (!malpka) {
 		cout << "Malpka nie działa.\n";
 	}
-	malpka -> move(-10, 7, 0);
+	malpka -> move(-10, 4.5, 0);
 	malpka -> scale(3, 3, 3);
-	malpka -> rotate(90, 0, -90);
+	malpka -> rotate(0, -45, 40);
 	malpka -> setColor(88, 25, 0, 1);
+	
+	Object *table = scenka -> createObject("table");
+	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE);
+	table -> move(-10, -2, 10);
+	table -> scale (6, 6, 6);
+	table -> setColor(119, 44, 0, 1);
 	
 	Camera* kamerka = scenka -> createCamera(5.0, 6.0, 0.0);
 	kamerka -> lookAt(1, 4, -1);
 	
 	cienie -> bind(malpka);
-	//cienie -> bind(kula);
+	cienie -> bind(plane);
+	cienie -> bind(table);
 
 	int swiatelko = scenka -> createLight(6.0, 6.0, 0.0);
 	scenka ->setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0);
 	scenka ->toggleLight();
-	
-	//kula ->printPointers();
 	
 	s_main ->enableMouseCamera();
 	

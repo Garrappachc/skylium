@@ -243,12 +243,12 @@ typedef sVec3D< GLdouble > sVector;
 
 typedef sVec4D< GLfloat > sColor;
 
+typedef sVec3D< GLfloat > sVertex;
+
+typedef sVec3D< int > sCoords;
+
 /* Some other typedefs */
 typedef std::vector< GLfloat > sArray;
-
-typedef std::vector< GLfloat > sVertex;
-
-typedef std::vector< int > sCoords;
 
 
 
