@@ -32,7 +32,7 @@
 class SceneManager : public Singleton < SceneManager > {
 public:
 	SceneManager();
-	~SceneManager();
+	virtual ~SceneManager();
 
 	/**
 	 * Tworzy nową scenę. Parametry użytkownik sobie ustawi później,
@@ -68,9 +68,9 @@ public:
 	Scene * getActiveScene();
 
 private:
-	std::vector < Scene* > sceneList_;
+	std::vector < Scene* > __sceneList;
 
-	Scene * activeScene_;
+	Scene * __activeScene;
 
 };
 

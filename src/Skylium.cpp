@@ -32,13 +32,13 @@
 
 using namespace std;
 
-Skylium::Skylium() {
-	sceneManagement_ = new SceneManager();
-	lastMousePositionX_ = 0;
-	lastMousePositionY_ = 0;
-	surfDisplay_ = NULL;
-	isRunning_ = true;
-	isMouseMotionEnabled_ = false;
+Skylium::Skylium() :
+		__lastMousePositionX(0),
+		__lastMousePositionY(0),
+		__isRunning(true),
+		__isMouseMotionEnabled(false),
+		__surfDisplay(NULL) {
+	__sceneManagement = new SceneManager();
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Utworzono instancję klasy Skylium...";
 #endif
@@ -48,7 +48,7 @@ Skylium::~Skylium() {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Czyszczenie... ";
 #endif
-	delete sceneManagement_;
+	delete __sceneManagement;
 	cleanup();
 #ifdef __DEBUG__
 	cout << LOG_INFO << "C'ya!\n";
@@ -85,7 +85,7 @@ Skylium::init(const string &_windowName) {
 	int windowWidth = info -> current_w - 50;
 	int windowHeight = info -> current_h - 100;
 
-    if((surfDisplay_ = SDL_SetVideoMode(windowWidth, windowHeight, bpp, SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER | SDL_OPENGL)) == NULL) {
+    if((__surfDisplay = SDL_SetVideoMode(windowWidth, windowHeight, bpp, SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER | SDL_OPENGL)) == NULL) {
         return false;
     }
 	
@@ -112,20 +112,20 @@ Skylium::render() {
 	glFrontFace(GL_CW);
 	glCullFace(GL_FRONT_AND_BACK);
 
-	sceneManagement_ -> displayActiveScene();
+	__sceneManagement -> displayActiveScene();
 
 	SDL_GL_SwapBuffers();
 }
 
 void
 Skylium::cleanup() {
-	SDL_FreeSurface(surfDisplay_);
+	SDL_FreeSurface(__surfDisplay);
 	SDL_Quit();
 }
 
 Scene *
 Skylium::createScene(const string &name) {
-	Scene *newScene = sceneManagement_ -> createScene(name);
+	Scene *newScene = __sceneManagement -> createScene(name);
 	return newScene;
 }
 
@@ -157,14 +157,14 @@ Skylium::sEvent() {
 				}
 				break;
 			case SDL_MOUSEMOTION:
-				if (isMouseMotionEnabled_) {
+				if (__isMouseMotionEnabled) {
 					int x = tempEvent.motion.x;
 					int y = tempEvent.motion.y;
-					const GLdouble moveX = (lastMousePositionX_ - x);
-					const GLdouble moveY = (lastMousePositionY_ - y);
-					sceneManagement_->getActiveScene()->getActiveCamera()->rotateCamera(moveX, moveY, 0.0);
-					lastMousePositionX_ = x;
-					lastMousePositionY_ = y;
+					const GLdouble moveX = (__lastMousePositionX - x);
+					const GLdouble moveY = (__lastMousePositionY - y);
+					__sceneManagement->getActiveScene()->getActiveCamera()->rotateCamera(moveX, moveY, 0.0);
+					__lastMousePositionX = x;
+					__lastMousePositionY = y;
 				}
 				break;
 			case SDL_QUIT:
@@ -176,10 +176,10 @@ Skylium::sEvent() {
 
 void
 Skylium::enableMouseCamera() {
-	isMouseMotionEnabled_ = true;
+	__isMouseMotionEnabled = true;
 }
 
 void
 Skylium::disableMouseCmaera() {
-	isMouseMotionEnabled_ = false;
+	__isMouseMotionEnabled = false;
 }

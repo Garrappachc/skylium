@@ -25,8 +25,8 @@ using namespace std;
 
 Box::Box(const string &_name) {
 	name = _name;
-	pGroups_.resize(1);
-	pGroups_[0] = new PolygonGroup("", boxPointers, sizeof(boxPointers) / sizeof(GLfloat));
-	pGroups_[0] -> normals_ = vector < GLfloat >(boxNormals, boxNormals + sizeof(boxNormals) / sizeof(GLfloat));
-	pGroups_[0] -> mode_ = GL_QUADS;
+	__pGroups.resize(1);
+	__pGroups[0] = new PolygonGroup("", boxPointers, sizeof(boxPointers) / sizeof(GLfloat));
+	__pGroups[0] -> __normals = vector < GLfloat >(boxNormals, boxNormals + sizeof(boxNormals) / sizeof(GLfloat));
+	__pGroups[0] -> __mode = GL_QUADS;
 }

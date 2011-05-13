@@ -76,25 +76,25 @@ public:
 private:
 	
 	/* Tablica wierzchołków. */
-	sArray pointers_;
+	sArray __pointers;
 	
 	/* Koordynaty tekstury. */
-	sArray texCoords_;
+	sArray __texCoords;
 	
 	/* Tablica normalnych. */
-	sArray normals_;
+	sArray __normals;
 	
 	/* Mamy w ogóle normalne? */
-	bool hasNormals_;
+	bool __hasNormals;
 	
 	/* Wskaźnik na używany materiał. */
-	Material * material_;
+	Material * __material;
 	
 	/* Jeżeli true, to glShadeModel(GL_SMOOTH) */
-	bool smooth_;
+	bool __smooth;
 	
 	/* Prymitywy */
-	GLenum mode_;
+	GLenum __mode;
 
 };
 

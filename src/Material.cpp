@@ -25,44 +25,44 @@ using namespace std;
 
 Material::Material() :
 		name(""),
-		mAmbient_(0.2, 0.2, 0.2, 1.0),
-		mDiffuse_(0.8, 0.8, 0.8, 1.0),
-		mSpecular_(0.0, 0.0, 0.0, 1.0),
-		mAlpha_(1.0),
-		mShininess_(0),
-		tAmbient_(0),
-		tDiffuse_(0),
-		tSpecular_(0),
-		tAlpha_(0),
-		tBump_(0) {}
+		__mAmbient(0.2, 0.2, 0.2, 1.0),
+		__mDiffuse(0.8, 0.8, 0.8, 1.0),
+		__mSpecular(0.0, 0.0, 0.0, 1.0),
+		__mAlpha(1.0),
+		__mShininess(0),
+		__tAmbient(0),
+		__tDiffuse(0),
+		__tSpecular(0),
+		__tAlpha(0),
+		__tBump(0) {}
 
 Material::Material(const string &_name) :
 		name(_name),
-		mAmbient_(0.2, 0.2, 0.2, 1.0),
-		mDiffuse_(0.8, 0.8, 0.8, 1.0),
-		mSpecular_(0.0, 0.0, 0.0, 1.0),
-		mAlpha_(1.0),
-		mShininess_(0),
-		tAmbient_(0),
-		tDiffuse_(0),
-		tSpecular_(0),
-		tAlpha_(0),
-		tBump_(0) {}
+		__mAmbient(0.2, 0.2, 0.2, 1.0),
+		__mDiffuse(0.8, 0.8, 0.8, 1.0),
+		__mSpecular(0.0, 0.0, 0.0, 1.0),
+		__mAlpha(1.0),
+		__mShininess(0),
+		__tAmbient(0),
+		__tDiffuse(0),
+		__tSpecular(0),
+		__tAlpha(0),
+		__tBump(0) {}
 
 Material::~Material() {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Destruktor: ~Material() <" << name << ">";
 #endif
-	if (tAmbient_)
-		glDeleteTextures(1, &tAmbient_);
-	if (tDiffuse_)
-		glDeleteTextures(1, &tDiffuse_);
-	if (tSpecular_)
-		glDeleteTextures(1, &tSpecular_);
-	if (tAlpha_)
-		glDeleteTextures(1, &tAlpha_);
-	if (tBump_)
-		glDeleteTextures(1, &tBump_);
+	if (__tAmbient)
+		glDeleteTextures(1, &__tAmbient);
+	if (__tDiffuse)
+		glDeleteTextures(1, &__tDiffuse);
+	if (__tSpecular)
+		glDeleteTextures(1, &__tSpecular);
+	if (__tAlpha)
+		glDeleteTextures(1, &__tAlpha);
+	if (__tBump)
+		glDeleteTextures(1, &__tBump);
 }
 
 bool
@@ -72,15 +72,15 @@ Material::loadTexture(const string &_fileName, const unsigned int &_type) {
 #endif
 	GLuint *texture;
 	if (_type & TEXTURE_AMBIENT)
-		texture = &tAmbient_;
+		texture = &__tAmbient;
 	else if (_type & TEXTURE_DIFFUSE)
-		texture = &tDiffuse_;
+		texture = &__tDiffuse;
 	else if (_type & TEXTURE_SPECULAR)
-		texture = &tSpecular_;
+		texture = &__tSpecular;
 	else if (_type & TEXTURE_ALPHA)
-		texture = &tAlpha_;
+		texture = &__tAlpha;
 	else if (_type & TEXTURE_BUMP)
-		texture = &tBump_; // on to-do list
+		texture = &__tBump; // on to-do list
 	else
 		return false;
 	
@@ -102,60 +102,60 @@ Material::loadTexture(const string &_fileName, const unsigned int &_type) {
 void
 Material::loadMaterial(const sColor &_param, const unsigned int &_type) {
 	if (_type & MATERIAL_AMBIENT)
-		mAmbient_ = _param;
+		__mAmbient = _param;
 	else if (_type & MATERIAL_DIFFUSE)
-		mDiffuse_ = _param;
+		__mDiffuse = _param;
 	else if (_type & MATERIAL_SPECULAR)
-		mSpecular_ = _param;
+		__mSpecular = _param;
 }
 
 void
 Material::loadAlpha(const GLfloat &_alpha) {
-	mAlpha_ = _alpha;
+	__mAlpha = _alpha;
 }
 
 void
 Material::loadShininess(const GLint &_shininess) {
-	mShininess_ = _shininess;
+	__mShininess = _shininess;
 }
 
 bool
 Material::hasAnyTexture() {
-	return (tAmbient_ || tDiffuse_ || tSpecular_ || tAlpha_ || tBump_);
+	return (__tAmbient || __tDiffuse || __tSpecular || __tAlpha || __tBump);
 }
 
 void
 Material::setTexture() {
-	if (tAlpha_) {
-		glBindTexture(GL_TEXTURE_2D, tAlpha_);
+	if (__tAlpha) {
+		glBindTexture(GL_TEXTURE_2D, __tAlpha);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	}
-	if (tDiffuse_) {
-		glBindTexture(GL_TEXTURE_2D, tDiffuse_);
+	if (__tDiffuse) {
+		glBindTexture(GL_TEXTURE_2D, __tDiffuse);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	}
-	if (tSpecular_) {
-		glBindTexture(GL_TEXTURE_2D, tSpecular_);
+	if (__tSpecular) {
+		glBindTexture(GL_TEXTURE_2D, __tSpecular);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	}
-	if (tAmbient_) {
-		glBindTexture(GL_TEXTURE_2D, tAmbient_);
+	if (__tAmbient) {
+		glBindTexture(GL_TEXTURE_2D, __tAmbient);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	}
-	if (tBump_)
-		glBindTexture(GL_TEXTURE_2D, tBump_); // that has to be done
+	if (__tBump)
+		glBindTexture(GL_TEXTURE_2D, __tBump); // that has to be done
 	
 }
 
 void
 Material::setMaterial() {
-	glMaterialfv(GL_FRONT, GL_AMBIENT, &mAmbient_[0]);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, &mDiffuse_[0]);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, &mSpecular_[0]);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, &__mAmbient[0]);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, &__mDiffuse[0]);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, &__mSpecular[0]);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-	glMateriali(GL_FRONT, GL_SHININESS, mShininess_);
+	glMateriali(GL_FRONT, GL_SHININESS, __mShininess);
 }

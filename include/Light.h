@@ -61,19 +61,19 @@ private:
 	
 	
 	/* Czy światło jest aktualnie włączone? */
-	bool working_;
+	bool __working;
 
 	/* Światło otoczenia */
-	sColor ambientLight_;
+	sColor __ambientLight;
 
 	/* Swiatło rozproszone */
-	sColor diffuseLight_;
+	sColor __diffuseLight;
 
 	/* Swiatło odbite */
-	sColor specularLight_;
+	sColor __specularLight;
 
 	/* Definujemy położenie żródła światła */
-	sVec3D < GLfloat > lightSrc_;
+	sVec3D < GLfloat > __lightSrc;
 
 };
 

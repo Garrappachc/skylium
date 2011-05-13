@@ -87,20 +87,20 @@ public:
 private:
 
 	/* Jedyna instancja SceneManagera. */
-	SceneManager * sceneManagement_;
+	SceneManager * __sceneManagement;
 
 	/* Przechowuje pozycję x i y myszy. */
-	int lastMousePositionX_;
-	int lastMousePositionY_;
+	int __lastMousePositionX;
+	int __lastMousePositionY;
 
 	/* Do pętli while. */
-	bool isRunning_;
+	bool __isRunning;
 	
 	/* Do kamerki z myszką */
-	bool isMouseMotionEnabled_;
+	bool __isMouseMotionEnabled;
 
 	/* Taka tam zmienna, potrzebna SDL-owi. */
-	SDL_Surface * surfDisplay_;
+	SDL_Surface * __surfDisplay;
 
 };
 #endif	/* Skylium_H */

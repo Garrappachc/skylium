@@ -23,43 +23,43 @@ using namespace std;
 
 PolygonGroup::PolygonGroup() :
 		name(""),
-		pointers_(0),
-		texCoords_(0),
-		normals_(0),
-		hasNormals_(0),
-		material_(NULL),
-		smooth_(false),
-		mode_(GL_TRIANGLES) {}
+		__pointers(0),
+		__texCoords(0),
+		__normals(0),
+		__hasNormals(0),
+		__material(NULL),
+		__smooth(false),
+		__mode(GL_TRIANGLES) {}
 
 PolygonGroup::PolygonGroup(const string &_name) :
 		name(_name),
-		pointers_(0),
-		texCoords_(0),
-		normals_(0),
-		hasNormals_(0),
-		material_(NULL),
-		smooth_(false),
-		mode_(GL_TRIANGLES) {}
+		__pointers(0),
+		__texCoords(0),
+		__normals(0),
+		__hasNormals(0),
+		__material(NULL),
+		__smooth(false),
+		__mode(GL_TRIANGLES) {}
 
 PolygonGroup::PolygonGroup(const string &_name, const GLfloat *_pointers, const int &_size) :
 		name(_name),
-		pointers_(_pointers, _pointers + _size),
-		texCoords_(0),
-		normals_(0),
-		hasNormals_(0),
-		material_(NULL),
-		smooth_(false),
-		mode_(GL_TRIANGLES) {}
+		__pointers(_pointers, _pointers + _size),
+		__texCoords(0),
+		__normals(0),
+		__hasNormals(0),
+		__material(NULL),
+		__smooth(false),
+		__mode(GL_TRIANGLES) {}
 
 PolygonGroup::PolygonGroup(const string &_name, const sArray &_pointers) :
 		name(_name),
-		pointers_(_pointers),
-		texCoords_(0),
-		normals_(0),
-		hasNormals_(0),
-		material_(NULL),
-		smooth_(false),
-		mode_(GL_TRIANGLES) {}
+		__pointers(_pointers),
+		__texCoords(0),
+		__normals(0),
+		__hasNormals(0),
+		__material(NULL),
+		__smooth(false),
+		__mode(GL_TRIANGLES) {}
 
 PolygonGroup::~PolygonGroup() {
 #ifdef __DEBUG__
@@ -69,35 +69,35 @@ PolygonGroup::~PolygonGroup() {
 
 void
 PolygonGroup::show() {
-	if (smooth_)
+	if (__smooth)
 		glShadeModel(GL_SMOOTH);
 	
-	if (material_ && material_ -> hasAnyTexture()) {
+	if (__material && __material -> hasAnyTexture()) {
 		glColor4f(1.0, 1.0, 1.0, 1.0);
-		material_ -> setTexture();
+		__material -> setTexture();
 		glEnable(GL_TEXTURE_2D);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 	
-	if(hasNormals_) {
+	if(__hasNormals) {
 		glEnableClientState(GL_NORMAL_ARRAY);
 	}
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
-	if (material_)
-		material_ -> setMaterial();
+	if (__material)
+		__material -> setMaterial();
 	
-	glVertexPointer(3, GL_FLOAT, 0, (GLvoid*)&pointers_[0]);
-	if (material_ && material_ -> hasAnyTexture())
-		glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)&texCoords_[0]);
-	if (hasNormals_)
-		glNormalPointer(GL_FLOAT, 0, (GLvoid*)&normals_[0]);
-	glDrawArrays(mode_, 0, (int)(pointers_.size() / 3));
+	glVertexPointer(3, GL_FLOAT, 0, (GLvoid*)&__pointers[0]);
+	if (__material && __material -> hasAnyTexture())
+		glTexCoordPointer(2, GL_FLOAT, 0, (GLvoid*)&__texCoords[0]);
+	if (__hasNormals)
+		glNormalPointer(GL_FLOAT, 0, (GLvoid*)&__normals[0]);
+	glDrawArrays(__mode, 0, (int)(__pointers.size() / 3));
 
-	if (material_ && material_ -> hasAnyTexture())
+	if (__material && __material -> hasAnyTexture())
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	if (hasNormals_)
+	if (__hasNormals)
 		glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	

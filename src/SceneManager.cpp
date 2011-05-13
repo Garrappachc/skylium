@@ -23,23 +23,23 @@
 using namespace std;
 
 SceneManager::SceneManager() :
-		sceneList_(0),
-		activeScene_(NULL) {}
+		__sceneList(0),
+		__activeScene(NULL) {}
 
 SceneManager::~SceneManager() {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Destruktor: ~SceneManager()";
 #endif
-	while (!sceneList_.empty())
-		delete sceneList_.back(), sceneList_.pop_back();
+	while (!__sceneList.empty())
+		delete __sceneList.back(), __sceneList.pop_back();
 }
 
 Scene *
 SceneManager::createScene(const string &_newSceneName) {
 	Scene *newScene = new Scene(_newSceneName);
-	sceneList_.push_back(newScene);
-	if (!activeScene_) {
-		activeScene_ = newScene;
+	__sceneList.push_back(newScene);
+	if (!__activeScene) {
+		__activeScene = newScene;
 	}
 	return newScene;
 }
@@ -52,8 +52,8 @@ SceneManager::displayActiveScene() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
 
-	if (activeScene_) {
-		activeScene_ -> show();
+	if (__activeScene) {
+		__activeScene -> show();
 		return true;
 	}
 	return false;
@@ -61,11 +61,11 @@ SceneManager::displayActiveScene() {
 
 bool
 SceneManager::setActive(const string &_sceneName) {
-	if (sceneList_.size() == 0)
+	if (__sceneList.size() == 0)
 		return false;
-	for (int i = 0; i < (int)sceneList_.size(); i++) {
-		if (sceneList_[i] -> name == _sceneName) {
-			activeScene_ = sceneList_[i];
+	for (int i = 0; i < (int)__sceneList.size(); i++) {
+		if (__sceneList[i] -> name == _sceneName) {
+			__activeScene = __sceneList[i];
 			return true;
 		}
 	}
@@ -74,11 +74,11 @@ SceneManager::setActive(const string &_sceneName) {
 
 bool
 SceneManager::setActive(const Scene *_scenePointer) {
-	if (sceneList_.size() == 0)
+	if (__sceneList.size() == 0)
 		return false;
-	for (int i = 0; i < (int)sceneList_.size(); i++) {
-		if (sceneList_[i] == _scenePointer) {
-			activeScene_ = sceneList_[i];
+	for (int i = 0; i < (int)__sceneList.size(); i++) {
+		if (__sceneList[i] == _scenePointer) {
+			__activeScene = __sceneList[i];
 			return true;
 		}
 	}
@@ -87,16 +87,16 @@ SceneManager::setActive(const Scene *_scenePointer) {
 
 Scene *
 SceneManager::getSceneByName(const string &_sceneName) {
-	if (sceneList_.size() == 0)
+	if (__sceneList.size() == 0)
 		return 0;
-	for (int i = 0; i < (int)sceneList_.size(); i++) {
-		if (sceneList_[i] -> name == _sceneName)
-			return sceneList_[i];
+	for (int i = 0; i < (int)__sceneList.size(); i++) {
+		if (__sceneList[i] -> name == _sceneName)
+			return __sceneList[i];
 	}
 	return 0;
 }
 
 Scene *
 SceneManager::getActiveScene() {
-	return activeScene_;
+	return __activeScene;
 }
