@@ -55,22 +55,22 @@ public:
 	void bind(Object*);
 
 private:
-	std::string vertFile_;
-	std::string fragFile_;
+	std::string __vertFile;
+	std::string __fragFile;
 
-	GLint vertexShader_;
-	GLint fragmentShader_;
+	GLint __vertexShader;
+	GLint __fragmentShader;
 
-	GLint shaderProgram_;
+	GLint __shaderProgram;
 
-	GLboolean isRunning_;
+	GLboolean __isRunning;
 
 	/**
 	 * Funkcja pomocnicza - sprawdza, czy istnieje podany plik.
 	 * @param Nazwa pliku.
 	 * @return True, jeżeli istnieje, w przeciwnym przypadku false.
 	 */
-	bool fileExists(const std::string&);
+	bool __fileExists(const std::string&);
 
 };
 

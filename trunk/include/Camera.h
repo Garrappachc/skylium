@@ -30,7 +30,7 @@ public:
 	Camera();
 	Camera(const GLdouble&, const GLdouble&, const GLdouble&);
 	
-	~Camera();
+	virtual ~Camera();
 	
 	/**
 	 * GL_PROJECTION;
@@ -38,7 +38,7 @@ public:
 	 * Tylko w razie zmiany parametrów.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml
 	 * http://www.felixgers.de/teaching/jogl/gluPerspective.gif
-     */
+	 */
 	void setProjection();
 
 	/**
@@ -47,7 +47,7 @@ public:
 	 * Tylko w razie zmiany parametrów.
 	 * http://pyopengl.sourceforge.net/documentation/manual/gluLookAt.3G.html
 	 * http://www.toldo.info/roberto/LaboratorioGrafica/Slides/images/glulookat.gif
-     */
+	 */
 	void setView();
 
 	/**
@@ -55,7 +55,7 @@ public:
      * @param movX oś X;
      * @param movY oś Y;
      * @param movZ oś Z.
-     */
+	 */
 	void moveCamera(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
@@ -63,7 +63,7 @@ public:
      * @param x;
      * @param y;
      * @param z.
-     */
+	 */
 	void rotateCamera(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
@@ -73,42 +73,38 @@ public:
      * @param x Pozycja X.
      * @param y Pozycja Y.
      * @param z Pozycja Z.
-     */
+	 */
 	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
 	
 	/**
 	 * Ustawia kamerę w pozycji początkowej.
-     */
+	 */
 	void resetCameraPosition();
 
 
 private:
 	/*** setProjection ***/
-	GLdouble fovy_;
-	GLdouble zNear_;
-	GLdouble zFar_;
+	GLdouble __fovy;
+	GLdouble __zNear;
+	GLdouble __zFar;
 
 
 	/*** setView ***/
-
-	/* Wyznacza kąt, pod ktorym porusza się kamera (do przodu) */
-	GLdouble Yaxis_;
 	
 	/* Punkt, w którym znajduje się kamera */
-	sVector eye_;
+	sVector __eye;
 
 	/* Punkt, na który patrzy się kamera */
-	sVector center_;
+	sVector __center;
 
 	/* Wektor zmiany kierunku patrzenia kamery */
-	sVector up_;
+	sVector __up;
 	/* Wartości, którymi będziemy zmieniać położenie kamery; */
-	/* będzie jeździła. */
-	sVector mov_;
+	sVector __mov;
 
 	/*** Inne ***/
-	int windowWidth_;
-	int windowHeight_;
+	int __windowWidth;
+	int __windowHeight;
 };
 
 #endif	/* CAMERA_H */

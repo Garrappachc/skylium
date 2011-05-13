@@ -52,96 +52,96 @@ public:
 
 	/**
 	 * Konstruktor obiektu. Przymuje już gotowe tablice wierzchołków.
-     * @param name Nazwa obiektu;
-     * @param pointers[] Tablica wierzchołków;
+	 * @param name Nazwa obiektu;
+	 * @param pointers[] Tablica wierzchołków;
 	 * @param size Liczba współrzędnych wierzchołków.
-     */
+	 */
 	Object(const std::string&, const GLfloat*, const int&);
 
 	/**
 	 * Konstruktor obiektu. Przymuje już gotowe tablice wierzchołków.
-     * @param name Nazwa obiektu.
-     * @param pointers Tablica wierzchołków.
-     */
+	 * @param name Nazwa obiektu.
+	 * @param pointers Tablica wierzchołków.
+	 */
 	Object(const std::string&, const sArray&);
 
 	/**
 	 * Konstruktor, który jako argument przyjmuje tylko nazwę obiektu.
-     * @param name Nazwa obiektu.
-     */
+	 * @param name Nazwa obiektu.
+	 */
 	Object(const std::string&);
 	
 	Object();
 	
-	~Object();
+	virtual ~Object();
 
 	/**
 	 * Renderuje obiekt.
-     */
+	 */
 	void show();
 
 	/**
 	 * Przesuwa obiekt o dany wektor.
-     * @param x;
-     * @param y;
-     * @param z;
-     */
+	 * @param x;
+	 * @param y;
+	 * @param z;
+	 */
 	void move(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Skaluje obiekt o podane wartości.
-     * @param x;
-     * @param y;
-     * @param z;
-     */
+	 * @param x;
+	 * @param y;
+	 * @param z;
+	 */
 	void scale(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Obraca obiekt.
-     * @param rotX Kąt obrotu wokół osi X.
-     * @param rotY Kąt obrotu wokół osi Y.
-     * @param rotZ Kąt obrotu wokół osi Z.
-     */
+	 * @param rotX Kąt obrotu wokół osi X.
+	 * @param rotY Kąt obrotu wokół osi Y.
+	 * @param rotZ Kąt obrotu wokół osi Z.
+	 */
 	void rotate(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Ładuje teksturę na obiekt.
-     * @param textureFile lokalizacja pliku z teksturą;
-     * @param texturePointers tablica koordynat tekstury;
+	 * @param textureFile lokalizacja pliku z teksturą;
+	 * @param texturePointers tablica koordynat tekstury;
 	 * @param size liczba koordynat tekstury.
-     * @return false, jeżeli coś poszło nie tak.
-     */
+	 * @return false, jeżeli coś poszło nie tak.
+	 */
 	bool loadTexture(const std::string&, const GLfloat*, const int&);
 
 	/**
 	 * Ładuje teksturę na obiekt.
-     * @param textureFile Lokalizacja pliku z teksturą;
-     * @param texturePointers Tablica koordynat tekstury;
-     * @return false, jeżeli coś poszło nie tak.
-     */
+	 * @param textureFile Lokalizacja pliku z teksturą;
+	 * @param texturePointers Tablica koordynat tekstury;
+	 * @return false, jeżeli coś poszło nie tak.
+	 */
 	bool loadTexture(const std::string&, const sArray&);
 	
 	/**
 	 * Ustawia ogólny kolor obiektu.
-     * @param R Składnik czerwony.
-     * @param G Składnik zielony.
-     * @param B Składnik niebieski.
-     * @param T Przezroczystość obiektu.
-     * @return false, jeżeli wartość R, G lub B jest większa niż 255 i mniejsza niż 0 lub T jest spoza przedziału <0; 1>.
-     */
+	 * @param R Składnik czerwony.
+	 * @param G Składnik zielony.
+	 * @param B Składnik niebieski.
+	 * @param T Przezroczystość obiektu.
+	 * @return false, jeżeli wartość R, G lub B jest większa niż 255 i mniejsza niż 0 lub T jest spoza przedziału <0; 1>.
+	 */
 	bool setColor(const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat&);
 	
 	bool setColor(const int&, const int&, const int&, const GLfloat&);
 
 	/**
 	 * Wczytuje dane obiektu z pliku .obj i .mtl.
-     * @param objFile Lokalizacja pliku .obj.
+	 * @param objFile Lokalizacja pliku .obj.
 	 * @param whatToLoad Definiuje, co ma się załadować. I tak:
 	 *		&bull; GET_VERTICES - ładuje tylko współrzędne wierzchołków. Jest to domyślna opcja, jeżeli nie zostanie nadmieniona, to i tak będzie dodana;
 	 *		&bull; GET_TEXTURE  - ładuje koordynaty tekstury oraz samą teksturę;
 	 *		&bull; GET_NORMALS  - ładuje normalne;
 	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
-     * @return false, jeżeli cokolwiek poszło nie tak.
+	 * @return false, jeżeli cokolwiek poszło nie tak.
      */
 	bool loadFromObj(const std::string&, const unsigned int&);
 
@@ -149,38 +149,38 @@ public:
 protected:
 	
 	/* Wektor grup poligonów */
-	std::vector< PolygonGroup* > pGroups_;
+	std::vector< PolygonGroup* > __pGroups;
 	
 	/* Iterator */
-	std::vector< PolygonGroup* >::iterator pGroupsIterator_;
+	std::vector< PolygonGroup* >::iterator __pGroupsIterator;
 	
 	/**
 	 * Ogólny kolor obiektu.
 	 */
-	sColor defColor_;
+	sColor __defColor;
 
 	/**
 	 * Wektor przesunięcia obiektu.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glTranslate.xml
 	 */
-	sVector mov_;
+	sVector __mov;
 
 	/**
 	 * Kąt obrotu obiektu.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glRotate.xml
 	 */
-	sVector rot_;
+	sVector __rot;
 
 	/**
 	 * Wektor przybliżenia obiektu.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glScale.xml
 	 */
-	sVector scale_;
+	sVector __scale;
 	
 	/**
 	 * Wskaźnik na shader, którego obiekt ma używać.
 	 */
-	Shader * shader_;
+	Shader * __shader;
 
 private:
 
@@ -189,7 +189,7 @@ private:
      * @param Nazwa pliku.
      * @return True, jeżeli istnieje, w przeciwnym przypadku false.
      */
-	bool fileExists(const std::string&);
+	bool __fileExists(const std::string&);
 	
 	/**
 	 * Parsuje plik .obj i zwraca true, jeżeli parsowanie się udało.
@@ -200,16 +200,16 @@ private:
 	 *		&bull; GET_NORMALS  - ładuje normalne;
 	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
      */
-	void parseObj(const std::string&, const unsigned int&);
+	void __parseObj(const std::string&, const unsigned int&);
 	
 	/**
 	 * Parsuje plik .mtl i zwraca true, jeżeli parsowanie się udało.
      * @param fileName Nazwa pliku .mtl.
      */
-	void parseMtl(const std::string&);
+	void __parseMtl(const std::string&);
 	
 	/* Wektor materiałów */
-	std::vector< Material* > materials_;
+	std::vector< Material* > __materials;
 
 };
 

@@ -37,20 +37,20 @@ unsigned int lights[] = {
 
 Scene::Scene() :
 		name(""),
-		objectList_(0),
-		cameraList_(0),
-		activeCamera_(NULL),
-		lightList_(8, NULL),
-		isLightOn_(false) {}
+		__objectList(0),
+		__cameraList(0),
+		__activeCamera(NULL),
+		__lightList(8, NULL),
+		__isLightOn(false) {}
 
 
 Scene::Scene(const string& _name) :
 		name(_name),
-		objectList_(0),
-		cameraList_(0),
-		activeCamera_(NULL),
-		lightList_(8, NULL),
-		isLightOn_(false) {
+		__objectList(0),
+		__cameraList(0),
+		__activeCamera(NULL),
+		__lightList(8, NULL),
+		__isLightOn(false) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Utworzono nową scenę: " << name;
 #endif
@@ -60,28 +60,28 @@ Scene::~Scene() {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Destruktor: ~Scene() <" << name << ">";
 #endif
-	while (!objectList_.empty())
-		delete objectList_.back(), objectList_.pop_back();
-	while (!cameraList_.empty())
-		delete cameraList_.back(), cameraList_.pop_back();
-	while (!lightList_.empty())
-		delete lightList_.back(), lightList_.pop_back();
+	while (!__objectList.empty())
+		delete __objectList.back(), __objectList.pop_back();
+	while (!__cameraList.empty())
+		delete __cameraList.back(), __cameraList.pop_back();
+	while (!__lightList.empty())
+		delete __lightList.back(), __lightList.pop_back();
 }
 
 void
 Scene::show() {
 	glLoadIdentity();
-	if (activeCamera_) {
-		activeCamera_ -> setProjection();
-		activeCamera_ -> setView();
+	if (__activeCamera) {
+		__activeCamera -> setProjection();
+		__activeCamera -> setView();
 	}
-	if (isLightOn_) {
+	if (__isLightOn) {
 		glEnable(GL_LIGHTING);
 	}
 	
-	setLights();
+	__setLights();
 
-	setObjects();
+	__setObjects();
 }
 
 #ifndef __NO_OBJECT_MANAGEMENT__
@@ -89,28 +89,28 @@ Scene::show() {
 Object *
 Scene::createObject(const string &_name, const GLfloat *_pointers, const int &_size) {
 	Object *newObject = new Object(_name, _pointers, _size);
-	objectList_.push_back(newObject);
+	__objectList.push_back(newObject);
 	return newObject;
 }
 
 Object *
 Scene::createObject(const string &_name, const sArray &_pointers) {
 	Object *newObject = new Object(_name, _pointers);
-	objectList_.push_back(newObject);
+	__objectList.push_back(newObject);
 	return newObject;
 }
 
 Object *
 Scene::createObject(const string &_name) {
 	Object *newObject = new Object(_name);
-	objectList_.push_back(newObject);
+	__objectList.push_back(newObject);
 	return newObject;
 }
 
 Object *
 Scene::createBox(const string &_name) {
 	Box *newBox = new Box(_name);
-	objectList_.push_back(newBox);
+	__objectList.push_back(newBox);
 	return newBox;
 }
 
@@ -118,23 +118,23 @@ Object *
 Scene::getObjectByName(const string &_name) {
 	if (_name == "")
 		return 0;
-	for (unsigned int i = 0; i < objectList_.size(); i++) {
-		if (objectList_[i] -> name == _name) {
-			return objectList_[i];
+	for (unsigned int i = 0; i < __objectList.size(); i++) {
+		if (__objectList[i] -> name == _name) {
+			return __objectList[i];
 		}
 	}
 	return 0;
 }
 
 void
-Scene::setObjects() {
-	if (objectList_.empty())
+Scene::__setObjects() {
+	if (__objectList.empty())
 		return;
 	
-	objectIterator_ = objectList_.begin();
-	while(objectIterator_ != objectList_.end()) {
-		(*objectIterator_) -> show();
-		objectIterator_++;
+	__objectIterator = __objectList.begin();
+	while(__objectIterator != __objectList.end()) {
+		(*__objectIterator) -> show();
+		__objectIterator++;
 	}
 }
 
@@ -145,15 +145,15 @@ Scene::setObjects() {
 Camera *
 Scene::createCamera(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 	Camera * newCamera = new Camera(_x, _y, _z);
-	if (!activeCamera_)
-		activeCamera_ = newCamera;
-	cameraList_.push_back(newCamera);
+	if (!__activeCamera)
+		__activeCamera = newCamera;
+	__cameraList.push_back(newCamera);
 	return newCamera;
 }
 
 Camera*
 Scene::getActiveCamera() {
-	return activeCamera_;
+	return __activeCamera;
 }
 #endif
 
@@ -162,45 +162,45 @@ Scene::getActiveCamera() {
 int
 Scene::createLight() {
 	unsigned int i;
-	for (i = 0; i < lightList_.size(); i++) {
-		if (lightList_[i] == NULL)
+	for (i = 0; i < __lightList.size(); i++) {
+		if (__lightList[i] == NULL)
 			break;
 	}
 	if (i > 7)
 		return -1;
-	lightList_[i] = new Light();
+	__lightList[i] = new Light();
 	return i;	
 }
 
 int
 Scene::createLight(const sVec3D< GLfloat > &_pos) {
 	unsigned int i;
-	for (i = 0; i < lightList_.size(); i++) {
-		if (lightList_[i] == NULL)
+	for (i = 0; i < __lightList.size(); i++) {
+		if (__lightList[i] == NULL)
 			break;
 	}
 	if (i > 7)
 		return -1;
-	lightList_[i] = new Light(_pos);
+	__lightList[i] = new Light(_pos);
 	return i;
 }
 
 int
 Scene::createLight(const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
 	unsigned int i;
-	for (i = 0; i < lightList_.size(); i++) {
-		if (lightList_[i] == NULL)
+	for (i = 0; i < __lightList.size(); i++) {
+		if (__lightList[i] == NULL)
 			break;
 	}
 	if (i > 7)
 		return -1;
-	lightList_[i] = new Light(_x, _y, _z);
+	__lightList[i] = new Light(_x, _y, _z);
 	return i;
 }
 
 bool
 Scene::setAmbientLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
-	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
+	if (_id >= (int)__lightList.size() || _id < 0 || __lightList[_id] == 0) {
 #ifdef __DEBUG__
 		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
@@ -212,13 +212,13 @@ Scene::setAmbientLight(const int &_id, const GLfloat &_R, const GLfloat &_G, con
 #endif
 		return false;
 	}
-	lightList_[_id] -> setAmbient(sColor(_R, _G, _B, _A));
+	__lightList[_id] -> setAmbient(sColor(_R, _G, _B, _A));
 	return true;
 }
 
 bool
 Scene::setDiffuseLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
-	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
+	if (_id >= (int)__lightList.size() || _id < 0 || __lightList[_id] == 0) {
 #ifdef __DEBUG__
 		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
@@ -230,13 +230,13 @@ Scene::setDiffuseLight(const int &_id, const GLfloat &_R, const GLfloat &_G, con
 #endif
 		return false;
 	}
-	lightList_[_id] -> setDiffuse(sColor(_R, _G, _B, _A));
+	__lightList[_id] -> setDiffuse(sColor(_R, _G, _B, _A));
 	return true;
 }
 
 bool
 Scene::setSpecularLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
-	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
+	if (_id >= (int)__lightList.size() || _id < 0 || __lightList[_id] == 0) {
 #ifdef __DEBUG__
 		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
@@ -248,28 +248,28 @@ Scene::setSpecularLight(const int &_id, const GLfloat &_R, const GLfloat &_G, co
 #endif
 		return false;
 	}
-	lightList_[_id] -> setSpecular(sColor(_R, _G, _B, _A));
+	__lightList[_id] -> setSpecular(sColor(_R, _G, _B, _A));
 	return true;
 }
 
 bool
 Scene::setLightPosition(const int &_id, const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
-	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
+	if (_id >= (int)__lightList.size() || _id < 0 || __lightList[_id] == 0) {
 #ifdef __DEBUG__
 		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
 	
-	lightList_[_id] ->setSrcPos(sVec3D< GLfloat >(_x, _y, _z));
+	__lightList[_id] ->setSrcPos(sVec3D< GLfloat >(_x, _y, _z));
 	return true;
 }
 
 void
 Scene::toggleLight() {
-	isLightOn_ = !isLightOn_;
+	__isLightOn = !__isLightOn;
 #ifdef __DEBUG__
-	if (isLightOn_)
+	if (__isLightOn)
 		cout << LOG_INFO << "Światła włączone.";
 	else
 		cout << LOG_INFO << "Światła wyłączone.";
@@ -278,19 +278,19 @@ Scene::toggleLight() {
 
 bool
 Scene::toggleLight(const int &_id) {
-	if (_id >= (int)lightList_.size() || _id < 0 || lightList_[_id] == 0) {
+	if (_id >= (int)__lightList.size() || _id < 0 || __lightList[_id] == 0) {
 #ifdef __DEBUG__
 		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
 		return false;
 	}
-	lightList_[_id] -> toggle();
+	__lightList[_id] -> toggle();
 	return true;
 }
 
 bool
 Scene::removeLight(const int &_id = -1) {
-	if (_id >= (int)lightList_.size() || lightList_[_id] == 0) {
+	if (_id >= (int)__lightList.size() || __lightList[_id] == 0) {
 #ifdef __DEBUG__
 		cout << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 #endif
@@ -298,38 +298,38 @@ Scene::removeLight(const int &_id = -1) {
 	}
 	if (_id == -1) {
 		int i;
-		for (i = (int)lightList_.size(); i >= 0; i--) {
-			if (lightList_[i] != NULL)
+		for (i = (int)__lightList.size(); i >= 0; i--) {
+			if (__lightList[i] != NULL)
 				break;
 		}
 		if (i != -1) {
-			delete lightList_[i];
-			lightList_[i] = NULL;
+			delete __lightList[i];
+			__lightList[i] = NULL;
 		}
 	} else {
-		delete lightList_[_id];
-		lightList_[_id] = NULL;
+		delete __lightList[_id];
+		__lightList[_id] = NULL;
 	}
 	return true;
 }
 
 void
-Scene::setLights() {
+Scene::__setLights() {
 	short i = 0;
-	lightIterator_ = lightList_.begin();
-	while (lightIterator_ != lightList_.end()) {
-		if (*lightIterator_ != 0) {
-			if ((*lightIterator_)->working_ )
+	__lightIterator = __lightList.begin();
+	while (__lightIterator != __lightList.end()) {
+		if (*__lightIterator != 0) {
+			if ((*__lightIterator)->__working )
 				glEnable(lights[i]);
 			else
 				glDisable(lights[i]);
-			glLightfv(lights[i], GL_AMBIENT, (*lightIterator_)->ambientLight_);
-			glLightfv(lights[i], GL_DIFFUSE, (*lightIterator_)->diffuseLight_);
-			glLightfv(lights[i], GL_SPECULAR, (*lightIterator_)->specularLight_);
-			glLightfv(lights[i], GL_POSITION, (*lightIterator_)->lightSrc_);
+			glLightfv(lights[i], GL_AMBIENT, (*__lightIterator)->__ambientLight);
+			glLightfv(lights[i], GL_DIFFUSE, (*__lightIterator)->__diffuseLight);
+			glLightfv(lights[i], GL_SPECULAR, (*__lightIterator)->__specularLight);
+			glLightfv(lights[i], GL_POSITION, (*__lightIterator)->__lightSrc);
 			i++;
 		}
-		lightIterator_++;
+		__lightIterator++;
 	}
 	
 }

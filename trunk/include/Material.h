@@ -42,71 +42,71 @@ class Material {
 public:
 	/**
 	 * Konstruktor domyślny, wszystko puste.
-     */
+	 */
 	Material();
 	
 	/**
 	 * Konstruktor domyślny, który przyjmuje jako argument swoją nazwę.
-     * @param name Nazwa materiału.
-     */
+	 * @param name Nazwa materiału.
+	 */
 	Material(const std::string&);
 	
 	/**
 	 * Destruktor usuwa wszystkie przypisane do niego tekstury.
-     */
-	~Material();
+	 */
+	virtual ~Material();
 	
 	/**
 	 * Ładuje teksturę z pliku.
-     * @param fileName Nazwa pliku z teksturą.
-     * @param type Typ tekstury, który ma być załadowany. I tak:
+	 * @param fileName Nazwa pliku z teksturą.
+	 * @param type Typ tekstury, który ma być załadowany. I tak:
 	 *		&bump; TEXTURE_AMBIENT - ładuje tAmbient_;
 	 *		&bump; TEXTURE_DIFFUSE - ładuje tDiffuse_;
 	 *		&bump; TEXTURE_SPECULAR - ładuje tSpecular_;
 	 *		&bump; TEXUTRE_ALPHA - ładuje tAlpha_;
 	 *		&bump; TEXTURE_BUMP - ładuje tBump_.
 	 * Domyślna wartość to TEXTURE_BUMP.
-     * @return False, jeżeli coś poszło nie tak.
-     */
+	 * @return False, jeżeli coś poszło nie tak.
+	 */
 	bool loadTexture(const std::string&, const unsigned int&);
 	
 	/**
 	 * Ustawia podany parametr materiału.
-     * @param param Wartość parametru.
-     * @param type Typ materiału, którego dotyczy wartość podana w argumencie
+	 * @param param Wartość parametru.
+	 * @param type Typ materiału, którego dotyczy wartość podana w argumencie
 	 * <i>param</i>. I tak:
 	 *		&bump; MATERIAL_AMBIENT - wartość mAmbient_;
 	 *		&bump; MATERIAL_DIFFUSE - wartość mDiffuse_;
 	 *		&bump; MATERIAL_SPECULAR - wartość mSpecular_.
-     */
+	 */
 	void loadMaterial(const sColor&, const unsigned int&);
 	
 	/**
 	 * Ustawia parametr mAlpha_.
-     * @param alpha Przezroczystość ([0; 1]).
-     */
+	 * @param alpha Przezroczystość ([0; 1]).
+	 */
 	void loadAlpha(const GLfloat&);
 	
 	/**
 	 * Ustawia odbicie.
-     * @param shininess Odbijanie materiału.
-     */
+	 * @param shininess Odbijanie materiału.
+	 */
 	void loadShininess(const GLint&);
 	
 	/**
 	 * Sprawdza, czy materiał posiada jakąś teksturę.
-     * @return True, jeżeli ma jakąkolwiek.
-     */
+	 * @return True, jeżeli ma jakąkolwiek.
+	 */
 	bool hasAnyTexture();
 	
 	/**
 	 * Ustawia parametry tekstury do renderowania.
-     */
+	 */
 	void setTexture();
 	
 	/**
 	 * Ustawia parametry materiału do renderowania.
-     */
+	 */
 	void setMaterial();
 	
 	/* Nazwa materiału. */
@@ -114,18 +114,18 @@ public:
 	
 private:
 	/* Materiał */
-	sColor mAmbient_;
-	sColor mDiffuse_;
-	sColor mSpecular_;
-	GLfloat mAlpha_;
-	GLint mShininess_;
+	sColor		__mAmbient;
+	sColor		__mDiffuse;
+	sColor		__mSpecular;
+	GLfloat		__mAlpha;
+	GLint		__mShininess;
 	
 	/* Tekstury */
-	GLuint tAmbient_;
-	GLuint tDiffuse_;
-	GLuint tSpecular_;
-	GLuint tAlpha_;
-	GLuint tBump_;
+	GLuint		__tAmbient;
+	GLuint		__tDiffuse;
+	GLuint		__tSpecular;
+	GLuint		__tAlpha;
+	GLuint		__tBump;
 
 };
 
