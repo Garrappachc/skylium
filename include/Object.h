@@ -152,7 +152,7 @@ protected:
 	std::vector< PolygonGroup* > __pGroups;
 	
 	/* Iterator */
-	std::vector< PolygonGroup* >::iterator __pGroupsIterator;
+	std::vector< PolygonGroup* >::const_iterator __pGroupsIterator;
 	
 	/**
 	 * Ogólny kolor obiektu.
