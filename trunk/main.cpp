@@ -15,6 +15,7 @@
 #include "include/Skylium.h"
 #include "include/Scene.h"
 #include "include/Shader.h"
+#include "include/Timer.h"
 
 using namespace std;
 
@@ -54,7 +55,7 @@ int
 main() {
 
 	Skylium *s_main = new Skylium();
-
+	
 	if (!s_main -> init("Skylium")) {
 		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
@@ -106,6 +107,8 @@ main() {
 	scenka ->setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0);
 	scenka ->toggleLight();
 	
+	Timer *zegarek = new Timer();
+	
 	s_main ->enableMouseCamera();
 	
 	sKey klawisz;
@@ -119,7 +122,13 @@ main() {
 		if (klawisz == KEY_LEFT)
 			kamerka -> moveCamera(0.0, 0.0, 0.1);
 		
+		if (zegarek -> passed(2500, MICROSECONDS)) {
+			table -> rotate(0, 0.1, 0);
+			plane -> rotate(0, 0.1, 0);
+		}
+		
 		s_main -> render();
+		
 	}
 	
 	s_main -> cleanup();

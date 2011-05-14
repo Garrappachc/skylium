@@ -225,7 +225,7 @@ private:
 	/**
 	 * Iterator po obiektach sceny.
 	 */
-	std::vector < Object* >::iterator __objectIterator;
+	std::vector < Object* >::const_iterator __objectIterator;
 	
 	/**
 	 * Wyświetla wszystkie obiekty.
@@ -256,7 +256,7 @@ private:
 	/**
 	 * Iterator po światłach.
 	 */
-	std::vector < Light* >::iterator __lightIterator;
+	std::vector < Light* >::const_iterator __lightIterator;
 	
 	/**
 	 * Jeżeli jest true, to przy renderowaniu mamy wywołanie glEnable(GL_LIGHTING).
