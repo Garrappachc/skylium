@@ -16,6 +16,8 @@
 #include "include/Scene.h"
 #include "include/Shader.h"
 #include "include/Timer.h"
+#include "include/sFont.h"
+#include "include/Hud.h"
 
 using namespace std;
 
@@ -56,7 +58,7 @@ main() {
 
 	Skylium *s_main = new Skylium();
 	
-	if (!s_main -> init("Skylium")) {
+	if (!s_main -> init("Skylium", false)) {
 		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
 	}
@@ -107,7 +109,14 @@ main() {
 	scenka ->setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0);
 	scenka ->toggleLight();
 	
-	Timer *zegarek = new Timer();
+	Timer *zegarek_dla_animacji = new Timer();
+	Timer *zegarek_dla_fps = new Timer();
+	
+	sFont *foncik = new sFont();
+	
+	Hud *hudek = new Hud(foncik, sSingleCoord(-100, 0), sSingleCoord(200, 20), 0.7);
+	
+	short fps = 0;
 	
 	s_main ->enableMouseCamera();
 	
@@ -122,18 +131,30 @@ main() {
 		if (klawisz == KEY_LEFT)
 			kamerka -> moveCamera(0.0, 0.0, 0.1);
 		
-		if (zegarek -> passed(2500, MICROSECONDS)) {
+		if (zegarek_dla_animacji -> passed(2500, MICROSECONDS)) {
 			table -> rotate(0, 0.1, 0);
 			plane -> rotate(0, 0.1, 0);
 		}
 		
-		s_main -> render();
+		fps++;
+		
+		if (zegarek_dla_fps -> passed(1, SECONDS)) {
+			cout << "\n	FPS: " << fps;
+			fps = 0;
+		}
+		
+		s_main -> execute();
+		
+		hudek -> drawBorder();
 		
 	}
 	
 	s_main -> cleanup();
 	delete s_main;
 	delete cienie;
+	delete zegarek_dla_animacji;
+	delete zegarek_dla_fps;
+	delete foncik;
 
 	return 0;
 }

@@ -57,22 +57,23 @@ Skylium::~Skylium() {
 
 void
 Skylium::execute() {
+	__catchEvents();
 	render();
 }
 
 bool
-Skylium::init(const string &_windowName) {
+Skylium::init(const string &_windowName, const bool &_fullscreen) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		return false;
 	}
 
 	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
-    SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
-    SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
-    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
-    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
+	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
+	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-    SDL_EnableKeyRepeat(1, 1);
+	SDL_EnableKeyRepeat(1, 1);
 
 	const SDL_VideoInfo *info = SDL_GetVideoInfo();
 
@@ -82,10 +83,22 @@ Skylium::init(const string &_windowName) {
 
 	int bpp = info -> vfmt -> BitsPerPixel;
 
-	int windowWidth = info -> current_w - 50;
-	int windowHeight = info -> current_h - 100;
+	int windowWidth, windowHeight;
+	
+	Uint32 flags = SDL_HWSURFACE;
+	flags |= SDL_GL_DOUBLEBUFFER;
+	flags |= SDL_OPENGL;
+	if (_fullscreen) {
+		flags |= SDL_FULLSCREEN;
+		windowWidth = info -> current_w;
+		windowHeight = info -> current_h;
+	} else {
+		flags |= SDL_RESIZABLE;
+		windowWidth = info -> current_w - 50;
+		windowHeight = info -> current_h - 100;
+	}
 
-    if((__surfDisplay = SDL_SetVideoMode(windowWidth, windowHeight, bpp, SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER | SDL_OPENGL)) == NULL) {
+    if((__surfDisplay = SDL_SetVideoMode(windowWidth, windowHeight, bpp, flags)) == NULL) {
         return false;
     }
 	
@@ -129,28 +142,38 @@ Skylium::createScene(const string &name) {
 	return newScene;
 }
 
-sKey
-Skylium::sEvent() {
-	sKey result;
+void
+Skylium::enableMouseCamera() {
+	__isMouseMotionEnabled = true;
+}
+
+void
+Skylium::disableMouseCmaera() {
+	__isMouseMotionEnabled = false;
+}
+
+void
+Skylium::__catchEvents() {
+	__currentKeys = KEY_NOKEY;
 	SDL_Event tempEvent;
 	while (SDL_PollEvent(&tempEvent)) {
 		switch (tempEvent.type) {
 			case SDL_KEYDOWN:
 				switch(tempEvent.key.keysym.sym) {
 					case SDLK_ESCAPE:
-						result = KEY_ESC;
+						__currentKeys = KEY_ESC;
 						break;
 					case SDLK_w:
-						result = KEY_UP;
+						__currentKeys = KEY_UP;
 						break;
 					case SDLK_s:
-						result = KEY_DOWN;
+						__currentKeys = KEY_DOWN;
 						break;
 					case SDLK_a:
-						result = KEY_LEFT;
+						__currentKeys = KEY_LEFT;
 						break;
 					case SDLK_d:
-						result = KEY_RIGHT;
+						__currentKeys = KEY_RIGHT;
 						break;
 					default:
 						break;
@@ -167,19 +190,11 @@ Skylium::sEvent() {
 					__lastMousePositionY = y;
 				}
 				break;
+			case SDL_VIDEORESIZE:
+				__sceneManagement->getActiveScene()->getActiveCamera()->setProjection();
+				break;
 			case SDL_QUIT:
 				cleanup();
 		}
 	}
-	return result;
-}
-
-void
-Skylium::enableMouseCamera() {
-	__isMouseMotionEnabled = true;
-}
-
-void
-Skylium::disableMouseCmaera() {
-	__isMouseMotionEnabled = false;
 }

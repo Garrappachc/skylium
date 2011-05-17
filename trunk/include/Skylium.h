@@ -55,9 +55,10 @@ public:
 	/**
 	 * Inicjacja okna.
 	 * @param windowName Nazwa okna.
+	 * @param fullcreen Jeżeli true, okno będzie fullscreen.
 	 * @return false, jeżeli coś poszło nie tak.
 	 */
-	bool init(const std::string&);
+	bool init(const std::string&, const bool& = false);
 
 	void loop();
 
@@ -78,13 +79,17 @@ public:
 	 * czy ruchem myszki.
      * @return Numer zdarzenia.
      */
-	sKey sEvent();
+	sKey sEvent() { return __currentKeys; }
 	
 	void enableMouseCamera();
 	
 	void disableMouseCmaera();
 	
 private:
+	/**
+	 * Łapie eventy, naciśnięte klawisze wrzuca do __currentKeys.
+	 */
+	void __catchEvents();
 
 	/* Jedyna instancja SceneManagera. */
 	SceneManager * __sceneManagement;
@@ -101,6 +106,8 @@ private:
 
 	/* Taka tam zmienna, potrzebna SDL-owi. */
 	SDL_Surface * __surfDisplay;
+	
+	sKey __currentKeys;
 
 };
 #endif	/* Skylium_H */

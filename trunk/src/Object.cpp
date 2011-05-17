@@ -108,28 +108,28 @@ void
 Object::show() {
 	glPushMatrix();
 	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	glColor4f(__defColor[0], __defColor[1], __defColor[2], __defColor[3]);
+		glColor4f(__defColor[0], __defColor[1], __defColor[2], __defColor[3]);
 	
-	glTranslated(__mov.x, __mov.y, __mov.z);
+		glTranslated(__mov.x, __mov.y, __mov.z);
 
-	glScaled(__scale.x, __scale.y, __scale.z);
+		glScaled(__scale.x, __scale.y, __scale.z);
 
-	glRotated(__rot.x, 1.0, 0, 0);
-	glRotated(__rot.y, 0, 1.0, 0);
-	glRotated(__rot.z, 0, 0, 1.0);
+		glRotated(__rot.x, 1.0, 0, 0);
+		glRotated(__rot.y, 0, 1.0, 0);
+		glRotated(__rot.z, 0, 0, 1.0);
 	
-	if (__shader)
-		__shader -> toggle();
+		if (__shader)
+			__shader -> toggle();
 	
-	__pGroupsIterator = __pGroups.begin();
-	while (__pGroupsIterator != __pGroups.end())
-		(*__pGroupsIterator) -> show(), __pGroupsIterator++;
+		__pGroupsIterator = __pGroups.begin();
+		while (__pGroupsIterator != __pGroups.end())
+			(*__pGroupsIterator) -> show(), __pGroupsIterator++;
 	
-	if (__shader)
-		__shader -> toggle();
+		if (__shader)
+			__shader -> toggle();
 
 	glPopMatrix();
 }

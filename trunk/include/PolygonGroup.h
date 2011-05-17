@@ -45,7 +45,7 @@ public:
 	 * Konstruktor, który jako argument przyjmuje tylko nazwę.
      * @param name Nazwa grupy.
      */
-	PolygonGroup(const std::string&);
+	explicit PolygonGroup(const std::string&);
 	
 	/**
 	 * Konstruktor, który jako argument przyjmuje tablicę wierzchołków - patrz
@@ -54,14 +54,14 @@ public:
      * @param pointers Tablica współrzędnych (x, y, z) wierzchołków grupy.
      * @param size Rozmiar powyższej tablicy.
      */
-	PolygonGroup(const std::string&, const GLfloat*, const int&);
+	explicit PolygonGroup(const std::string&, const GLfloat*, const int&);
 	
 	/**
 	 * Konstruktor, który jako argument przyjmuje wektor współrzędnych grupy.
 	 * @param name Nazwa grupy.
      * @param pointers Wektor współrzędnych grupy ( vector<GLfloat> ).
      */
-	PolygonGroup(const std::string&, const sArray&);
+	explicit PolygonGroup(const std::string&, const sArray&);
 	
 	~PolygonGroup();
 	
