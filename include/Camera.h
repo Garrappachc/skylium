@@ -49,20 +49,27 @@ public:
 	 * http://www.toldo.info/roberto/LaboratorioGrafica/Slides/images/glulookat.gif
 	 */
 	void setView();
+	
+	/**
+	 * Ustawia kamerę ortogonalną (2D).
+	 * @param coord1 Pierwsza współrzędna.
+	 * @param coord2 Druga współrzędna.
+	 */
+	void setOrtho(const sSingleCoord&, const sSingleCoord&);
 
 	/**
 	 * Przesuwa kamerę o podane wartości, w trybie 2D.
-     * @param movX oś X;
-     * @param movY oś Y;
-     * @param movZ oś Z.
+	 * @param movX oś X;
+	 * @param movY oś Y;
+	 * @param movZ oś Z.
 	 */
 	void moveCamera(const GLdouble&, const GLdouble&, const GLdouble&);
 
 	/**
 	 * Obraca kamerę w jednym miejscu - obsługa myszy.
-     * @param x;
-     * @param y;
-     * @param z.
+	 * @param x;
+	 * @param y;
+	 * @param z.
 	 */
 	void rotateCamera(const GLdouble&, const GLdouble&, const GLdouble&);
 
@@ -70,9 +77,9 @@ public:
 	 * Ustawia punkt, na który patrzy się kamera.
 	 * Jako argument przyjmuje albo trzy GLdouble, które definiują punkt (x, y, z),
 	 * albo tablicę GLdouble (p[0], p[1], p[2]).
-     * @param x Pozycja X.
-     * @param y Pozycja Y.
-     * @param z Pozycja Z.
+	 * @param x Pozycja X.
+	 * @param y Pozycja Y.
+	 * @param z Pozycja Z.
 	 */
 	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
 	
@@ -101,10 +108,10 @@ private:
 	sVector __up;
 	/* Wartości, którymi będziemy zmieniać położenie kamery; */
 	sVector __mov;
-
-	/*** Inne ***/
-	int __windowWidth;
+	
+	/* Przyda się przy setOrtho() */
 	int __windowHeight;
+	int __windowWidth;
 };
 
 #endif	/* CAMERA_H */

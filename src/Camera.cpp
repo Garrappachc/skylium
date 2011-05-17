@@ -37,27 +37,19 @@ Camera::Camera() :
 		__center(0, 0, 0),
 		__up(0, 1, 0),
 		__mov(0, 0, 0) {
-
-	const SDL_VideoInfo *info = SDL_GetVideoInfo();
-	__windowWidth = info -> current_w;
-	__windowHeight = info -> current_h;
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Camera()";
 #endif
 }
 
-Camera::Camera(const GLdouble& x, const GLdouble& y, const GLdouble& z) :
+Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z) :
 		__fovy(45.0),
 		__zNear(1.0),
 		__zFar(200.0),
-		__eye(x, y, z),
+		__eye(_x, _y, _z),
 		__center(0, 0, 0),
 		__up(0, 1, 0),
 		__mov(0, 0, 0) {
-
-	const SDL_VideoInfo *info = SDL_GetVideoInfo();
-	__windowWidth = info -> current_w;
-	__windowHeight = info -> current_h;
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Camera(const GLdouble&, const GLdouble&, const GLdouble&)";
 #endif
@@ -71,10 +63,13 @@ Camera::~Camera() {
 
 void
 Camera::setProjection() {
-	glEnable(GL_DEPTH_TEST);
+	const SDL_VideoInfo *info = SDL_GetVideoInfo();
+	__windowWidth = info -> current_w;
+	__windowHeight = info -> current_h;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	GLdouble aspect = (GLdouble) __windowWidth / __windowHeight;
+	glViewport(0, 0, __windowWidth, __windowHeight);
 	gluPerspective(__fovy, aspect, __zNear, __zFar);
 }
 
@@ -87,6 +82,16 @@ Camera::setView() {
 			__center.x + __mov.x, __center.y + __mov.y, __center.z + __mov.z,
 			__up.x, __up.y, __up.z
 		);
+}
+
+void
+Camera::setOrtho(const sSingleCoord &_coord1, const sSingleCoord &_coord2) {
+	glViewport((int)_coord1.x * __windowWidth,
+			 (int)_coord1.y * __windowHeight,
+			 (int)_coord2.x * __windowWidth,
+			 (int)_coord2.y * __windowHeight);
+	
+	gluOrtho2D(_coord1.x, _coord2.x, _coord1.y, _coord2.y);
 }
 
 void

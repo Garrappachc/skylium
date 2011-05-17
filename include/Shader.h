@@ -31,7 +31,7 @@ public:
 	 * @param vertFileName Nazwa pliku z kodem vertex shadera.
 	 * @param fragFileName Nazwa pliku z kodem fragment shadera.
 	 */
-	Shader(const std::string&, const std::string&);
+	explicit Shader(const std::string&, const std::string&);
 	
 	virtual ~Shader();
 

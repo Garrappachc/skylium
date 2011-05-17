@@ -29,7 +29,8 @@ PolygonGroup::PolygonGroup() :
 		__hasNormals(0),
 		__material(NULL),
 		__smooth(false),
-		__mode(GL_TRIANGLES) {}
+		__mode(GL_TRIANGLES)
+			{}
 
 PolygonGroup::PolygonGroup(const string &_name) :
 		name(_name),
@@ -39,7 +40,8 @@ PolygonGroup::PolygonGroup(const string &_name) :
 		__hasNormals(0),
 		__material(NULL),
 		__smooth(false),
-		__mode(GL_TRIANGLES) {}
+		__mode(GL_TRIANGLES)
+			{}
 
 PolygonGroup::PolygonGroup(const string &_name, const GLfloat *_pointers, const int &_size) :
 		name(_name),
@@ -49,7 +51,8 @@ PolygonGroup::PolygonGroup(const string &_name, const GLfloat *_pointers, const 
 		__hasNormals(0),
 		__material(NULL),
 		__smooth(false),
-		__mode(GL_TRIANGLES) {}
+		__mode(GL_TRIANGLES)
+			{}
 
 PolygonGroup::PolygonGroup(const string &_name, const sArray &_pointers) :
 		name(_name),
@@ -59,7 +62,8 @@ PolygonGroup::PolygonGroup(const string &_name, const sArray &_pointers) :
 		__hasNormals(0),
 		__material(NULL),
 		__smooth(false),
-		__mode(GL_TRIANGLES) {}
+		__mode(GL_TRIANGLES)
+			{}
 
 PolygonGroup::~PolygonGroup() {
 #ifdef __DEBUG__

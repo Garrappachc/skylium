@@ -36,7 +36,7 @@ public:
 	 * Konstruktor, który przyjmuje położenie źródła światła w postaci sVec3D.
      * @param położenie źródła światła.
      */
-	Light(const sVec3D< GLfloat >&);
+	explicit Light(const sVec3D< GLfloat >&);
 
 	/**
 	 * Konstruktor, który przyjmuje położenie źródła światła w postaci x, y, z.
@@ -44,7 +44,7 @@ public:
      * @param y Współrzędna y źródła światła.
      * @param z Współrzędna z źródła światła.
      */
-	Light(const GLfloat&, const GLfloat&, const GLfloat&);
+	explicit Light(const GLfloat&, const GLfloat&, const GLfloat&);
 	
 	~Light();
 	

@@ -47,7 +47,6 @@ SceneManager::createScene(const string &_newSceneName) {
 bool
 SceneManager::displayActiveScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
 #ifdef __DEBUG_STRONG__
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif

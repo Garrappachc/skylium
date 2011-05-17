@@ -1,5 +1,5 @@
 /* 
- * Box.h
+ * sFont.h
  * Copyright (C) 2011 Michał Garapich
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,19 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
+#ifndef SFONT_H
+#define	SFONT_H
 
-#ifndef BOX_H
-#define	BOX_H
+#include <string>
 
-#include "Object.h"
+#include <GL/gl.h>
+#include <GL/glx.h>
 
-class Box : public Object {
-public:
-	/**
-	 * @param name Name of the box (object).
-	*/
-	explicit Box(const std::string&);
+enum {
+	
 };
 
-#endif	/* BOX_H */
+class sFont {
+public:
+	
+	explicit sFont(const std::string& = "-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1", const int& = 96);
+	
+	explicit sFont(const sFont&);
+	
+	virtual ~sFont();
+	
+	void print(const int&, const int&, const std::string&);
+	
+private:
+	
+	/* Nasz font */
+	Font __font;
+	
+	GLuint __base;
+	
+	int __characters;
+
+};
+
+#endif	/* SFONT_H */
 

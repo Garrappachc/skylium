@@ -1,5 +1,5 @@
 /* 
- * Box.h
+ * Hud.h
  * Copyright (C) 2011 Michał Garapich
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,18 +16,34 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-#ifndef BOX_H
-#define	BOX_H
 
-#include "Object.h"
+#ifndef HUD_H
+#define HUD_H
 
-class Box : public Object {
+#include <GL/gl.h>
+
+#include "sFont.h"
+#include "Vectors.h"
+
+class Hud {
+
 public:
-	/**
-	 * @param name Name of the box (object).
-	*/
-	explicit Box(const std::string&);
+	
+	Hud();
+
+	Hud(const sFont*, const sSingleCoord&, const sSingleCoord&, const GLfloat& = 0.7);
+	
+	void drawBorder();
+
+private:
+	
+	const sFont * __hudFont;
+	
+	sSingleCoord __coord1;
+	sSingleCoord __coord2;
+	
+	GLfloat __alpha;
+    
 };
 
-#endif	/* BOX_H */
-
+#endif // HUD_H

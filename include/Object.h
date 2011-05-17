@@ -56,20 +56,20 @@ public:
 	 * @param pointers[] Tablica wierzchołków;
 	 * @param size Liczba współrzędnych wierzchołków.
 	 */
-	Object(const std::string&, const GLfloat*, const int&);
+	explicit Object(const std::string&, const GLfloat*, const int&);
 
 	/**
 	 * Konstruktor obiektu. Przymuje już gotowe tablice wierzchołków.
 	 * @param name Nazwa obiektu.
 	 * @param pointers Tablica wierzchołków.
 	 */
-	Object(const std::string&, const sArray&);
+	explicit Object(const std::string&, const sArray&);
 
 	/**
 	 * Konstruktor, który jako argument przyjmuje tylko nazwę obiektu.
 	 * @param name Nazwa obiektu.
 	 */
-	Object(const std::string&);
+	explicit Object(const std::string&);
 	
 	Object();
 	

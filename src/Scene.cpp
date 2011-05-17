@@ -41,7 +41,8 @@ Scene::Scene() :
 		__cameraList(0),
 		__activeCamera(NULL),
 		__lightList(8, NULL),
-		__isLightOn(false) {}
+		__isLightOn(false)
+			{}
 
 
 Scene::Scene(const string& _name) :
@@ -70,9 +71,9 @@ Scene::~Scene() {
 
 void
 Scene::show() {
-	glLoadIdentity();
+	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	if (__activeCamera) {
-		__activeCamera -> setProjection();
+		//__activeCamera ->setProjection();
 		__activeCamera -> setView();
 	}
 	if (__isLightOn) {
@@ -145,8 +146,10 @@ Scene::__setObjects() {
 Camera *
 Scene::createCamera(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
 	Camera * newCamera = new Camera(_x, _y, _z);
-	if (!__activeCamera)
+	if (!__activeCamera) {
 		__activeCamera = newCamera;
+		__activeCamera->setProjection();
+	}
 	__cameraList.push_back(newCamera);
 	return newCamera;
 }

@@ -44,7 +44,7 @@ public:
 	 * Konstruktor.
 	 * @param name - nazwa sceny.
 	 */
-	Scene(const std::string&);
+	explicit Scene(const std::string&);
 
 	/**
 	 * Destruktor, który powinien zniszczyć wszystkie obiekty.
