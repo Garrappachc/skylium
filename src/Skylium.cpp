@@ -126,7 +126,10 @@ Skylium::render() {
 	glCullFace(GL_FRONT_AND_BACK);
 
 	__sceneManagement -> displayActiveScene();
+}
 
+void
+Skylium::swapBuffers() {
 	SDL_GL_SwapBuffers();
 }
 
@@ -143,13 +146,11 @@ Skylium::createScene(const string &name) {
 }
 
 void
-Skylium::enableMouseCamera() {
-	__isMouseMotionEnabled = true;
-}
-
-void
-Skylium::disableMouseCmaera() {
-	__isMouseMotionEnabled = false;
+Skylium::toggleMouseCamera() {
+	if (!__isMouseMotionEnabled)
+		__isMouseMotionEnabled = true;
+	else
+		__isMouseMotionEnabled = false;
 }
 
 void
@@ -174,6 +175,9 @@ Skylium::__catchEvents() {
 						break;
 					case SDLK_d:
 						__currentKeys = KEY_RIGHT;
+						break;
+					case SDLK_TAB:
+						__currentKeys = KEY_TAB;
 						break;
 					default:
 						break;

@@ -279,14 +279,17 @@ Object::__parseMtl(const string &_fileName) {
 		} else if (buffer.substr(0, 2) == "Ka") {
 			sColor param;
 			line >> temp >> param[0] >> param[1] >> param[2];
+			param[3] = 0.0;
 			current -> loadMaterial(param, MATERIAL_AMBIENT);
 		} else if (buffer.substr(0, 2) == "Kd") {
 			sColor param;
 			line >> temp >> param[0] >> param[1] >> param[2];
+			param[3] = 0.0;
 			current -> loadMaterial(param, MATERIAL_DIFFUSE);
 		} else if (buffer.substr(0, 2) == "Ks") {
 			sColor param;
 			line >> temp >> param[0] >> param[1] >> param[2];
+			param[3] = 0.0;
 			current -> loadMaterial(param, MATERIAL_SPECULAR);
 		} else if (buffer.substr(0, 2) == "Ns") {
 			GLint param;

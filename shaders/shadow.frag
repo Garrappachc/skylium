@@ -1,43 +1,20 @@
-/* -------------------------------------------------------
+varying vec3 N;
+varying vec3 v;
 
-This shader implements a point light per pixel using  the 
-diffuse, specular, and ambient terms acoording to "Mathematics of Lighthing" 
-as found in the book "OpenGL Programming Guide" (aka the Red Book)
+void main() {
+	vec3 L = normalize(gl_LightSource[0].position.xyz - v);
+	vec3 E = normalize(-v);
+	vec3 R = normalize(-reflect(L, N));
 
-AntÃ³nio Ramires Fernandes
+	vec4 Iamb = gl_FrontLightProduct[0].ambient;
 
---------------------------------------------------------- */
+	vec4 Idiff = gl_FrontLightProduct[0].diffuse * max(dot(N, L), 0.0);
+	Idiff = clamp(Idiff, 0.0, 1.0);
 
-varying vec4 diffuse,ambientGlobal, ambient;
-varying vec3 normal,lightDir,halfVector;
-varying float dist;
-
-
-void main()
-{
-	vec3 n,halfV,viewV,ldir;
-	float NdotL,NdotHV;
-	vec4 color = ambientGlobal;
-	float att;
+	vec4 Ispec = gl_FrontLightProduct[0].specular * pow(max(dot(R, E), 0.0), 0.3 * gl_FrontMaterial.shininess);
+	Ispec = clamp(Ispec, 0.0, 1.0);
 	
-	/* a fragment shader can't write a verying variable, hence we need
-	a new variable to store the normalized interpolated normal */
-	n = normalize(normal);
-	
-	/* compute the dot product between normal and ldir */
-	NdotL = max(dot(n,normalize(lightDir)),0.0);
+	gl_FragColor = (gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) * gl_Color;
 
-	if (NdotL > 0.0) {
-		att = 1.0 / (gl_LightSource[0].constantAttenuation +
-				gl_LightSource[0].linearAttenuation * dist +
-				gl_LightSource[0].quadraticAttenuation * dist * dist);
-		color += att * (diffuse * NdotL + ambient);
-	
-		
-		halfV = normalize(halfVector);
-		NdotHV = max(dot(n,halfV),0.0);
-		color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
-	}
 
-	gl_FragColor = color;
 }
