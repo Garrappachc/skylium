@@ -32,7 +32,8 @@ typedef enum {
 	KEY_UP = 2,
 	KEY_DOWN = 4,
 	KEY_RIGHT = 8,
-	KEY_LEFT = 16
+	KEY_LEFT = 16,
+	KEY_TAB = 32
 } sKey;
 
 class Skylium : public Singleton < Skylium > {
@@ -63,6 +64,8 @@ public:
 	void loop();
 
 	void render();
+	
+	void swapBuffers();
 
 	void cleanup();
 
@@ -81,9 +84,7 @@ public:
      */
 	sKey sEvent() { return __currentKeys; }
 	
-	void enableMouseCamera();
-	
-	void disableMouseCmaera();
+	void toggleMouseCamera();
 	
 private:
 	/**

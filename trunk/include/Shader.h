@@ -53,6 +53,16 @@ public:
 	 * @return false, jeżeli coś poszło nie tak.
 	 */
 	void bind(Object*);
+	
+	/**
+	 * Odpina shadera od obiektu.
+	 */
+	void unbind(Object*);
+	
+	/**
+	 * Zwraca true, jeżeli shader jest przypięty do danego obiektu.
+	 */
+	bool isBinded(Object*);
 
 private:
 	std::string __vertFile;

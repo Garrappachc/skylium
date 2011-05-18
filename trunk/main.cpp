@@ -21,7 +21,7 @@
 
 using namespace std;
 
-GLfloat boxTex[] = {
+GLfloat boxTex[] = { // tekstury dla pudełka - do przeniesienia do frameworka w najbliższej przyszłości.
 	0, 0,
 	1, 0,
 	1, 1,
@@ -58,78 +58,82 @@ main() {
 
 	Skylium *s_main = new Skylium();
 	
-	if (!s_main -> init("Skylium", false)) {
+	if (!s_main -> init("Skylium", false)) { // tworzy okno, false - okno, true - fullscreen
 		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
 	}
 	
 	Shader *cienie = new Shader("shaders/shadow.vert", "shaders/shadow.frag");
-	if (!cienie -> make())
+	if (!cienie -> make()) // kompilacja + linkowanie
 		exit(1);
+	
+	Scene *scenka = s_main -> createScene("Scenka"); // tworzymy scenę
 
-	Scene *scenka = s_main -> createScene("Scenka");
-
-	Object *pudelko = scenka -> createBox("Pudelko");
+	Object *pudelko = scenka -> createBox("Pudelko"); // poprzez scenkę tworzymy nowy obiekt
 	pudelko -> scale(-3, -3, -3);
 	pudelko -> move(-10, 0, 0);
-	if (!pudelko -> loadTexture("texture/box.jpg", boxTex, 48))
+	if (!pudelko -> loadTexture("texture/box.jpg", boxTex, 48)) // ładujemy teksturę
 		cout << "Nie udało się załadować tekstury!";
 	
-	Object *plane = scenka -> createObject("plane");
-	plane -> loadFromObj("objects/plane.obj", GET_VERTICES | GET_TEXTURE | GET_NORMALS);
+	Object *plane = scenka -> createObject("plane"); // tworzymy nowy obiekt
+	plane -> loadFromObj("objects/plane.obj", GET_VERTICES | GET_TEXTURE | GET_NORMALS); // wczytujemy z .obj'ta
 	plane -> move(-10, 5.1, 10);
 	plane -> scale (1.5, 1.5, 1.5);
 	plane -> setColor(0, 132, 200, 1);
-	plane -> rotate(0, 0, 20);
+	plane -> rotate(0, 0, 20); // a co
 
-	Object *malpka = scenka -> createObject("malpka");
-	malpka->loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL);
-	if (!malpka) {
-		cout << "Malpka nie działa.\n";
-	}
+	Object *malpka = scenka -> createObject("malpka"); // małpka
+	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL)) // znowu .obj
+		exit(1); // nie chcemy brzydali na ekranie
 	malpka -> move(-10, 4.5, 0);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
 	malpka -> setColor(88, 25, 0, 1);
 	
 	Object *table = scenka -> createObject("table");
-	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE);
+	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
 	table -> move(-10, -2, 10);
 	table -> scale (6, 6, 6);
 	table -> setColor(119, 44, 0, 1);
 	
-	Camera* kamerka = scenka -> createCamera(5.0, 6.0, 0.0);
-	kamerka -> lookAt(1, 4, -1);
+	Camera* kamerka = scenka -> createCamera(5.0, 6.0, 0.0); // kamerka na pozycji (5, 6, 0)
+	kamerka -> lookAt(1, 4, -1); // kamerka skierowana na punkt (1, 4, -1)
 	
-	cienie -> bind(malpka);
-	cienie -> bind(plane);
-	cienie -> bind(table);
+	cienie -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
+	cienie -> bind(plane); // do samolociku
+	cienie -> bind(table); // do stolika
+	// do pudełka już nie, bo nie chce mi się shadera pisać na razie
 
-	int swiatelko = scenka -> createLight(6.0, 6.0, 0.0);
-	scenka ->setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0);
-	scenka ->toggleLight();
+	int swiatelko = scenka -> createLight(6.0, 6.0, 0.0); // światło na pozycji (6, 6, 0)
+	scenka -> setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
+	scenka -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
 	
-	Timer *zegarek_dla_animacji = new Timer();
-	Timer *zegarek_dla_fps = new Timer();
+	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
+	Timer *zegarek_dla_fps = new Timer(); // liczymy fps'y
+	Timer *zegarek_dla_taba = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
 	
-	sFont *foncik = new sFont();
+	short fps = 0; // licznik fps.
 	
-	Hud *hudek = new Hud(foncik, sSingleCoord(-100, 0), sSingleCoord(200, 20), 0.7);
+	s_main -> toggleMouseCamera(); // Ha! Włączamy obracanie kamerą za pomocą myszy
 	
-	short fps = 0;
-	
-	s_main ->enableMouseCamera();
-	
-	sKey klawisz;
-	while ((klawisz = s_main -> sEvent()) != KEY_ESC) {
+	sKey klawisz; // tutaj przechwytujemy klawisze
+	while ((klawisz = s_main -> sEvent()) != KEY_ESC) { // żeby się dało czymś wyjść
 		if (klawisz == KEY_DOWN)
-			kamerka -> moveCamera(0.1, 0.0, 0.0);
+			kamerka -> moveCamera(0.1, 0.0, 0.0); // KEY_DOWN to nie kursor w dół, tylko S
 		if (klawisz == KEY_UP)
-			kamerka -> moveCamera(-0.1, 0.0, 0.0);
+			kamerka -> moveCamera(-0.1, 0.0, 0.0); // W
 		if (klawisz == KEY_RIGHT)
-			kamerka -> moveCamera(0.0, 0.0, -0.1);
+			kamerka -> moveCamera(0.0, 0.0, -0.1); // A
 		if (klawisz == KEY_LEFT)
-			kamerka -> moveCamera(0.0, 0.0, 0.1);
+			kamerka -> moveCamera(0.0, 0.0, 0.1); // D
+		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
+																	// przytrzymamy taba tak krótko, żeby się
+																	// po prostu raz włączył lub wyłączył
+			if (cienie -> isBinded(malpka))
+				cienie -> unbind(malpka);
+			else
+				cienie -> bind(malpka);
+		}
 		
 		if (zegarek_dla_animacji -> passed(2500, MICROSECONDS)) {
 			table -> rotate(0, 0.1, 0);
@@ -143,18 +147,20 @@ main() {
 			fps = 0;
 		}
 		
-		s_main -> execute();
+		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
 		
-		hudek -> drawBorder();
+		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
 		
 	}
 	
-	s_main -> cleanup();
-	delete s_main;
-	delete cienie;
+	// musimy wywalić ręcznie wszystko, co utworzyliśmy ręcznie (operatorem new w źródle)
+	delete cienie; // wywalamy shadera
 	delete zegarek_dla_animacji;
 	delete zegarek_dla_fps;
-	delete foncik;
+	delete zegarek_dla_taba;
+
+	// całą resztę wywali za nas Skylium.
+	delete s_main;
 
 	return 0;
 }

@@ -45,6 +45,9 @@ Shader::~Shader() {
 
 	glDeleteShader(__vertexShader);
 	glDeleteShader(__fragmentShader);
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: Shader() <" << __vertFile << ", " << __fragFile << ">";
+#endif
 
 }
 
@@ -157,6 +160,19 @@ Shader::toggle() {
 void
 Shader::bind(Object *_dest) {
 	_dest -> __shader = this;
+}
+
+void
+Shader::unbind(Object *_dest) {
+	_dest -> __shader = NULL;
+}
+
+bool
+Shader::isBinded(Object *_dest) {
+	if (_dest -> __shader == NULL)
+		return false;
+	else
+		return true;
 }
 
 bool
