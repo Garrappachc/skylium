@@ -1,6 +1,13 @@
 CXX=g++
 CXXFLAGS=-g -Wall -pipe -D__DEBUG__
-LFLAGS=-lSOIL -lSDL -lglee -lGL -lGLU
+
+LSOIL=SOIL
+LSDL=SDL
+LGLEE=GLee
+LGL=GL
+LGLU=GLU
+
+LFLAGS=-l$(LSOIL) -l$(LSDL) -l$(LGLEE) -l$(LGL) -l$(LGLU)
 
 OBJS=Box.o Camera.o Hud.o Light.o Material.o Object.o ObjectObjParser.o PolygonGroup.o Scene.o SceneManager.o sFont.o Shader.o Skylium.o Timer.o
 

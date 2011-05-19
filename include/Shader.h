@@ -62,7 +62,7 @@ public:
 	/**
 	 * Zwraca true, jeżeli shader jest przypięty do danego obiektu.
 	 */
-	bool isBinded(Object*);
+	bool isBound(Object*);
 
 private:
 	std::string __vertFile;

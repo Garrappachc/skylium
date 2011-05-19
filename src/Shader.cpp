@@ -168,7 +168,7 @@ Shader::unbind(Object *_dest) {
 }
 
 bool
-Shader::isBinded(Object *_dest) {
+Shader::isBound(Object *_dest) {
 	if (_dest -> __shader == NULL)
 		return false;
 	else
