@@ -129,7 +129,7 @@ main() {
 		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
-			if (cienie -> isBinded(malpka))
+			if (cienie -> isBound(malpka))
 				cienie -> unbind(malpka);
 			else
 				cienie -> bind(malpka);

@@ -40,7 +40,7 @@ Scene::Scene() :
 		__objectList(0),
 		__cameraList(0),
 		__activeCamera(NULL),
-		__lightList(8, NULL),
+		__lightList(8, (Light*)NULL),
 		__isLightOn(false)
 			{}
 
@@ -50,7 +50,7 @@ Scene::Scene(const string& _name) :
 		__objectList(0),
 		__cameraList(0),
 		__activeCamera(NULL),
-		__lightList(8, NULL),
+		__lightList(8, (Light*)NULL),
 		__isLightOn(false) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Utworzono nową scenę: " << name;
