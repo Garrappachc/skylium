@@ -1,0 +1,23 @@
+#labels Featured,Phase-Deploy
+= How to build Skylium =
+
+In a terminal, type:
+{{{
+svn checkout http://skylium.googlecode.com/svn/trunk/ skylium
+}}}
+
+Ok, you've just downloaded sources into folder named "skylium". Go to this folder and compile:
+{{{
+cd skylium
+make
+}}}
+
+Some lines of compilation. You're good! The program is ready to run.
+{{{
+./skylium
+}}}
+
+You can remove compiled files (.o) by typing:
+{{{
+make clean
+}}}
