@@ -1,15 +1,16 @@
 CXX=g++
-CXXFLAGS=-g -Wall -pipe -D__DEBUG__
+CXXFLAGS=-g -Wall -pipe -D__DEBUG__ `sdl-config --cflags` -std=c++0x
 
-LSOIL=SOIL
-LSDL=SDL
-LGLEE=GLee
-LGL=GL
-LGLU=GLU
+LSOIL=-lSOIL
+LSDL=`sdl-config --libs`
+LGLEE=-lglee
+LGL=-lGL
+LGLU=-lGLU
+LGLEW=-lGLEW
 
-LFLAGS=-l$(LSOIL) -l$(LSDL) -l$(LGLEE) -l$(LGL) -l$(LGLU)
+LFLAGS=$(LSOIL) $(LSDL) $(LGLEE) $(LGL) $(LGLU) $(LGLEW)
 
-OBJS=Box.o Camera.o Hud.o Light.o Material.o Object.o ObjectObjParser.o PolygonGroup.o Scene.o SceneManager.o sFont.o Shader.o Skylium.o Timer.o
+OBJS=Camera.o FaceComp.o Light.o Material.o Mesh.o Object.o Scene.o SceneManager.o Shader.o Skylium.o Timer.o Vertex.o
 
 
 skylium: $(OBJS) main.o
