@@ -32,24 +32,24 @@ main() {
 	
 	Scene *scenka = s_main -> createScene("Scenka"); // tworzymy scenę
 	
+	Object *table = scenka -> createObject("table");
+	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
+	table -> move(0, -2, -10);
+	table -> scale (6, 6, 6);
+	table -> setColor(240, 240, 255, 1);
+	table -> loadIntoVBO();
+	
 	Object *malpka = scenka -> createObject("malpka"); // małpka
 	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL)) // znowu .obj
 		exit(1); // nie chcemy brzydali na ekranie
-	malpka -> move(-10, 4.5, 0);
+	malpka -> move(0, 7, -10);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
 	malpka -> setColor(136, 47, 0);
 	malpka -> loadIntoVBO();
 	
-	Object *table = scenka -> createObject("table");
-	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
-	table -> move(-10, -2, 10);
-	table -> scale (6, 6, 6);
-	table -> setColor(144, 244, 255, 1);
-	table -> loadIntoVBO();
-	
-	Camera* kamerka = scenka -> createCamera(5.0, 6.0, 0.0); // kamerka na pozycji (5, 6, 0)
-	kamerka -> lookAt(1, 4, -1); // kamerka skierowana na punkt (1, 4, -1)
+	Camera* kamerka = scenka -> createCamera(0.0, 4.0, 10.0); // kamerka na pozycji (5, 6, 0)
+	kamerka -> lookAt(0, 3, -10); // kamerka skierowana na punkt (1, 4, -1)
 	
 	cienie -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
 	cienie -> bind(table); // do stolika
@@ -69,13 +69,13 @@ main() {
 	sKey klawisz; // tutaj przechwytujemy klawisze
 	while ((klawisz = s_main -> sEvent()) != KEY_ESC) { // żeby się dało czymś wyjść
 		if (klawisz == KEY_DOWN)
-			kamerka -> moveCamera(0.1, 0.0, 0.0); // KEY_DOWN to nie kursor w dół, tylko S
+			kamerka -> moveCamera(0.0, 0.0, -0.1); // KEY_DOWN to nie kursor w dół, tylko S
 		if (klawisz == KEY_UP)
-			kamerka -> moveCamera(-0.1, 0.0, 0.0); // W
+			kamerka -> moveCamera(0.0, 0.0, 0.1); // W
 		if (klawisz == KEY_RIGHT)
-			kamerka -> moveCamera(0.0, 0.0, -0.1); // A
+			kamerka -> moveCamera(0.1, 0.0, 0.0); // A
 		if (klawisz == KEY_LEFT)
-			kamerka -> moveCamera(0.0, 0.0, 0.1); // D
+			kamerka -> moveCamera(-0.1, 0.0, 0.0); // D
 		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
@@ -87,6 +87,7 @@ main() {
 		
 		if (zegarek_dla_animacji -> passed(2500, MICROSECONDS)) {
 			table -> rotate(0, 0.1, 0);
+			malpka -> rotate(0, 0.1, 0);
 		}
 		
 		fps++;

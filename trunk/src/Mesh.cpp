@@ -48,58 +48,66 @@ Mesh::~Mesh() {
 
 void
 Mesh::show() {
-	if (__smooth)
+	if (__smooth) // czy jest smooth?
 		glShadeModel(GL_SMOOTH);
 	
-	if (__material && __material -> hasAnyTexture()) {
-		glColor4f(1.0, 1.0, 1.0, 1.0);
-		__material -> setTexture();
-		glEnable(GL_TEXTURE_2D);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	if (__material && __material -> hasAnyTexture()) { // czy mamy jakąkolwiek teksturę?
+		glColor4f(1.0, 1.0, 1.0, 1.0); // musi być biały kolor - bez tego nie będzie tekstury
+		__material -> setTexture(); // ustawiamy parametry tekstur
+		glEnable(GL_TEXTURE_2D); // odblokowujemy tekstury
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY); // i ich współrzędne
 	}
 	
-	if (__hasNormals)
-		glEnableClientState(GL_NORMAL_ARRAY);
+	if (__hasNormals) // mamy normalne?
+		glEnableClientState(GL_NORMAL_ARRAY); // powiedzmy o tym OpenGLowi
 	
+	// chcemy tablice wierzchołków
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
+	// ustawiamy materiał
 	if (__material)
 		__material -> setMaterial();
 	
 	
-	
 	// renderujemy!
-	glBindBuffer(GL_ARRAY_BUFFER, __vboID);
-	
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
+	glBindBuffer(GL_ARRAY_BUFFER, __vboID); // ustawiamy aktywny wskaźnik na odpowiednim buforze
 	
 	if (__material && __material -> hasAnyTexture())
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
+		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // gdzie są koordynaty tekstur
 	
 	if (__hasNormals)
-		glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
+		glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // gdzie normalne
+
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // i gdzie wierzchołki
 	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID); // teraz chcemy bufor z indeksami
+
+	// Teraz rysujemy wszystko za jednym zamachem.
+	// __mode - defaultowo GL_TRIANGLES. Tryb rysowania;
+	// __index.size() - ilość wierzchołków do odwzorowania;
+	// GL_UNSIGNED_SHORT - typ danych w tablicy indeksów. Nasza tablica to std::vector<GLushort>, czyli
+	// 	właśnie unsigned short;
+	// BUFFER_OFFSET(0) - mówimy, skąd chcemy zacząć pobierać indeksy wierzchołków.
 	glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 	
-	GLenum err = glGetError();
+	GLenum err = glGetError(); // pobieramy błędy
 	while (err != GL_NO_ERROR) {
 		cout << err << endl;
 		err = glGetError();
 	}
 	
-	if (__material && __material -> hasAnyTexture())
+	if (__material && __material -> hasAnyTexture()) // blokujemy
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	
-	if (__hasNormals)
+	if (__hasNormals) // blokujemy
 		glDisableClientState(GL_NORMAL_ARRAY);
 	
-	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY); // blokujemy
 	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // bufor już nam nie będzie potrzebny - wracamy ze wskaźnikiem do ramu
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
-	glShadeModel(GL_FLAT);
+	glShadeModel(GL_FLAT); // zawsze!
 }
 
 void
@@ -129,9 +137,9 @@ Mesh::loadIntoVbo() {
 #endif
 	
 	// mówimy, gdzie co jest
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // 0, żeby aktywny wskaźnik był na początku
 	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // 12 = rozmiar Position
 	glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // 20 = rozmiar Position + rozmiar TexCoords
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // 0, żeby aktywny wskaźnik był na początku
 	
 	// generujemy VBO ID dla indeksów, ustawiamy aktywny wskaźnik
 	glGenBuffers(1, &__vboIndexID);
@@ -162,20 +170,10 @@ Mesh::smooth(const bool &_s) {
 unsigned
 Mesh::push_back(const Vertex &_v) {
 	__vertices.push_back(_v);
-	/*cout << "\nUmieszczony wierzchołek:\n  Pozycja: ("
-		<< _v.vertexPosition.x << ", "
-		<< _v.vertexPosition.y << ", "
-		<< _v.vertexPosition.z << ")\n  Koordynaty tekstury: ("
-		<< _v.textureCoords.u << ", "
-		<< _v.textureCoords.v << ")\n  Normalna: ("
-		<< _v.normalVector.x << ", "
-		<< _v.normalVector.y << ", "
-		<< _v.normalVector.z << ")\n";*/
 	return __vertices.size() - 1;
 }
 
 void
 Mesh::addNewIdx(const int &_idx) {
-	//cout << "\nUmieszczony indeks: " << _idx << endl;
 	__index.push_back(_idx);
 }

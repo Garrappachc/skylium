@@ -26,6 +26,14 @@
 
 #include "Vectors.h"
 
+/**
+ * UWAGA.
+ * Co do obrotu i ruchu kamery.
+ * W trybie FPP __center jest _wektorem_, nie punktem na który ma patrzeć kamera.
+ * Jest to wektor znormalizowany, który określa punkt lookAt w stosunku do punktu (0, 0, 0).
+ * Dlatego przy wywoływaniu gluLookAt(...), jako center określamy __center + __eye.
+ */
+
 class Camera {
 
 public:
@@ -78,18 +86,15 @@ public:
 	 */
 	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
 	
-	/**
-	 * Ustawia kamerę w pozycji początkowej.
-	 */
-	void resetCameraPosition();
+	void printCenter();
 
 
 private:
+	
 	/*** setProjection ***/
 	GLdouble __fovy;
 	GLdouble __zNear;
 	GLdouble __zFar;
-
 
 	/*** setView ***/
 	
@@ -101,8 +106,9 @@ private:
 
 	/* Wektor zmiany kierunku patrzenia kamery */
 	sVector __up;
-	/* Wartości, którymi będziemy zmieniać położenie kamery; */
-	sVector __mov;
+	
+	/* Kąt, pod którym kamera znajduje się w stosunku do osi -z i osi y */
+	sVector __angle;
 	
 	/* Przyda się przy setOrtho() */
 	int __windowHeight;

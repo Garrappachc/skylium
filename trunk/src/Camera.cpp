@@ -16,8 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __NO_CAMERA_MANAGEMENT__
-
 #include <iostream>
 #include <cmath>
 #include <SDL/SDL.h>
@@ -37,8 +35,7 @@ Camera::Camera() :
 		__zFar(200.0),
 		__eye(0, 0, 0),
 		__center(0, 0, 0),
-		__up(0, 1, 0),
-		__mov(0, 0, 0) {
+		__up(0, 1, 0) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Camera()";
 #endif
@@ -50,8 +47,7 @@ Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z) :
 		__zFar(200.0),
 		__eye(_x, _y, _z),
 		__center(0, 0, 0),
-		__up(0, 1, 0),
-		__mov(0, 0, 0) {
+		__up(0, 1, 0) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Camera(" << _x << ", " << _y << ", " << _z << ")";
 #endif
@@ -80,51 +76,52 @@ Camera::setView() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(
-			__eye.x + __mov.x, __eye.y + __mov.y, __eye.z + __mov.z,
-			__center.x + __mov.x, __center.y + __mov.y, __center.z + __mov.z,
+			__eye.x, __eye.y, __eye.z,
+			__center.x + __eye.x, __center.y + __eye.y, __center.z + __eye.z,
 			__up.x, __up.y, __up.z
 		);
 }
 
 void
 Camera::moveCamera(const GLdouble &movX, const GLdouble &movY, const GLdouble &movZ) {
-	__mov += sVec3D< GLdouble >(
-			movX,
-			movY,
-			movZ
-		);
+	__eye.x += (__center.x * movZ);
+	__eye.z += (__center.z * movZ);
+	__eye.x += (__center.z * movX * -1);
+	__eye.z += (__center.x * movX);
+	__eye.y += (__center.y * movY);
 }
 
 void
-Camera::rotateCamera(const GLdouble& x, const GLdouble& y, const GLdouble&) {
-	sVec3D < GLdouble > step1, step2;
-
-	// Obracamy wokół osi Y
-	if (x != 0) {
-		step1.x = cos( (x + 90.0) * PIdiv180);
-		step1.z = sin( x * PIdiv180);
-	}
-
-	// Obracamy wokół osi X
-	GLdouble cosX = cos(y * PIdiv180);
-	step2.x = step1.y * cosX;
-	step2.z = step1.z * cosX;
-	step2.y = sin(y * PIdiv180);
+Camera::rotateCamera(const GLdouble& _x, const GLdouble& _y, const GLdouble&) {
+	/* Apdejtujemy nasz kąt */
+	__angle.x -= (GLdouble)(_x / 100);
+	__angle.y += (GLdouble)(_y / 200);
 	
-	__center += sVec3D< GLdouble >(step2.x * 5, step2.y, step2.z);
-}
-
-void
-Camera::resetCameraPosition() {
-	__mov = sVec3D< GLdouble >(0, 0, 0);
+	// nie chcemy wyjść poza zakres
+	if (__angle.y > 90 * PIdiv180) __angle.y = 90 * PIdiv180;
+	else if (__angle.y < -90 * PIdiv180) __angle.y = -90 * PIdiv180;
+	
+	// podnosimy nasz wektor do góry
+	__center.y = sin(__angle.y);
+	
+	/* Obliczamy nową pozycję na płaszczyźnie x-z */
+	__center.x = cos(__angle.x - 90);
+	__center.z = sin(__angle.x - 90);
+	
+	__center.normalize();
 }
 
 void
 Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 	__center = sVector(x, y, z);
+	__center.normalize();
 #ifdef __DEBUG__
 	cout << LOG_INFO << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z;
 #endif
 }
 
-#endif //__NO_CAMERA_MANAGEMENT__
+
+void
+Camera::printCenter() {
+	cout << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z << endl;
+}

@@ -22,6 +22,8 @@
 #include <vector>
 #include <cstring>
 
+#include <math.h>
+
 #include <GL/gl.h>
 
 template < typename T >
@@ -90,6 +92,30 @@ public:
 		return *__data;
 	}
 	
+	friend sVec2D operator +(const sVec2D &_a, const sVec2D &_b) {
+		sVec2D< T > x = _a;
+		x += _b;
+		return x;
+	}
+	
+	friend sVec2D operator -(const sVec2D &_a, const sVec2D &_b) {
+		sVec2D< T > x = _a;
+		x -= _b;
+		return x;
+	}
+	
+	friend sVec2D operator *(const sVec2D &_a, const sVec2D &_b) {
+		sVec2D< T > x = _a;
+		x *= _b;
+		return x;
+	}
+	
+	friend sVec2D operator /(const sVec2D &_a, const sVec2D &_b) {
+		sVec2D< T >x = _a;
+		x /= _b;
+		return x;
+	}
+	
 	T& operator +=(const sVec2D &_orig) {
 		__data[0] += _orig[0];
 		__data[1] += _orig[1];
@@ -100,6 +126,24 @@ public:
 		__data[0] -= _orig[0];
 		__data[1] -= _orig[1];
 		return *__data;
+	}
+	
+	T& operator *=(const sVec2D &_orig) {
+		__data[0] *= _orig[0];
+		__data[1] *= _orig[1];
+		return *__data;
+	}
+	
+	T& operator /=(const sVec2D &_orig) {
+		__data[0] /= _orig[0];
+		__data[1] /= _orig[1];
+		return *__data;
+	}
+	
+	void normalize() {
+		float len = sqrt((__data[0]*__data[0]) + (__data[1]*__data[1]));
+		__data[0] /= len;
+		__data[1] /= len;
 	}
 };
 
@@ -167,6 +211,30 @@ public:
 		return *__data;
 	}
 	
+	friend sVec3D operator +(const sVec3D &_a, const sVec3D &_b) {
+		sVec3D< T > x = _a;
+		x += _b;
+		return x;
+	}
+	
+	friend sVec3D operator -(const sVec3D &_a, const sVec3D &_b) {
+		sVec3D< T > x = _a;
+		x -= _b;
+		return x;
+	}
+	
+	friend sVec3D operator *(const sVec3D &_a, const sVec3D &_b) {
+		sVec3D< T > x = _a;
+		x *= _b;
+		return x;
+	}
+	
+	friend sVec3D operator /(const sVec3D &_a, const sVec3D &_b) {
+		sVec3D< T >x = _a;
+		x /= _b;
+		return x;
+	}
+	
 	T& operator +=(const sVec3D &_orig) {
 		__data[0] += _orig[0];
 		__data[1] += _orig[1];
@@ -179,6 +247,28 @@ public:
 		__data[1] -= _orig[1];
 		__data[2] -= _orig[2];
 		return *__data;
+	}
+	
+	T& operator *=(const sVec3D &_orig) {
+		__data[0] *= _orig[0];
+		__data[1] *= _orig[1];
+		__data[2] *= _orig[2];
+		return *__data;
+	}
+	
+	T& operator /=(const sVec3D &_orig) {
+		__data[0] /= _orig[0];
+		__data[1] /= _orig[1];
+		__data[2] /= _orig[2];
+		return *__data;
+	}
+	
+	
+	void normalize() {
+		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]));
+		__data[0] /= len;
+		__data[1] /= len;
+		__data[2] /= len;
 	}
 };
 
@@ -255,19 +345,67 @@ public:
 		return *__data;
 	}
 	
+	friend sVec4D operator +(const sVec4D &_a, const sVec4D &_b) {
+		sVec4D< T > x = _a;
+		x += _b;
+		return x;
+	}
+	
+	friend sVec4D operator -(const sVec4D &_a, const sVec4D &_b) {
+		sVec4D< T > x = _a;
+		x -= _b;
+		return x;
+	}
+	
+	friend sVec4D operator *(const sVec4D &_a, const sVec4D &_b) {
+		sVec4D< T > x = _a;
+		x *= _b;
+		return x;
+	}
+	
+	friend sVec4D operator /(const sVec4D &_a, const sVec4D &_b) {
+		sVec4D< T >x = _a;
+		x /= _b;
+		return x;
+	}
+	
 	T& operator +=(const sVec4D& _orig) {
 		__data[0] += _orig[0];
 		__data[1] += _orig[1];
 		__data[2] += _orig[2];
 		__data[3] += _orig[3];
-		return __data;
+		return *__data;
 	}
 	T& operator -=(const sVec4D& _orig) {
 		__data[0] -= _orig[0];
 		__data[1] -= _orig[1];
 		__data[2] -= _orig[2];
 		__data[3] -= _orig[3];
-		return __data;
+		return *__data;
+	}
+	
+	T& operator *=(const sVec4D& _orig) {
+		__data[0] *= _orig[0];
+		__data[1] *= _orig[1];
+		__data[2] *= _orig[2];
+		__data[3] *= _orig[3];
+		return *__data;
+	}
+	
+	T& operator /=(const sVec4D& _orig) {
+		__data[0] /= _orig[0];
+		__data[1] /= _orig[1];
+		__data[2] /= _orig[2];
+		__data[3] /= _orig[3];
+		return *__data;
+	}
+	
+	void normalize() {
+		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]) + (__data[3] * __data[3]));
+		__data[0] /= len;
+		__data[1] /= len;
+		__data[2] /= len;
+		__data[3] /= len;
 	}
 };
 
