@@ -259,7 +259,7 @@ Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
 										Normal(tempNor[idx.n - 1]) // normalna
 									)
 							);
-						faces.insert(make_pair< Face, int >(idx, newVertIdx)); // wrzucamy do mapy naszego face'a
+						faces.insert(pair< Face, int >(idx, newVertIdx)); // wrzucamy do mapy naszego face'a
 																	// i przypisujemy do niego nowo nabyty indeks
 						current -> addNewIdx(newVertIdx); // wczucamy do tablicy indeksów naszego mesha nowy indeks
 					} else {
@@ -283,7 +283,7 @@ Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
 										Normal(tempNor[idx.n - 1])
 								)
 							);
-						faces.insert(make_pair< Face, int >(idx, newVertIdx));
+						faces.insert(pair< Face, int >(idx, newVertIdx));
 						
 						current -> addNewIdx(newVertIdx);
 						p++;
