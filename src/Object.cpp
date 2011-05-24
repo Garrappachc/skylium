@@ -208,6 +208,7 @@ Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
 			tempPos.clear();
 			tempNor.clear();
 			tempTex.clear();
+			faces.clear();
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!(_whatToLoad & GET_MATERIAL))
 				continue;
@@ -262,7 +263,7 @@ Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
 																	// i przypisujemy do niego nowo nabyty indeks
 						current -> addNewIdx(newVertIdx); // wczucamy do tablicy indeksów naszego mesha nowy indeks
 					} else {
-						current -> addNewIdx((*it).second); // to samo, cop wyżej
+						current -> addNewIdx(it -> second); // to samo, cop wyżej
 					}
 					p++; // zliczamy face'y
 				}
