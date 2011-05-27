@@ -49,6 +49,11 @@ public:
 	Object(const std::string& = "");
 	
 	/**
+	 * Konstruktor kopiujący.
+	 */
+	Object(const Object&);
+	
+	/**
 	 * Niszczy wszystkie meshe oraz materiały.
 	 */
 	virtual ~Object();
@@ -56,7 +61,7 @@ public:
 	/**
 	 * Obraca układ współrzędnych o zadane wartości, wyświetla obiekt.
 	 */
-	void show();
+	virtual void show();
 	
 	/**
 	 * Przesuwa obiekt o dany wektor.
@@ -117,7 +122,14 @@ public:
 	/**
 	 * Ładuje cały obiekt do bufora karty graficznej.
 	 */
-	void loadIntoVBO();
+	virtual void loadIntoVBO();
+	
+	/**
+	 * Szuka materiału po nazwie i zwraca do niego wskaźnik.
+	 * @param name Nazwa szukanego materiału.
+	 * @return Wskaźnik do instancji reprezentującej szukany materiał, lub 0, jeżeli nie znaleziono.
+	 */
+	Material * getMaterialByName(const std::string&);
 	
 	std::string name;
 	

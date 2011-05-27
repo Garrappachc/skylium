@@ -88,7 +88,7 @@ Camera::moveCamera(const GLdouble &movX, const GLdouble &movY, const GLdouble &m
 	__eye.z += (__center.z * movZ);
 	__eye.x += (__center.z * movX * -1);
 	__eye.z += (__center.x * movX);
-	__eye.y += (__center.y * movY);
+	__eye.y += movY / 10;
 }
 
 void

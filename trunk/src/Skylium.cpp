@@ -34,7 +34,8 @@ Skylium::Skylium() :
 		__isMouseMotionEnabled(false),
 		__surfDisplay(NULL),
 		__lastMousePositionX(0),
-		__lastMousePositionY(0) {
+		__lastMousePositionY(0),
+		__shaderList(0) {
 	__sceneManagement = new SceneManager();
 	
 #ifdef __DEBUG__
@@ -47,8 +48,9 @@ Skylium::~Skylium() {
 	SDL_FreeSurface(__surfDisplay);
 	SDL_Quit();
 	
-	// Niszczymy SceneMangager
+	// Niszczymy SceneMangagera i ShaderManagera
 	delete __sceneManagement;
+	
 #ifdef __DEBUG__
 	cout << LOG_INFO << "C'ya!\n";
 #endif
@@ -129,6 +131,37 @@ Skylium::createScene(const string &_sceneName) {
 	return newScene;
 }
 
+Shader *
+Skylium::createShader(const unsigned &_type, const string &_vertFile, const string &_fragFile) {
+	string vertFile, fragFile;
+	switch (_type) {
+		case IDENTITY:
+			vertFile = "shaders/identity.vert";
+			fragFile = "shaders/identity.frag";
+			break;
+		case PHONG_SHADING:
+			vertFile = "shaders/shadow.vert";
+			fragFile = "shaders/shadow.frag";
+			break;
+		case TOON:
+			vertFile = "shaders/toon.vert";
+			fragFile = "shaders/toon.frag";
+			break;
+		case CUSTOM:
+			vertFile = _vertFile;
+			fragFile = _fragFile;
+			break;
+		default:
+			vertFile = "shaders/identity.vert";
+			fragFile = "shaders/identity.frag";
+			break;
+	}
+	
+	Shader *newShader = new Shader(vertFile, fragFile);
+	__shaderList.push_back(newShader);
+	return newShader;
+}
+
 void
 Skylium::__render() {
 	glEnable(GL_COLOR_MATERIAL);
@@ -170,6 +203,12 @@ Skylium::__catchEvents() {
 						break;
 					case SDLK_TAB:
 						__pendingKeys = KEY_TAB;
+						break;
+					case SDLK_x:
+						__pendingKeys = KEY_X;
+						break;
+					case SDLK_z:
+						__pendingKeys = KEY_Z;
 						break;
 					default:
 						break;

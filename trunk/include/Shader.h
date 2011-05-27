@@ -23,6 +23,7 @@
 #include <string>
 
 #include "Object.h"
+#include "Vectors.h"
 
 /**
  * Program shadera wysokopoziomowego.
@@ -67,6 +68,14 @@ public:
 	 * Zwraca true, jeżeli shader jest przypięty do danego obiektu.
 	 */
 	bool isBound(Object*);
+	
+	/**
+	 * Wysyła jakieś zmienne do shadera.
+	 * @param name Nazwa zmiennej w shaderze.
+	 * @param params Wektor 4 floatów do wysłania.
+	 * @return False, jeżeli coś poszło nie tak. Patrz log.
+	 */
+	bool setUniform4f(const std::string&, const sVec4D< GLfloat >&);
 
 private:
 	std::string __vertFile;

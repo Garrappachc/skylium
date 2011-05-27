@@ -41,6 +41,20 @@ Mesh::Mesh(const string &_name) :
 		__usage(GL_STATIC_DRAW),
 		__mode(GL_TRIANGLES) {}
 
+Mesh::Mesh(const Mesh &_orig) :
+		name(_orig.name),
+		__vertices(_orig.__vertices),
+		__vboID(_orig.__vboID),
+		__index(_orig.__index),
+		__vboIndexID(_orig.__vboIndexID),
+		__hasNormals(_orig.__hasNormals),
+		__material(NULL),
+		__smooth(_orig.__smooth),
+		__usage(_orig.__usage),
+		__mode(_orig.__mode) {
+	__material = new Material(*_orig.__material);
+}
+
 Mesh::~Mesh() {
 	glDeleteBuffers(1, &__vboID);
 	glDeleteBuffers(1, &__vboIndexID);

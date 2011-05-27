@@ -77,8 +77,14 @@ Scene::show() {
 }
 
 Object *
-Scene::createObject(const string &_name) {
-	Object *newObject = new Object(_name);
+Scene::createObject(const string &_name, const Object *_orig) {
+	Object *newObject;
+	if (_orig == NULL) // wartość domyślna
+		newObject = new Object(_name);
+	else {
+		newObject = new Object(*_orig);
+		newObject -> name = _name;
+	}
 	__objectList.push_back(newObject);
 	return newObject;
 }
