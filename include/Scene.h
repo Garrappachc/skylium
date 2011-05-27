@@ -56,7 +56,7 @@ public:
 	 * @param name Nazwa nowego obiektu.
 	 * @return Wskaźnik do nowo utworzonego obiektu.
 	 */
-	Object * createObject(const std::string&);
+	Object * createObject(const std::string&, const Object* = (Object*)NULL);
 	
 	/**
 	 * Przeczesuje wektor w poszukiwaniu obiektu o zadanej nazwie.

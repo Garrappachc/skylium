@@ -9,9 +9,9 @@
 #include "include/Light.h"
 #include "include/Object.h"
 #include "include/Scene.h"
-#include "include/Shader.h"
 #include "include/Skylium.h"
 #include "include/Timer.h"
+#include "include/Material.h"
 
 using namespace std;
 
@@ -26,36 +26,54 @@ main() {
 	}
 	
 	
-	Shader *cienie = new Shader("shaders/shadow.vert", "shaders/shadow.frag");
+	Shader *cienie = s_main -> createShader(PHONG_SHADING);
 	if (!cienie -> make()) // kompilacja + linkowanie
 		exit(1);
 	
 	Scene *scenka = s_main -> createScene("Scenka"); // tworzymy scenę
+
+	Object *surface = scenka -> createObject("surface1");
+	if (!surface -> loadFromObj("objects/surface.obj", GET_VERTICES | GET_NORMALS | GET_TEXTURE | GET_MATERIAL))
+		exit(1);
+	
+	surface -> move(-6, -2.65, -10);
+	surface -> scale(2, 2, 2);
+	surface -> loadIntoVBO();
+	
+	// we crate the larger surface
+	for (int k = 0; k < 5; k++ ) {
+		for (int i = -1; i < 4; i++) {
+			Object *surface_new = scenka -> createObject("surface_" + i, surface);
+			surface_new -> move(6*i, 0, 6*k);
+		}
+	}
+	
 	
 	Object *table = scenka -> createObject("table");
 	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
-	table -> move(0, -2, -10);
+	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
-	table -> setColor(240, 240, 255, 1);
+	table -> setColor(0, 85, 255, 1);
 	table -> loadIntoVBO();
 	
 	Object *malpka = scenka -> createObject("malpka"); // małpka
 	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL)) // znowu .obj
 		exit(1); // nie chcemy brzydali na ekranie
-	malpka -> move(0, 7, -10);
+	malpka -> move(0, 7, 0);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
 	malpka -> setColor(136, 47, 0);
 	malpka -> loadIntoVBO();
 	
 	Camera* kamerka = scenka -> createCamera(0.0, 4.0, 10.0); // kamerka na pozycji (5, 6, 0)
-	kamerka -> lookAt(0, 3, -10); // kamerka skierowana na punkt (1, 4, -1)
+	kamerka -> lookAt(0, 7, -10); // kamerka skierowana na punkt (1, 4, -1)
 	
 	cienie -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
 	cienie -> bind(table); // do stolika
 	
 	int swiatelko = scenka -> createLight(6.0, 6.0, 0.0); // światło na pozycji (6, 6, 0)
 	scenka -> setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
+	scenka -> setSpecularLight(swiatelko, 0.8, 0.8, 0.8, 1.0);
 	scenka -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
 	
 	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
@@ -76,6 +94,10 @@ main() {
 			kamerka -> moveCamera(0.1, 0.0, 0.0); // A
 		if (klawisz == KEY_LEFT)
 			kamerka -> moveCamera(-0.1, 0.0, 0.0); // D
+		if (klawisz == KEY_Z)
+			kamerka -> moveCamera(0.0, -0.5, 0.0);
+		if (klawisz == KEY_X)
+			kamerka -> moveCamera(0.0, 0.5, 0.0);
 		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
@@ -83,6 +105,11 @@ main() {
 				cienie -> unbind(malpka);
 			else
 				cienie -> bind(malpka);
+			
+			if (cienie -> isBound(table))
+				cienie -> unbind(table);
+			else
+				cienie -> bind(table);
 		}
 		
 		if (zegarek_dla_animacji -> passed(2500, MICROSECONDS)) {
@@ -104,7 +131,6 @@ main() {
 	}
 	
 	// musimy wywalić ręcznie wszystko, co utworzyliśmy ręcznie (operatorem new w źródle)
-	delete cienie; // wywalamy shadera
 	delete zegarek_dla_animacji;
 	delete zegarek_dla_fps;
 	delete zegarek_dla_taba;

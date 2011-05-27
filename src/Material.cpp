@@ -26,22 +26,6 @@
 
 using namespace std;
 
-Material::Material() :
-		name(""),
-		__mAmbient(0.2, 0.2, 0.2, 1.0),
-		__mDiffuse(0.8, 0.8, 0.8, 1.0),
-		__mSpecular(0.0, 0.0, 0.0, 1.0),
-		__mAlpha(1.0),
-		__mShininess(0),
-		__tAmbient(0),
-		__tDiffuse(0),
-		__tSpecular(0),
-		__tAlpha(0) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Material()";
-#endif
-}
-
 Material::Material(const string &_name) :
 		name(_name),
 		__mAmbient(0.2, 0.2, 0.2, 1.0),
@@ -52,7 +36,8 @@ Material::Material(const string &_name) :
 		__tAmbient(0),
 		__tDiffuse(0),
 		__tSpecular(0),
-		__tAlpha(0) {
+		__tAlpha(0),
+		__wrapping(GL_CLAMP_TO_BORDER) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Material(name = \"" << name << "\")";
 #endif
@@ -137,22 +122,22 @@ Material::setTexture() {
 	if (__tAlpha) {
 		glBindTexture(GL_TEXTURE_2D, __tAlpha);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
 	}
 	if (__tDiffuse) {
 		glBindTexture(GL_TEXTURE_2D, __tDiffuse);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
 	}
 	if (__tSpecular) {
 		glBindTexture(GL_TEXTURE_2D, __tSpecular);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
 	}
 	if (__tAmbient) {
 		glBindTexture(GL_TEXTURE_2D, __tAmbient);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
 	}
 }
 
@@ -163,4 +148,9 @@ Material::setMaterial() {
 	glMaterialfv(GL_FRONT, GL_SPECULAR, &__mSpecular[0]);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	glMateriali(GL_FRONT, GL_SHININESS, __mShininess);
+}
+
+void
+Material::setWrapping(const GLenum &_wrapping) {
+	__wrapping = _wrapping;
 }

@@ -42,16 +42,11 @@ class Material {
 public:
 	
 	/**
-	 * Konstruktor domyślny, wszystko puste.
-	 */
-	Material();
-	
-	/**
 	 * Konstruktor, który przyjmuje jako argument swoją nazwę.
 	 * Reszta pusta.
 	 * @param name Nazwa materiału.
 	 */
-	Material(const std::string&);
+	Material(const std::string& = "");
 	
 	/**
 	 * Destruktor usuwa wszystkie przypisane do niego tekstury.
@@ -113,6 +108,12 @@ public:
 	 */
 	void setMaterial();
 	
+	/**
+	 * Pozwala modyfikować zmienną __wrapping;
+	 * @param wrapping Enum odpowiadający pożądanemu zaginaniu tekstury.
+	 */
+	void setWrapping(const GLenum&);
+	
 	/* Nazwa materiału. */
 	std::string name;
 	
@@ -130,6 +131,8 @@ private:
 	GLuint		__tDiffuse;
 	GLuint		__tSpecular;
 	GLuint		__tAlpha;
+	
+	GLenum		__wrapping;
 	
 	
 };

@@ -24,6 +24,7 @@
 #include <map>
 
 #include <sys/stat.h>
+#include <GLee.h>
 
 #include "../include/Object.h"
 #include "../include/Vertex.h"
@@ -49,11 +50,30 @@ Object::Object(const string &_name) :
 #endif
 }
 
+Object::Object(const Object &_orig) :
+		name(_orig.name),
+		__defColor(_orig.__defColor),
+		__mov(_orig.__mov),
+		__rot(_orig.__rot),
+		__scale(_orig.__scale),
+		__shader(_orig.__shader),
+		__meshes(0),
+		__meshesIterator(),
+		__materials(0) {
+	for (unsigned i = 0; i < _orig.__meshes.size(); i++) {
+		__meshes.push_back(new Mesh(*_orig.__meshes[i]));
+	}
+	for (unsigned i = 0; i < _orig.__materials.size(); i++) {
+		__materials.push_back(new Material(*_orig.__materials[i]));
+	}
+}
+
+
 Object::~Object() {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Destruktor: ~Object(name = \"" << name << "\")";
 #endif
-	
+
 	while (!__meshes.empty())
 		delete __meshes.back(), __meshes.pop_back();
 	while (!__materials.empty())
@@ -63,11 +83,14 @@ Object::~Object() {
 void
 Object::show() {
 	glPushMatrix();
+		
+		if (__shader)
+			__shader -> toggle();
+
+		glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
+		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
-		//glColor4f(1, 0, 0, 1);
 		
 		glTranslated(__mov.x, __mov.y, __mov.z);
 		
@@ -76,9 +99,6 @@ Object::show() {
 		glRotated(__rot.x, 1.0, 0.0, 0.0);
 		glRotated(__rot.y, 0.0, 1.0, 0.0);
 		glRotated(__rot.z, 0.0, 0.0, 1.0);
-	
-		if (__shader)
-			__shader -> toggle();
 		
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end())
@@ -150,6 +170,15 @@ Object::loadIntoVBO() {
 	__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end())
 			(*__meshesIterator) -> loadIntoVbo(), __meshesIterator++;
+}
+
+Material *
+Object::getMaterialByName(const string &_name) {
+	for (unsigned i = 0; i < __materials.size(); i++) {
+		if (__materials[i] -> name == _name)
+			return __materials[i];
+	}
+	return (Material*)0;
 }
 
 void
@@ -353,6 +382,11 @@ Object::__parseMtl(const string &_fileName) {
 		} else if (buffer.substr(0, 6) == "map_Kd") {
 			string texfile;
 			line >> temp >>texfile;
+			if (!__fileExists("texture/" + texfile)) {
+#ifdef __DEBUG__
+				cout << LOG_WARN << "Nie znalazłem tekstury: " << "texture/" << texfile;
+#endif
+			}
 			current ->loadTexture("texture/" + texfile, TEXTURE_DIFFUSE);
 		}
 	}

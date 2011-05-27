@@ -17,7 +17,7 @@ skylium: $(OBJS) main.o
 	$(CXX) -o $@  $^ $(LFLAGS)
 
 $(OBJS): %.o: src/%.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@
+	 $(CXX) -c $(CXXFLAGS) $< -o $@
 
 main.o: %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@

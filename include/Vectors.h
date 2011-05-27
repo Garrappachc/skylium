@@ -180,6 +180,13 @@ public:
 		memcpy(__data, _orig, sizeof(T*)*3);
 	}
 	
+	sVec3D(const sVec3D< T > &_orig) :
+			__data({_orig.__data[0], _orig.__data[1], _orig.__data[2]}),
+			x(__data[0]),
+			y(__data[1]),
+			z(__data[2]) {}
+			
+	
 	operator T*() {
 		return __data;
 	}
@@ -312,6 +319,13 @@ public:
 			a(__data[3]) {
 		memcpy(__data, _orig, sizeof(T*)*4);
 	}
+	
+	sVec4D(const sVec4D< T > &_orig) :
+			__data({_orig.__data[0], _orig.__data[1], _orig.__data[2], _orig.__data[3]}),
+			r(__data[0]),
+			g(__data[1]),
+			b(__data[2]),
+			a(__data[3]) {}
 	
 	/* Operatory */
 	operator T*() {

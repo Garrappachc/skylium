@@ -37,6 +37,11 @@ public:
 	 */
 	Mesh(const std::string& = "");
 	
+	/**
+	 * Konstruktor kopiujący.
+	 */
+	Mesh(const Mesh&);
+	
 	virtual ~Mesh();
 	
 	/**

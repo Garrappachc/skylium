@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 
 #include "../include/Shader.h"
+#include "../include/Vectors.h"
 #include "../include/defines.h"
 
 using namespace std;
@@ -173,6 +174,18 @@ Shader::isBound(Object *_dest) {
 		return false;
 	else
 		return true;
+}
+
+bool
+Shader::setUniform4f(const string &_name, const sVec4D< GLfloat > &_params) {
+	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
+	glUniform4f(location, _params[0], _params[1], _params[2], _params[3]);
+	GLenum err = glGetError(); // pobieramy błędy
+	while (err != GL_NO_ERROR) {
+		cout << "Błąd! Numer błędu: " << err << endl;
+		err = glGetError();
+	}
+	return true;
 }
 
 bool

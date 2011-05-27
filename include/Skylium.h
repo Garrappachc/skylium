@@ -25,6 +25,7 @@
 #include "Singleton.h"
 #include "SceneManager.h"
 #include "Scene.h"
+#include "Shader.h"
 
 /* Obsługa klawiszy */
 typedef enum {
@@ -34,8 +35,18 @@ typedef enum {
 	KEY_DOWN = 4,
 	KEY_RIGHT = 8,
 	KEY_LEFT = 16,
-	KEY_TAB = 32
+	KEY_TAB = 32,
+	KEY_X = 64,
+	KEY_Z = 128
 } sKey;
+
+/* Róże typy shaderów */
+enum {
+	IDENTITY = 1,
+	PHONG_SHADING,
+	TOON,
+	CUSTOM
+};
 
 class Skylium : public Singleton < Skylium > {
 
@@ -74,6 +85,11 @@ public:
 	
 	SceneManager*& Scenes;
 	
+	/*
+	 * Tworzy nowego shadera i zwraca wskaźnik do niego.
+	 */
+	Shader * createShader(const unsigned&, const std::string& = "", const std::string& = "");
+	
 	
 private:
 	
@@ -104,6 +120,8 @@ private:
 	/* Przechowuje pozycję x i y myszy. */
 	int __lastMousePositionX;
 	int __lastMousePositionY;
+	
+	std::vector< Shader* > __shaderList;
 	
 };
 
