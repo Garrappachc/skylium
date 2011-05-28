@@ -152,6 +152,7 @@ Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 
 
 void
-Camera::printCenter() {
+Camera::printInfo() {
+	cout << "Eye: " << __eye.x << ", " << __eye.y << ", " << __eye.z << endl;
 	cout << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z << endl;
 }
