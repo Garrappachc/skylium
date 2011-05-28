@@ -75,7 +75,16 @@ public:
 	 * @param z Współrzędna z położenia kamery.
 	 * @return Wskaźnik do nowo utworzonej kamery.
 	 */
-	Camera * createCamera(const GLdouble&, const GLdouble&, const GLdouble&);
+	Camera * createCamera(const GLdouble&, const GLdouble&, const GLdouble&, const cType& = FPP);
+	
+	/**
+	 * Ustawia aktywną kamerę na tą podaną w argumencie.
+	 * @param camera Wskaźnik na kamerę, która ma stać się aktywną kamerą.
+	 * @param checking Sprawdza, czy kamera znajduje się w wektorze. Jeżeli false, sprawdzanie jest wyłączone, 
+	 * 				co przy częstych zmianach kamery pozwala na zwiększenie wydajności.
+	 * @return False, jeżeli checking = true i nie znaleziono danej kamery w wektorze.
+	 */
+	bool setActiveCamera(Camera*, const bool& = true);
 	
 	/**
 	 * Zwraca wskaźnik na aktywną kamerę.
@@ -140,6 +149,16 @@ public:
 	 * @return False, jeżeli nie znaleziono światła o podanym ID.
 	 */
 	bool setLightPosition(const int&, const GLfloat&, const GLfloat&, const GLfloat&);
+	
+	/**
+	 * Przesuwa dane światło o podany wektor.
+	 * @param id Numer światła.
+	 * @param X Składowa X wektora przesunięcia.
+	 * @param Y Składowa Y wektora przesunięcia.
+	 * @param Z Składowa Z wektora przesunięcia.
+	 * @return False, jeżeli nie znaleziono światła o podanym ID.
+	 */
+	bool moveLight(const int&, const GLfloat&, const GLfloat&, const GLfloat&);
 	
 	/**
 	 * Włącza lub wyłącza oświetlenie całej sceny.

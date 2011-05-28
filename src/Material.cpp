@@ -44,7 +44,7 @@ Material::Material(const string &_name) :
 }
 
 Material::~Material() {
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Destruktor: ~Material(name = \"" << name << "\")";
 #endif
 	if (__tAmbient)

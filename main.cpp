@@ -12,6 +12,7 @@
 #include "include/Skylium.h"
 #include "include/Timer.h"
 #include "include/Material.h"
+#include "include/FontBase.h"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ main() {
 	// we crate the larger surface
 	for (int k = 0; k < 5; k++ ) {
 		for (int i = -1; i < 4; i++) {
-			Object *surface_new = scenka -> createObject("surface_" + i, surface);
+			Object *surface_new = scenka -> createObject((string)("surface_" + i), surface);
 			surface_new -> move(6*i, 0, 6*k);
 		}
 	}
@@ -53,7 +54,7 @@ main() {
 	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
-	table -> setColor(0, 85, 255, 1);
+	table -> setColor(0, 46, 75);
 	table -> loadIntoVBO();
 	
 	Object *malpka = scenka -> createObject("malpka"); // małpka
@@ -62,19 +63,23 @@ main() {
 	malpka -> move(0, 7, 0);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
-	malpka -> setColor(136, 47, 0);
+	malpka -> setColor(99, 29, 6);
 	malpka -> loadIntoVBO();
 	
-	Camera* kamerka = scenka -> createCamera(0.0, 4.0, 10.0); // kamerka na pozycji (5, 6, 0)
-	kamerka -> lookAt(0, 7, -10); // kamerka skierowana na punkt (1, 4, -1)
+	Camera* kamerka_fpp = scenka -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
+	kamerka_fpp -> lookAt(0, 7, 0); // kamerka skierowana na punkt (1, 4, -1)
+	
+	Camera *kamerka_kula = scenka -> createCamera(0, 4, -20, SPHERICAL);
+	kamerka_kula -> lookAt(0, 7, 0);
 	
 	cienie -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
 	cienie -> bind(table); // do stolika
 	
-	int swiatelko = scenka -> createLight(6.0, 6.0, 0.0); // światło na pozycji (6, 6, 0)
+	int swiatelko = scenka -> createLight(7, 3, 0); // światło na pozycji (6, 6, 0)
 	scenka -> setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
-	scenka -> setSpecularLight(swiatelko, 0.8, 0.8, 0.8, 1.0);
 	scenka -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
+	
+	FontBase *foncik = new FontBase();
 	
 	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
 	Timer *zegarek_dla_fps = new Timer(); // liczymy fps'y
@@ -87,17 +92,21 @@ main() {
 	sKey klawisz; // tutaj przechwytujemy klawisze
 	while ((klawisz = s_main -> sEvent()) != KEY_ESC) { // żeby się dało czymś wyjść
 		if (klawisz == KEY_DOWN)
-			kamerka -> moveCamera(0.0, 0.0, -0.1); // KEY_DOWN to nie kursor w dół, tylko S
+			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, -0.1); // KEY_DOWN to nie kursor w dół, tylko S
 		if (klawisz == KEY_UP)
-			kamerka -> moveCamera(0.0, 0.0, 0.1); // W
+			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, 0.1); // W
 		if (klawisz == KEY_RIGHT)
-			kamerka -> moveCamera(0.1, 0.0, 0.0); // A
+			scenka -> getActiveCamera() -> moveCamera(0.1, 0.0, 0.0); // A
 		if (klawisz == KEY_LEFT)
-			kamerka -> moveCamera(-0.1, 0.0, 0.0); // D
+			scenka -> getActiveCamera() -> moveCamera(-0.1, 0.0, 0.0); // D
 		if (klawisz == KEY_Z)
-			kamerka -> moveCamera(0.0, -0.5, 0.0);
+			scenka -> getActiveCamera() -> moveCamera(0.0, -0.5, 0.0);
 		if (klawisz == KEY_X)
-			kamerka -> moveCamera(0.0, 0.5, 0.0);
+			scenka -> getActiveCamera() -> moveCamera(0.0, 0.5, 0.0);
+		if (klawisz == KEY_F1)
+			scenka -> setActiveCamera(kamerka_fpp);
+		if (klawisz == KEY_F2)
+			scenka -> setActiveCamera(kamerka_kula);
 		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
@@ -126,6 +135,8 @@ main() {
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
 		
+		foncik -> print(0, 0, "Heja!");
+		
 		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
 		
 	}
@@ -134,6 +145,7 @@ main() {
 	delete zegarek_dla_animacji;
 	delete zegarek_dla_fps;
 	delete zegarek_dla_taba;
+	delete foncik;
 	
 	// całą resztę wywali za nas Skylium.
 	delete s_main;

@@ -44,6 +44,9 @@ Skylium::Skylium() :
 }
 
 Skylium::~Skylium() {
+#ifdef __DEBUG__
+	cout << LOG_INFO << "Destruktor: ~Skylium()";
+#endif
 	// Uwalniamy kontekst renderowania
 	SDL_FreeSurface(__surfDisplay);
 	SDL_Quit();
@@ -107,6 +110,7 @@ Skylium::init(const string &_windowName, const bool &_fullScreen) {
 	}
 	
 	SDL_WM_SetCaption(_windowName.c_str(), NULL);
+	SDL_ShowCursor(SDL_DISABLE);
 	
 	// inicjalizujemy GLEWa
 	glewInit();
@@ -209,6 +213,12 @@ Skylium::__catchEvents() {
 						break;
 					case SDLK_z:
 						__pendingKeys = KEY_Z;
+						break;
+					case SDLK_F1:
+						__pendingKeys = KEY_F1;
+						break;
+					case SDLK_F2:
+						__pendingKeys = KEY_F2;
 						break;
 					default:
 						break;

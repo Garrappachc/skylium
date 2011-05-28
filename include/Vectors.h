@@ -142,6 +142,8 @@ public:
 	
 	void normalize() {
 		float len = sqrt((__data[0]*__data[0]) + (__data[1]*__data[1]));
+		if (len == 0)
+			return;
 		__data[0] /= len;
 		__data[1] /= len;
 	}
@@ -273,6 +275,8 @@ public:
 	
 	void normalize() {
 		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]));
+		if (len == 0)
+			return;
 		__data[0] /= len;
 		__data[1] /= len;
 		__data[2] /= len;
@@ -416,6 +420,8 @@ public:
 	
 	void normalize() {
 		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]) + (__data[3] * __data[3]));
+		if (len == 0)
+			return;
 		__data[0] /= len;
 		__data[1] /= len;
 		__data[2] /= len;

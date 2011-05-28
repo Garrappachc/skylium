@@ -46,7 +46,7 @@ Shader::~Shader() {
 
 	glDeleteShader(__vertexShader);
 	glDeleteShader(__fragmentShader);
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Destruktor: Shader(\"" << __vertFile << "\", \"" << __fragFile << "\")";
 #endif
 
