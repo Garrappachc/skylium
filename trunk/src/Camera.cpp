@@ -79,18 +79,23 @@ void
 Camera::setView() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	if (__type == FPP)
+	if (__type == FPP) {
 		gluLookAt(
 				__eye.x, __eye.y, __eye.z,
 				__center.x + __eye.x, __center.y + __eye.y, __center.z + __eye.z,
 				__up.x, __up.y, __up.z
 			);
-	else if (__type == SPHERICAL)
+		cout << "FPP. Eye: (" << __eye.x << ", " << __eye.y << ", " << __eye.z << "), center: (" <<
+				__center.x + __eye.x << ", " << __center.y + __eye.y << ", " << __center.z + __eye.z << ")" << endl;
+	} else if (__type == SPHERICAL) {
 		gluLookAt(
 				__eye.x + __center.x, __eye.y + __center.y, __eye.z + __center.z,
 				__center.x, __center.y, __center.z,
 				__up.x, __up.y, __up.z
 			);
+		cout << "SPHR. Eye: (" << __eye.x + __center.x << ", " << __eye.y + __center.y << ", " << __eye.z + __center.z << "), center: (" <<
+				__center.x << ", " << __center.y << ", " << __center.z << ")\n";
+	}
 }
 
 void
