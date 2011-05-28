@@ -93,7 +93,7 @@ public:
 	 */
 	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
 	
-	void printCenter();
+	void printInfo();
 
 
 private:
