@@ -251,7 +251,21 @@ public:
 		return *__data;
 	}
 	
+	T& operator +=(const T &_orig) {
+		__data[0] += _orig[0];
+		__data[1] += _orig[1];
+		__data[2] += _orig[2];
+		return *__data;
+	}
+	
 	T& operator -=(const sVec3D &_orig) {
+		__data[0] -= _orig[0];
+		__data[1] -= _orig[1];
+		__data[2] -= _orig[2];
+		return *__data;
+	}
+	
+	T& operator -=(const T &_orig) {
 		__data[0] -= _orig[0];
 		__data[1] -= _orig[1];
 		__data[2] -= _orig[2];
@@ -265,10 +279,24 @@ public:
 		return *__data;
 	}
 	
+	T& operator *=(const T &_orig) {
+		__data[0] *= _orig;
+		__data[1] *= _orig;
+		__data[2] *= _orig;
+		return *__data;
+	}
+	
 	T& operator /=(const sVec3D &_orig) {
 		__data[0] /= _orig[0];
 		__data[1] /= _orig[1];
 		__data[2] /= _orig[2];
+		return *__data;
+	}
+	
+	T& operator /=(const T &_orig) {
+		__data[0] /= _orig;
+		__data[1] /= _orig;
+		__data[2] /= _orig;
 		return *__data;
 	}
 	

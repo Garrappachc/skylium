@@ -129,8 +129,7 @@ main() {
 		fps++;
 		
 		if (zegarek_dla_fps -> passed(1, SECONDS)) {
-			//cout << "\n	FPS: " << fps;
-			scenka -> getActiveCamera() -> printInfo();
+			cout << "\n	FPS: " << fps;
 			fps = 0;
 		}
 		
