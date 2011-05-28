@@ -110,7 +110,8 @@ Skylium::init(const string &_windowName, const bool &_fullScreen) {
 	}
 	
 	SDL_WM_SetCaption(_windowName.c_str(), NULL);
-	SDL_ShowCursor(SDL_DISABLE);
+	//SDL_ShowCursor(SDL_DISABLE);
+	SDL_WarpMouse(windowWidth / 2, windowHeight / 2);
 	
 	// inicjalizujemy GLEWa
 	glewInit();
