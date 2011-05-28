@@ -67,7 +67,7 @@ main() {
 	malpka -> loadIntoVBO();
 	
 	Camera* kamerka_fpp = scenka -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
-	kamerka_fpp -> lookAt(0, 7, 0); // kamerka skierowana na punkt (1, 4, -1)
+	kamerka_fpp -> lookAt(0, 7, 0); // kamerka skierowana na punkt (0, 7, 0)
 	
 	Camera *kamerka_kula = scenka -> createCamera(0, 4, -20, SPHERICAL);
 	kamerka_kula -> lookAt(0, 7, 0);
