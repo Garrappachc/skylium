@@ -26,6 +26,13 @@
 
 #include "Vectors.h"
 
+/* Typy kamer */
+typedef enum {
+	FPP		= 1,	// z widoku pierwszej osoby, myszką ruszamy punkt "lookAt"
+	TPP,			// z góry
+	SPHERICAL		// z widoku pierwszej osoby, myszką ruszamy punkt "eye"
+} cType;
+
 /**
  * UWAGA.
  * Co do obrotu i ruchu kamery.
@@ -37,8 +44,8 @@
 class Camera {
 
 public:
-	Camera();
-	Camera(const GLdouble&, const GLdouble&, const GLdouble&);
+	Camera(const cType& = FPP);
+	Camera(const GLdouble&, const GLdouble&, const GLdouble&, const cType& = FPP);
 	
 	virtual ~Camera();
 	
@@ -90,6 +97,9 @@ public:
 
 
 private:
+	
+	/* Typ kamery */
+	cType __type;
 	
 	/*** setProjection ***/
 	GLdouble __fovy;

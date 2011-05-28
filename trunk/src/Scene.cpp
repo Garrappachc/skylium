@@ -50,7 +50,7 @@ Scene::Scene(const string &_name) :
 }
 
 Scene::~Scene() {
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Destruktor: ~Scene(name = \"" << name << "\")";
 #endif
 	while (!__objectList.empty())
@@ -101,14 +101,30 @@ Scene::getObjectByName(const string &_name) {
 }
 
 Camera *
-Scene::createCamera(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
-	Camera *newCamera = new Camera(_x, _y, _z);
+Scene::createCamera(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z, const cType &_cType) {
+	Camera *newCamera = new Camera(_x, _y, _z, _cType);
 	if (!__activeCamera) {
 		__activeCamera = newCamera;
 		__activeCamera -> setProjection(); // ustawiamy parametry "widzenia"
 	}
 	__cameraList.push_back(newCamera);
 	return newCamera;
+}
+
+bool
+Scene::setActiveCamera(Camera *_camera, const bool &_checking) {
+	if (_checking) {
+		for (unsigned i = 0; i < __cameraList.size(); i++) {
+			if (__cameraList[i] == _camera) {
+				__activeCamera = _camera;
+				return true;
+			}
+		}
+		return false;
+	} else {
+		__activeCamera = _camera;
+		return true;
+	}
 }
 
 short
@@ -189,7 +205,19 @@ Scene::setLightPosition(const int &_id, const GLfloat &_x, const GLfloat &_y, co
 		return false;
 	}
 	
-	__lightList[_id] ->setSrcPos(sPosition(_x, _y, _z));
+	__lightList[_id] -> setSrcPos(sPosition(_x, _y, _z));
+	return true;
+}
+
+bool
+Scene::moveLight(const int &_id, const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
+	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
+#ifdef __DEBUG__
+		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+#endif
+		return false;
+	}
+	__lightList[_id] -> __lightSrc += sVec3D< GLfloat >(_x, _y, _z);
 	return true;
 }
 

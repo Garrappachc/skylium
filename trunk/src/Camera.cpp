@@ -29,7 +29,8 @@ static const double PIdiv2 = PI/2;
 
 using namespace std;
 
-Camera::Camera() :
+Camera::Camera(const cType &_type) :
+		__type(_type),
 		__fovy(45.0),
 		__zNear(1.0),
 		__zFar(200.0),
@@ -41,20 +42,23 @@ Camera::Camera() :
 #endif
 }
 
-Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z) :
+Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z, const cType &_type) :
+		__type(_type),
 		__fovy(45.0),
 		__zNear(1.0),
 		__zFar(200.0),
 		__eye(_x, _y, _z),
 		__center(0, 0, 0),
 		__up(0, 1, 0) {
+	if (__type == SPHERICAL)
+		__eye.normalize();
 #ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Camera(" << _x << ", " << _y << ", " << _z << ")";
+	cout << LOG_INFO << "Konstruktor: Camera(" << __eye.x << ", " << __eye.y << ", " << __eye.z << ")";
 #endif
 }
 
 Camera::~Camera() {
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Destruktor: ~Camera()";
 #endif
 }
@@ -75,46 +79,71 @@ void
 Camera::setView() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(
-			__eye.x, __eye.y, __eye.z,
-			__center.x + __eye.x, __center.y + __eye.y, __center.z + __eye.z,
-			__up.x, __up.y, __up.z
-		);
+	if (__type == FPP)
+		gluLookAt(
+				__eye.x, __eye.y, __eye.z,
+				__center.x + __eye.x, __center.y + __eye.y, __center.z + __eye.z,
+				__up.x, __up.y, __up.z
+			);
+	else if (__type == SPHERICAL)
+		gluLookAt(
+				__eye.x + __center.x, __eye.y + __center.y, __eye.z + __center.z,
+				__center.x, __center.y, __center.z,
+				__up.x, __up.y, __up.z
+			);
 }
 
 void
 Camera::moveCamera(const GLdouble &movX, const GLdouble &movY, const GLdouble &movZ) {
-	__eye.x += (__center.x * movZ);
-	__eye.z += (__center.z * movZ);
-	__eye.x += (__center.z * movX * -1);
-	__eye.z += (__center.x * movX);
-	__eye.y += movY / 10;
+	if (__type == FPP) {
+		__eye.x += (__center.x * movZ);
+		__eye.z += (__center.z * movZ);
+		__eye.x += (__center.z * movX * -1);
+		__eye.z += (__center.x * movX);
+		__eye.y += movY / 10;
+	} else if (__type == SPHERICAL) {
+		__center.x += movX;
+		__center.y += movY;
+		__center.z += movZ;
+	}
 }
 
 void
 Camera::rotateCamera(const GLdouble& _x, const GLdouble& _y, const GLdouble&) {
-	/* Apdejtujemy nasz kąt */
-	__angle.x -= (GLdouble)(_x / 100);
-	__angle.y += (GLdouble)(_y / 200);
+	if (__type == FPP) {
+		/* Apdejtujemy nasz kąt */
+		__angle.x -= (GLdouble)(_x / 100);
+		__angle.y += (GLdouble)(_y / 200);
 	
-	// nie chcemy wyjść poza zakres
-	if (__angle.y > 90 * PIdiv180) __angle.y = 90 * PIdiv180;
-	else if (__angle.y < -90 * PIdiv180) __angle.y = -90 * PIdiv180;
+		// nie chcemy wyjść poza zakres
+		if (__angle.y > 90 * PIdiv180) __angle.y = 90 * PIdiv180;
+		else if (__angle.y < -90 * PIdiv180) __angle.y = -90 * PIdiv180;
 	
-	// podnosimy nasz wektor do góry
-	__center.y = sin(__angle.y);
+		// podnosimy nasz wektor do góry
+		__center.y = sin(__angle.y);
 	
-	/* Obliczamy nową pozycję na płaszczyźnie x-z */
-	__center.x = cos(__angle.x - 90);
-	__center.z = sin(__angle.x - 90);
+		/* Obliczamy nową pozycję na płaszczyźnie x-z */
+		__center.x = cos(__angle.x - 90);
+		__center.z = sin(__angle.x - 90);
 	
-	__center.normalize();
+		__center.normalize();
+	} else if (__type == SPHERICAL) {
+		__angle.x += (GLdouble)(_x / 100);
+		__angle.y -= (GLdouble)(_y / 100);
+		
+		__eye.x = -1 * cos(__angle.y) * sin(__angle.x);
+		__eye.y = sin(__angle.y);
+		__eye.z = cos(__angle.y) * cos(__angle.x);
+		
+		__eye.normalize();
+	}
 }
 
 void
 Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 	__center = sVector(x, y, z);
-	__center.normalize();
+	if (__type == FPP)
+		__center.normalize();
 #ifdef __DEBUG__
 	cout << LOG_INFO << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z;
 #endif

@@ -59,7 +59,7 @@ Light::Light(const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) :
 }
 
 Light::~Light() {
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Destruktor: ~Light()";
 #endif
 }

@@ -37,7 +37,9 @@ typedef enum {
 	KEY_LEFT = 16,
 	KEY_TAB = 32,
 	KEY_X = 64,
-	KEY_Z = 128
+	KEY_Z = 128,
+	KEY_F1 = 256,
+	KEY_F2 = 512
 } sKey;
 
 /* Róże typy shaderów */

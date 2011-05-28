@@ -70,7 +70,7 @@ Object::Object(const Object &_orig) :
 
 
 Object::~Object() {
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Destruktor: ~Object(name = \"" << name << "\")";
 #endif
 
