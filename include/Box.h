@@ -25,7 +25,7 @@
 #include "Object.h"
 #include "Skylium.h"
 
-class Box : Object {
+class Box : public Object {
 
 public:
 	
@@ -38,8 +38,6 @@ public:
 	bool loadFromObj();
 	
 	void loadIntoVBO();
-
-
 
 };
 

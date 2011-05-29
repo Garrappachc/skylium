@@ -135,7 +135,7 @@ main() {
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
 		
-		foncik -> print(0, 0, "Heja!");
+		foncik -> print(0.2, 0.2, "Heja!");
 		
 		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
 		
