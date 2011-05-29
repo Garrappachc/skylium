@@ -130,12 +130,6 @@ Mesh::show() {
 void
 Mesh::loadIntoVbo() {
 	
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): Rozmiar tablicy wierzchołków: " << __vertices.size() << ".";
-	cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): Rozmiar tablicy indeksów: " << __index.size() << ".";
-	cout.flush();
-#endif
-	
 	// generujemy VBO ID
 	glGenBuffers(1, &__vboID);
 	// ustawiamy aktywny wskaźnik
@@ -146,12 +140,8 @@ Mesh::loadIntoVbo() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * __vertices.size(), NULL, __usage);
 	// wysyłamy tablicę wierzchołków do bufora
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * __vertices.size(), &__vertices[0]);
-	int bufferSize;
-	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): wierzchołki w VBO. Rozmiar: " << bufferSize << " B.";
-	cout.flush();
-#endif
+	int bufferSize_v;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_v);
 	
 	// mówimy, gdzie co jest
 	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // 12 = rozmiar Position
@@ -165,9 +155,10 @@ Mesh::loadIntoVbo() {
 	// wysyłamy tablicę indeksów do karty graficznej
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * __index.size(), NULL, __usage);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * __index.size(), &__index[0]);
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
+	int bufferSize_i;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_i);
 #ifdef __DEBUG__
-	cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): indeksy w VBO. Rozmiar: " << bufferSize << " B.";
+	cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): mesh w VBO. Rozmiar: " << bufferSize_v + bufferSize_i << " B.";
 	cout.flush();
 #endif
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
