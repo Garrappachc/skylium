@@ -44,9 +44,24 @@ typedef enum {
 class Camera {
 
 public:
+	
+	/**
+	 * Konstruktor domyślny. Kamera FPP w pozycji (0, 0, 0).
+	 */
 	Camera(const cType& = FPP);
+	
+	/**
+	 * Konstruktor, który jako parametry przyjmuje współrzędne położenia kamery.
+	 * @param x Współrzędna x.
+	 * @param y Współrzędna y.
+	 * @param z Współrzędna z.
+	 * @param type Typ kamery. FPP | SPHERICAL | TPP
+	 */
 	Camera(const GLdouble&, const GLdouble&, const GLdouble&, const cType& = FPP);
 	
+	/**
+	 * Destruktor wywala tylko log na ekran.
+	 */
 	virtual ~Camera();
 	
 	/**
@@ -92,8 +107,6 @@ public:
 	 * @param z Pozycja Z.
 	 */
 	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
-	
-	void printInfo();
 
 
 private:

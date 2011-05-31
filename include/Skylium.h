@@ -85,12 +85,14 @@ public:
 	
 	Scene * createScene(const std::string&);
 	
-	SceneManager*& Scenes;
-	
 	/*
 	 * Tworzy nowego shadera i zwraca wskaźnik do niego.
 	 */
 	Shader * createShader(const unsigned&, const std::string& = "", const std::string& = "");
+	
+	void getWindowSize(int &_a, int &_b) { _a = __windowWidth; _b = __windowHeight; }
+	
+	SceneManager*& Scenes;
 	
 	
 private:
@@ -122,6 +124,10 @@ private:
 	/* Przechowuje pozycję x i y myszy. */
 	int __lastMousePositionX;
 	int __lastMousePositionY;
+	
+	/* Przechowuje rozmiary okna. */
+	int __windowWidth;
+	int __windowHeight;
 	
 	std::vector< Shader* > __shaderList;
 	

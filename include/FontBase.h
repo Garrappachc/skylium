@@ -35,7 +35,7 @@ public:
 	
 	virtual ~FontBase();
 	
-	void print(const GLfloat&, const GLfloat&, const std::string&);
+	void print(const GLfloat&, const GLfloat&, const std::string&) const;
 	
 private:
 	

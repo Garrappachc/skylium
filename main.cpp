@@ -12,7 +12,6 @@
 #include "include/Skylium.h"
 #include "include/Timer.h"
 #include "include/Material.h"
-#include "include/FontBase.h"
 
 using namespace std;
 
@@ -79,8 +78,6 @@ main() {
 	scenka -> setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
 	scenka -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
 	
-	FontBase *foncik = new FontBase();
-	
 	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
 	Timer *zegarek_dla_fps = new Timer(); // liczymy fps'y
 	Timer *zegarek_dla_taba = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
@@ -135,8 +132,6 @@ main() {
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
 		
-		foncik -> print(0.2, 0.2, "Heja!");
-		
 		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
 		
 	}
@@ -145,7 +140,6 @@ main() {
 	delete zegarek_dla_animacji;
 	delete zegarek_dla_fps;
 	delete zegarek_dla_taba;
-	delete foncik;
 	
 	// całą resztę wywali za nas Skylium.
 	delete s_main;
