@@ -82,17 +82,15 @@ FontBase::~FontBase() {
 }
 
 void
-FontBase::print(const GLfloat &_x, const GLfloat &_y, const string &_text) {
-	glPushMatrix();
+FontBase::print(const GLfloat &_x, const GLfloat &_y, const string &_text) const {
+	const char *text = _text.c_str();
+	glRasterPos2f(_x, _y);
+	glColor4f(0.0, 0.0, 0.0, 1.0);
+	//glPushMatrix();
 		glPushAttrib(GL_LIST_BIT);
 			glListBase(__base - 32);
 			
-			const char *text = _text.c_str();
-			
-			glRasterPos2f(_x, _y);
-			glColor4f(0.0, 0.0, 0.0, 1.0);
-			
 			glCallLists(_text.length(), GL_UNSIGNED_BYTE, text);
 		glPopAttrib();
-	glPopMatrix();
+	//glPopMatrix();
 }

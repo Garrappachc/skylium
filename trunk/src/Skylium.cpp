@@ -87,22 +87,20 @@ Skylium::init(const string &_windowName, const bool &_fullScreen) {
 	
 	int bpp = info -> vfmt -> BitsPerPixel;
 	
-	int windowWidth, windowHeight;
-	
 	Uint32 flags = SDL_HWSURFACE;
 	flags |= SDL_GL_DOUBLEBUFFER;
 	flags |= SDL_OPENGL;
 	if (!_fullScreen) {
 		flags |= SDL_RESIZABLE;
-		windowWidth = info -> current_w - 50;
-		windowHeight = info -> current_h - 100;
+		__windowWidth = info -> current_w - 50;
+		__windowHeight = info -> current_h - 100;
 	} else {
 		flags |= SDL_FULLSCREEN;
-		windowWidth = info -> current_w;
-		windowHeight = info -> current_h;
+		__windowWidth = info -> current_w;
+		__windowHeight = info -> current_h;
 	}
 	
-	if ((__surfDisplay = SDL_SetVideoMode(windowWidth, windowHeight, bpp, flags)) == NULL) {
+	if ((__surfDisplay = SDL_SetVideoMode(__windowWidth, __windowHeight, bpp, flags)) == NULL) {
 #ifdef __DEBUG__
 		cout << LOG_ERROR << "Nie udało się utworzyć okna! Zamykam.";
 #endif
@@ -113,13 +111,13 @@ Skylium::init(const string &_windowName, const bool &_fullScreen) {
 #ifndef __DEBUG__
 	SDL_ShowCursor(SDL_DISABLE);
 #endif
-	SDL_WarpMouse(windowWidth / 2, windowHeight / 2);
+	SDL_WarpMouse(__windowWidth / 2, __windowHeight / 2);
 	
 	// inicjalizujemy GLEWa
 	glewInit();
 	
 	glClearColor(1, 1, 1, 1);
-	glViewport(0, 0, windowWidth, windowHeight);
+	glViewport(0, 0, __windowWidth, __windowHeight);
 	glLoadIdentity();
 	
 	return true;
@@ -239,6 +237,9 @@ Skylium::__catchEvents() {
 				}
 				break;
 			case SDL_VIDEORESIZE:
+				const SDL_VideoInfo *info = SDL_GetVideoInfo();
+				__windowWidth = info -> current_w;
+				__windowHeight = info -> current_h;
 				__sceneManagement->getActiveScene()->getActiveCamera()->setProjection();
 				break;
 		}
