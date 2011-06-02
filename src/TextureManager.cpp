@@ -1,5 +1,5 @@
 /*
-    defines.h
+    TextureManager.cpp
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -16,23 +16,33 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DEFINES_H
-#define DEFINES_H
 
-#define LOG_INFO "\n\e[36m(II)\e[0m "
-#define LOG_ERROR "\n\e[31m(EE)\e[0m "
-#define LOG_WARN "\n\e[33m(WW)\e[0m "
+#include "../include/TextureManager.h"
+#include "../include/Texture.h"
 
-/** 
- * Minimalny rozmiar tablicy wierzchołków, żeby została załadowana do VBO.
- * Domyślna wartość - 256 bajtów.
- */
-static const unsigned MIN_SIZE_OF_VERTEX_ARRAY = 256;
+using namespace std;
 
-/**
- * Maksymalny rozmiar tablicy wierzchołków, aby została cała załadowana do VBO.
- * Domyślna wartość - 256 MB.
- */
-static const unsigned MAX_SIZE_OF_VERTEX_ARRAY = 268435456;
+TextureManager::TextureManager() :
+		__textureList(0) {
 
-#endif  /* DEFINES_H */
+}
+
+TextureManager::~TextureManager() {
+	while (!__textureList.empty())
+		delete __textureList.back(), __textureList.pop_back();
+}
+
+Texture *
+TextureManager::getTextureByName(const string &_name) {
+	for (unsigned i = 0; i < __textureList.size(); i++)
+		if (__textureList[i]->name == _name) return __textureList[i];
+	
+	return NULL;
+}
+
+void
+TextureManager::pushBack(Texture *_tex) {
+	if (_tex == NULL)
+		return;
+	__textureList.push_back(_tex);
+}

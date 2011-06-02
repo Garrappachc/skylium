@@ -29,6 +29,7 @@ using namespace std;
 
 Skylium::Skylium() : 
 		Scenes(__sceneManagement),
+		Textures(__textureManagement),
 		__sceneManagement(NULL),
 		__pendingKeys(KEY_NOKEY),
 		__isMouseMotionEnabled(false),
@@ -37,6 +38,7 @@ Skylium::Skylium() :
 		__lastMousePositionY(0),
 		__shaderList(0) {
 	__sceneManagement = new SceneManager();
+	__textureManagement = new TextureManager();
 	
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Skylium()";
@@ -51,7 +53,8 @@ Skylium::~Skylium() {
 	SDL_FreeSurface(__surfDisplay);
 	SDL_Quit();
 	
-	// Niszczymy SceneMangagera i ShaderManagera
+	// Niszczymy SceneMangagera i TextureManagera
+	delete __textureManagement;
 	delete __sceneManagement;
 	
 #ifdef __DEBUG__
@@ -167,13 +170,37 @@ Skylium::createShader(const unsigned &_type, const string &_vertFile, const stri
 	return newShader;
 }
 
+bool
+Skylium::isSupported(char *_ext) {
+	const unsigned char *pszExtensions = NULL, *pszStart;
+	unsigned char *pszWhere, *pszTerminator;
+	pszWhere = (unsigned char *) strchr(_ext, ' ' );
+	if( pszWhere || *_ext == '\0' )
+		return false;
+      // Pobierz łańcuch z rozszerzeniami dostępnymi na danej karcie graficznej
+	pszExtensions = glGetString( GL_EXTENSIONS );
+      // Sprawdź, czy w łańcuchu z rozszerzeniami jest dokładna kopia szTargetExtension
+	pszStart = pszExtensions;
+	for(;;) {
+		pszWhere = (unsigned char *)strstr((const char *) pszStart, _ext);
+		if(!pszWhere)
+			break;
+		pszTerminator = pszWhere + strlen(_ext);
+		if(pszWhere == pszStart || *(pszWhere - 1) == ' ')
+			if(*pszTerminator == ' ' || *pszTerminator == '\0')
+				return true;
+		pszStart = pszTerminator;
+	}
+	return false;
+}
+
 void
 Skylium::__render() {
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_DEPTH_TEST);
 	
 	glDisable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 	glCullFace(GL_FRONT_AND_BACK);
 	
 	glEnable(GL_POLYGON_SMOOTH);

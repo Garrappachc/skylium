@@ -21,20 +21,16 @@
 #define MATERIAL_H
 
 #include <string>
+#include <vector>
 
 #include "Vectors.h"
+
+class Texture;
 
 enum {
 	MATERIAL_AMBIENT	= 1,
 	MATERIAL_DIFFUSE	= 2,
 	MATERIAL_SPECULAR	= 4
-};
-
-enum {
-	TEXTURE_AMBIENT	= 1,
-	TEXTURE_DIFFUSE	= 2,
-	TEXTURE_SPECULAR	= 4,
-	TEXTURE_ALPHA		= 8
 };
 
 class Material {
@@ -49,22 +45,15 @@ public:
 	Material(const std::string& = "");
 	
 	/**
+	 * Konstruktor kopiujący.
+	 */
+	Material(const Material&);
+	
+	/**
 	 * Destruktor usuwa wszystkie przypisane do niego tekstury.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glDeleteTextures.xml
 	 */
 	virtual ~Material();
-	
-	/**
-	 * Ładuje teksturę z pliku.
-	 * @param fileName Nazwa pliku z teksturą.
-	 * @param type Typ tekstury, który ma być załadowany. I tak:
-	 *		&bump; TEXTURE_AMBIENT - ładuje tAmbient;
-	 *		&bump; TEXTURE_DIFFUSE - ładuje tDiffuse;
-	 *		&bump; TEXTURE_SPECULAR - ładuje tSpecular;
-	 *		&bump; TEXUTRE_ALPHA - ładuje tAlpha;
-	 * @return False, jeżeli coś poszło nie tak.
-	 */
-	bool loadTexture(const std::string&, const unsigned&);
 	
 	/**
 	 * Ustawia podany parametr materiału.
@@ -93,14 +82,14 @@ public:
 	 * Sprawdza, czy materiał posiada jakąś teksturę.
 	 * @return True, jeżeli ma jakąkolwiek.
 	 */
-	bool hasAnyTexture();
+	bool hasAnyTexture() { return __textures.size() > 0; }
 	
 	/**
 	 * Ustawia parametry tekstury do renderowania.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glTexParameter.xml
 	 */
-	void setTexture();
+	void setTextures();
 	
 	/**
 	 * Ustawia parametry materiału do renderowania.
@@ -109,10 +98,11 @@ public:
 	void setMaterial();
 	
 	/**
-	 * Pozwala modyfikować zmienną __wrapping;
-	 * @param wrapping Enum odpowiadający pożądanemu zaginaniu tekstury.
+	 * Dodaje do wektora __textures wskaźnik na teksturę, który
+	 * został podany jako argument.
+	 * @param _tex Wskaźnik na teksturę.
 	 */
-	void setWrapping(const GLenum&);
+	void appendTexture(Texture*);
 	
 	/* Nazwa materiału. */
 	std::string name;
@@ -120,20 +110,16 @@ public:
 private:
 	
 	/* Materiał */
-	sColor		__mAmbient;
-	sColor		__mDiffuse;
-	sColor		__mSpecular;
-	GLfloat		__mAlpha;
-	GLint		__mShininess;
+	sColor			__mAmbient;
+	sColor			__mDiffuse;
+	sColor			__mSpecular;
+	GLfloat			__mAlpha;
+	GLint				__mShininess;
 	
 	/* Tekstury */
-	GLuint		__tAmbient;
-	GLuint		__tDiffuse;
-	GLuint		__tSpecular;
-	GLuint		__tAlpha;
-	
-	GLenum		__wrapping;
-	
+	std::vector< Texture* >				__textures;
+	std::vector< Texture* >::const_iterator	__texturesIterator;
+
 	
 };
 

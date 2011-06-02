@@ -24,6 +24,7 @@
 
 #include "Singleton.h"
 #include "SceneManager.h"
+#include "TextureManager.h"
 #include "Scene.h"
 #include "Shader.h"
 
@@ -92,7 +93,15 @@ public:
 	
 	void getWindowSize(int &_a, int &_b) { _a = __windowWidth; _b = __windowHeight; }
 	
+	/**
+	 * Sprawdza, czy dane rozszerzenie jest dostępne.
+	 */
+	bool isSupported(char*);
+	
+	
+	/* Dostęp do manadżerów z zewnątrze */
 	SceneManager*& Scenes;
+	TextureManager*& Textures;
 	
 	
 private:
@@ -111,6 +120,9 @@ private:
 	
 	/* Instancja SceneManagera */
 	SceneManager * __sceneManagement;
+	
+	/* Instancja TextureManagera */
+	TextureManager * __textureManagement;
 	
 	/* Przechowuje wciśnięte klawisze. Patrz metoda sEvent(). */
 	sKey __pendingKeys;
