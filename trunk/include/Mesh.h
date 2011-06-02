@@ -88,6 +88,11 @@ public:
 	 */
 	void enableNormals() { __hasNormals = true; }
 	
+	/**
+	 * Zwraca rozmiar tablicy wierzchołków.
+	 */
+	size_t getSizeOfVertices() { return sizeof(Vertex) * __vertices.size(); }
+	
 	std::string name;
 	
 private:

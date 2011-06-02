@@ -52,6 +52,7 @@ Mesh::Mesh(const Mesh &_orig) :
 		__smooth(_orig.__smooth),
 		__usage(_orig.__usage),
 		__mode(_orig.__mode) {
+	/* FIXME: Why, the hell, we are making the new material? */
 	__material = new Material(*_orig.__material);
 }
 
@@ -70,7 +71,7 @@ Mesh::show() {
 	
 	if (__material && __material -> hasAnyTexture()) { // czy mamy jakąkolwiek teksturę?
 		glColor4f(1.0, 1.0, 1.0, 1.0); // musi być biały kolor - bez tego nie będzie tekstury
-		__material -> setTexture(); // ustawiamy parametry tekstur
+		__material -> setTextures(); // ustawiamy parametry tekstur
 		glEnable(GL_TEXTURE_2D); // odblokowujemy tekstury
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY); // i ich współrzędne
 	}
@@ -87,25 +88,39 @@ Mesh::show() {
 	
 	
 	// renderujemy!
-	glBindBuffer(GL_ARRAY_BUFFER, __vboID); // ustawiamy aktywny wskaźnik na odpowiednim buforze
+	if (__vboID != 0) {
+		glBindBuffer(GL_ARRAY_BUFFER, __vboID); // ustawiamy aktywny wskaźnik na odpowiednim buforze
 	
-	if (__material && __material -> hasAnyTexture())
-		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // gdzie są koordynaty tekstur
+		if (__material && __material -> hasAnyTexture())
+			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // gdzie są koordynaty tekstur
 	
-	if (__hasNormals)
-		glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // gdzie normalne
+		if (__hasNormals)
+			glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // gdzie normalne
 
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // i gdzie wierzchołki
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // i gdzie wierzchołki
+	} else {
+		if (__material && __material -> hasAnyTexture())
+			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &__vertices[0].textureCoords);
+		
+		if (__hasNormals)
+			glNormalPointer(GL_FLOAT, sizeof(Vertex), &__vertices[0].normalVector);
+		
+		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &__vertices[0]);
+	}
 	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID); // teraz chcemy bufor z indeksami
+	if (__vboIndexID != 0) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID); // teraz chcemy bufor z indeksami
 
-	// Teraz rysujemy wszystko za jednym zamachem.
-	// __mode - defaultowo GL_TRIANGLES. Tryb rysowania;
-	// __index.size() - ilość wierzchołków do odwzorowania;
-	// GL_UNSIGNED_SHORT - typ danych w tablicy indeksów. Nasza tablica to std::vector<GLushort>, czyli
-	// 	właśnie unsigned short;
-	// BUFFER_OFFSET(0) - mówimy, skąd chcemy zacząć pobierać indeksy wierzchołków.
-	glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+		// Teraz rysujemy wszystko za jednym zamachem.
+		// __mode - defaultowo GL_TRIANGLES. Tryb rysowania;
+		// __index.size() - ilość wierzchołków do odwzorowania;
+		// GL_UNSIGNED_SHORT - typ danych w tablicy indeksów. Nasza tablica to std::vector<GLushort>, czyli
+		// 	właśnie unsigned short;
+		// BUFFER_OFFSET(0) - mówimy, skąd chcemy zacząć pobierać indeksy wierzchołków.
+		glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+	} else {
+		glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, &__index[0]);
+	}
 	
 	GLenum err = glGetError(); // pobieramy błędy
 	while (err != GL_NO_ERROR) {
@@ -121,8 +136,10 @@ Mesh::show() {
 	
 	glDisableClientState(GL_VERTEX_ARRAY); // blokujemy
 	
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // bufor już nam nie będzie potrzebny - wracamy ze wskaźnikiem do ramu
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	if (__vboID != 0) {
+		glBindBuffer(GL_ARRAY_BUFFER, 0); // bufor już nam nie będzie potrzebny - wracamy ze wskaźnikiem do ramu
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 	
 	glShadeModel(GL_FLAT); // zawsze!
 }

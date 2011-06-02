@@ -30,6 +30,8 @@
 #include "../include/Vertex.h"
 #include "../include/FaceComp.h"
 #include "../include/Shader.h"
+#include "../include/Skylium.h"
+#include "../include/Texture.h"
 
 #include "../include/defines.h"
 
@@ -162,14 +164,23 @@ Object::loadFromObj(const string &_objFile, const unsigned &_whatToLoad) {
 	}
 	
 	__parseObj(_objFile, _whatToLoad);
+	
+	loadIntoVBO();
+	
 	return true;
 }
 
 void
 Object::loadIntoVBO() {
+	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_buffer_object"))
+		return;
 	__meshesIterator = __meshes.begin();
-		while (__meshesIterator != __meshes.end())
-			(*__meshesIterator) -> loadIntoVbo(), __meshesIterator++;
+		while (__meshesIterator != __meshes.end()) {
+			if ((*__meshesIterator) -> getSizeOfVertices() > MIN_SIZE_OF_VERTEX_ARRAY &&
+				(*__meshesIterator) -> getSizeOfVertices() <  MAX_SIZE_OF_VERTEX_ARRAY)
+				(*__meshesIterator) -> loadIntoVbo();
+			__meshesIterator++;
+		}
 }
 
 Material *
@@ -387,7 +398,8 @@ Object::__parseMtl(const string &_fileName) {
 				cout << LOG_WARN << "Nie znalazłem tekstury: " << "texture/" << texfile;
 #endif
 			}
-			current ->loadTexture("texture/" + texfile, TEXTURE_DIFFUSE);
+			Texture *newTex = new Texture("texture/" + texfile);
+			current -> appendTexture(newTex);
 		}
 	}
 	

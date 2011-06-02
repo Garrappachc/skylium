@@ -4,6 +4,7 @@
 */
 
 #include <iostream>
+#include <sstream>
 
 #include "include/Camera.h"
 #include "include/Light.h"
@@ -38,12 +39,14 @@ main() {
 	
 	surface -> move(-6, -2.65, -10);
 	surface -> scale(2, 2, 2);
-	surface -> loadIntoVBO();
 	
 	// we crate the larger surface
 	for (int k = 0; k < 5; k++ ) {
 		for (int i = -1; i < 4; i++) {
-			Object *surface_new = scenka -> createObject((string)("surface_" + i), surface);
+			ostringstream temp;
+			temp << i;
+			string str = "surface_" + temp.str();
+			Object *surface_new = scenka -> createObject(str, surface);
 			surface_new -> move(6*i, 0, 6*k);
 		}
 	}
@@ -53,8 +56,7 @@ main() {
 	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
-	table -> setColor(0, 46, 75);
-	table -> loadIntoVBO();
+	table -> setColor(77, 44, 0);
 	
 	Object *malpka = scenka -> createObject("malpka"); // małpka
 	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL)) // znowu .obj
@@ -62,8 +64,7 @@ main() {
 	malpka -> move(0, 7, 0);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
-	malpka -> setColor(99, 29, 6);
-	malpka -> loadIntoVBO();
+	malpka -> setColor(3, 121, 255);
 	
 	Camera* kamerka_fpp = scenka -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
 	kamerka_fpp -> lookAt(0, 7, 0); // kamerka skierowana na punkt (0, 7, 0)
