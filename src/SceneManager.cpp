@@ -53,9 +53,6 @@ SceneManager::createScene(const string &_name) {
 void
 SceneManager::displayActiveScene() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#ifdef __DEBUG_GL__
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-#endif
 	
 	if (__activeScene) {
 		__activeScene -> show();	
