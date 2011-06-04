@@ -1,5 +1,5 @@
 /*
-    FontBase.h
+    config.cpp
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -16,36 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "../include/config.h"
 
-#ifndef FONTBASE_H
-#define FONTBASE_H
-
-#include <string>
-
-#include <GL/gl.h>
-#include <GL/glx.h>
-
-class FontBase {
-	
-public:
-	
-	FontBase(const std::string& = "-*-courier-bold-r-normal--14-*-*-*-*-*-*-*", const int& = 96);
-	
-	FontBase(const FontBase&);
-	
-	virtual ~FontBase();
-	
-	void print(const GLfloat&, const GLfloat&, const std::string&) const;
-	
-private:
-	
-	Font __font;
-	
-	GLuint __base;
-	
-	int __characters;
-	
-	
-};
-
-#endif // FONTBASE_H
+bool		sGlobalConfig::USING_VBO = true;
+unsigned	sGlobalConfig::MAX_VBO_SIZE = 268435456;
+unsigned	sGlobalConfig::MIN_VBO_SIZE = 256;
+bool		sGlobalConfig::FULLSCREEN_RENDERING = false;

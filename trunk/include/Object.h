@@ -29,6 +29,7 @@
 #include "Mesh.h"
 
 class Shader;
+class SkyliumConfig;
 
 enum {
 	GET_VERTICES	= 1,
@@ -158,6 +159,8 @@ private:
 	void __parseObj(const std::string&, const unsigned&);
 	
 	void __parseMtl(const std::string&);
+	
+	SkyliumConfig * __config;
 	
 };
 

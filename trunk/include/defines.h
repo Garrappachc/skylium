@@ -23,16 +23,4 @@
 #define LOG_ERROR "\n\e[31m(EE)\e[0m "
 #define LOG_WARN "\n\e[33m(WW)\e[0m "
 
-/** 
- * Minimalny rozmiar tablicy wierzchołków, żeby została załadowana do VBO.
- * Domyślna wartość - 256 bajtów.
- */
-static const unsigned MIN_SIZE_OF_VERTEX_ARRAY = 256;
-
-/**
- * Maksymalny rozmiar tablicy wierzchołków, aby została cała załadowana do VBO.
- * Domyślna wartość - 256 MB.
- */
-static const unsigned MAX_SIZE_OF_VERTEX_ARRAY = 268435456;
-
 #endif  /* DEFINES_H */

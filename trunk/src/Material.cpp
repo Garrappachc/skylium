@@ -47,7 +47,7 @@ Material::Material(const Material &_orig) :
 		__mShininess(0),
 		__textures(0) {
 	__textures = _orig.__textures;
-#ifdef __DEBUG__
+#ifdef __DEBUG_STRONG__
 	cout << LOG_INFO << "Konstruktor: Material(orig.name = \"" << name << "\")";
 #endif
 }
