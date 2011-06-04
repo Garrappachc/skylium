@@ -60,8 +60,10 @@ Mesh::~Mesh() {
 #ifdef __DEBUG__STRONG__
 	cout << "Destruktor: ~Mesh(name = \"" << name << "\".";
 #endif
-	glDeleteBuffers(1, &__vboID);
-	glDeleteBuffers(1, &__vboIndexID);
+	if (__vboID != 0)
+		glDeleteBuffers(1, &__vboID);
+	if (__vboIndexID != 0)
+		glDeleteBuffers(1, &__vboIndexID);
 }
 
 void
