@@ -17,15 +17,30 @@
 */
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
+#include <sys/stat.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 
 #include "../include/Skylium.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
+
+/**
+ * Funkcje pomocnicze.
+ */
+template < typename T >
+inline T string2T(const std::string &_s) {
+	T temp;
+	istringstream ss(_s);
+	ss >> temp;
+	return temp;
+}
 
 Skylium::Skylium() : 
 		Scenes(__sceneManagement),
@@ -63,7 +78,10 @@ Skylium::~Skylium() {
 }
 
 bool
-Skylium::init(const string &_windowName, const bool &_fullScreen) {
+Skylium::init(const string &_windowName) {
+	
+	__loadConfig("skylium.cfg");
+	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 #ifdef __DEBUG__
 		cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
@@ -89,6 +107,8 @@ Skylium::init(const string &_windowName, const bool &_fullScreen) {
 	}
 	
 	int bpp = info -> vfmt -> BitsPerPixel;
+	
+	bool _fullScreen = sGlobalConfig::FULLSCREEN_RENDERING;
 	
 	Uint32 flags = SDL_HWSURFACE;
 	flags |= SDL_GL_DOUBLEBUFFER;
@@ -272,4 +292,62 @@ Skylium::__catchEvents() {
 		}
 	}
 	
+}
+
+void
+Skylium::__loadConfig(const string &_fileName) {
+	
+	if (!__fileExists(_fileName)) {
+#ifdef __DEBUG__
+		cout << LOG_WARN << "Nie znaleziono pliku konfiguracyjnego! W użyciu wartości domyślne.";
+		return;
+#endif
+	}
+	
+	fstream configFile(_fileName.c_str(), ios::in);
+	
+	string buffer, param, value;
+	
+	while (!configFile.eof()) {
+		param = "";
+		getline(configFile, buffer);
+		
+		if (buffer[0] == '#')
+			continue;
+		
+		istringstream line(buffer);
+		
+		line >> param >> value;
+		
+		if (param == "min_vbo_size") {
+			sGlobalConfig::MIN_VBO_SIZE = string2T< unsigned >(value);
+		} else if (param == "max_vbo_size") {
+			sGlobalConfig::MAX_VBO_SIZE = string2T< unsigned >(value);
+		} else if (param == "fullscreen") {
+			if (value == "false" || value == "0")
+				sGlobalConfig::FULLSCREEN_RENDERING = false;
+			else if (value == "true" || value == "1")
+				sGlobalConfig::FULLSCREEN_RENDERING = true;
+			else
+				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"fullscreen\" to 0, 1, false lub true.";
+		} else if (param == "using_vbo") {
+			if (value == "false" || value == "0")
+				sGlobalConfig::USING_VBO = false;
+			else if (value == "true" || value == "1")
+				sGlobalConfig::USING_VBO = true;
+			else
+				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"using_vbo\" to 0, 1, false lub true.";
+		} else
+			continue;
+	}
+	configFile.close();
+}
+
+bool
+Skylium::__fileExists(const string &_fileName) {
+	struct stat buf;
+	if (stat(_fileName.c_str(), &buf) == 0)
+		return 1;
+	else
+		return 0;
 }

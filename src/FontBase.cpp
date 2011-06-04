@@ -55,7 +55,7 @@ FontBase::FontBase(const string &_fontName, const int &_characters) :
 	}
 	
 	__font = fontInfo -> fid;
-	glXUseXFont(__font, 32, _characters, __base);
+	glXUseXFont(__font, ' ', _characters, __base);
 	
 	GLenum err = glGetError(); // pobieramy błędy
 	while (err != GL_NO_ERROR) {
@@ -83,14 +83,12 @@ FontBase::~FontBase() {
 
 void
 FontBase::print(const GLfloat &_x, const GLfloat &_y, const string &_text) const {
-	const char *text = _text.c_str();
-	glRasterPos2f(_x, _y);
 	glColor4f(0.0, 0.0, 0.0, 1.0);
 	//glPushMatrix();
 		glPushAttrib(GL_LIST_BIT);
-			glListBase(__base - 32);
-			
-			glCallLists(_text.length(), GL_UNSIGNED_BYTE, text);
+			glListBase(__base - ' ');
+			glRasterPos3f(_x, _y, 0.0f);
+			glCallLists(_text.length(), GL_BYTE, _text.c_str());
 		glPopAttrib();
 	//glPopMatrix();
 }

@@ -13,6 +13,8 @@
 #include "include/Skylium.h"
 #include "include/Timer.h"
 #include "include/Material.h"
+#include "include/FontBase.h"
+#include "include/Hud.h"
 
 using namespace std;
 
@@ -21,7 +23,7 @@ main() {
 	
 	Skylium *s_main = new Skylium();
 	
-	if (!s_main -> init("Skylium", false)) { // tworzy okno, false - okno, true - fullscreen
+	if (!s_main -> init("Skylium")) { // tworzy okno, false - okno, true - fullscreen
 		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
 	}
@@ -56,7 +58,7 @@ main() {
 	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
-	table -> setColor(77, 44, 0);
+	table -> setColor(0.7f, 0.7f, 0.7f);
 	
 	Object *malpka = scenka -> createObject("malpka"); // małpka
 	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL)) // znowu .obj
@@ -64,7 +66,7 @@ main() {
 	malpka -> move(0, 7, 0);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
-	malpka -> setColor(3, 121, 255);
+	malpka -> setColor(54, 18, 0);
 	
 	Camera* kamerka_fpp = scenka -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
 	kamerka_fpp -> lookAt(0, 7, 0); // kamerka skierowana na punkt (0, 7, 0)
@@ -82,6 +84,10 @@ main() {
 	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
 	Timer *zegarek_dla_fps = new Timer(); // liczymy fps'y
 	Timer *zegarek_dla_taba = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
+	
+	//FontBase *foncik = new FontBase();
+	
+	//Hud *hudzik = new Hud(foncik);
 	
 	short fps = 0; // licznik fps.
 	
@@ -132,6 +138,8 @@ main() {
 		}
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
+		
+		//hudzik -> draw();
 		
 		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
 		

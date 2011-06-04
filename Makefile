@@ -10,7 +10,7 @@ LGLEW=-lGLEW
 
 LFLAGS=$(LSOIL) $(LSDL) $(LGLEE) $(LGL) $(LGLU) $(LGLEW)
 
-OBJS=Camera.o FaceComp.o Light.o Material.o Mesh.o Object.o Scene.o SceneManager.o Shader.o Skylium.o Texture.o TextureManager.o Timer.o Vertex.o
+OBJS= Camera.o FaceComp.o FontBase.o Hud.o Light.o Material.o Mesh.o Object.o Scene.o SceneManager.o Shader.o Skylium.o Texture.o TextureManager.o Timer.o Vertex.o config.o
 
 
 skylium: $(OBJS) main.o

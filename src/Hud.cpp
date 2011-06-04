@@ -18,6 +18,8 @@
 
 
 #include "../include/Hud.h"
+#include "../include/Skylium.h"
+#include "../include/FontBase.h"
 
 #include "../include/defines.h"
 
@@ -42,14 +44,14 @@ Hud::draw() {
 	// włączamy Hud Mode
 	hudMode(true);
 	
-	glColor4f(0.6f, 0.2f, 0.2f, 0.6f);
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_QUADS);
-		glVertex2f(0.2, 0.0);
-		glVertex2f(0.2, 0.4);
-		glVertex2f(0.8, 0.4);
-		glVertex2f(0.8, 0.0);
+		glVertex3f(0.2, 0.0, 0.0);
+		glVertex3f(0.2, 0.4, 0.0);
+		glVertex3f(0.8, 0.4, 0.0);
+		glVertex3f(0.8, 0.0, 0.0);
 	glEnd();
-	glColor4f(0.6f, 0.2f, 0.2f, 0.9f);
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glLineWidth(2.0f);
 	glBegin(GL_LINE_LOOP);
 		glVertex2f(0.2, 0.0);
@@ -57,6 +59,8 @@ Hud::draw() {
 		glVertex2f(0.8, 0.4);
 		glVertex2f(0.8, 0.0);
 	glEnd();
+	
+	__font -> print(0.0f, 0.0f, "aaabbb");
 	
 	hudMode(false);
 }
@@ -69,7 +73,7 @@ Hud::hudMode(bool flag) {
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		gluOrtho2D(0, w, 0, h);
+		glOrtho(0, w, h, 0, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();

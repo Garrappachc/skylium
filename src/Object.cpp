@@ -34,6 +34,7 @@
 #include "../include/Texture.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
@@ -165,7 +166,8 @@ Object::loadFromObj(const string &_objFile, const unsigned &_whatToLoad) {
 	
 	__parseObj(_objFile, _whatToLoad);
 	
-	loadIntoVBO();
+	if (sGlobalConfig::USING_VBO)
+		loadIntoVBO();
 	
 	return true;
 }
@@ -176,8 +178,8 @@ Object::loadIntoVBO() {
 		return;
 	__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end()) {
-			if ((*__meshesIterator) -> getSizeOfVertices() > MIN_SIZE_OF_VERTEX_ARRAY &&
-				(*__meshesIterator) -> getSizeOfVertices() <  MAX_SIZE_OF_VERTEX_ARRAY)
+			if ((*__meshesIterator) -> getSizeOfVertices() > sGlobalConfig::MIN_VBO_SIZE &&
+				(*__meshesIterator) -> getSizeOfVertices() <  sGlobalConfig::MAX_VBO_SIZE)
 				(*__meshesIterator) -> loadIntoVbo();
 			__meshesIterator++;
 		}

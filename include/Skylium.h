@@ -68,7 +68,7 @@ public:
 	 * @param fullScreen Jeżeli true, będzie fullscreen.
 	 * @return False, jeżeli coś poszło nie tak.
 	 */
-	bool init(const std::string&, const bool& = false);
+	bool init(const std::string&);
 	
 	/**
 	 * Przechwytuje zdarzenia z kolejki, a następnie renderuje scenę.
@@ -117,6 +117,17 @@ private:
 	 */
 	void __catchEvents();
 	
+	/**
+	 * Ładuje plik konfiguracyjny.
+	 * @param fileName Lokalizacji pliku.
+	 * @param 
+	 */
+	void __loadConfig(const std::string&);
+	
+	/**
+	 * Zwraca false, jeżeli plik nie istnieje.
+	 */
+	bool __fileExists(const std::string&);
 	
 	/* Instancja SceneManagera */
 	SceneManager * __sceneManagement;
