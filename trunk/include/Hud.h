@@ -20,12 +20,15 @@
 #ifndef HUD_H
 #define HUD_H
 
+#include <vector>
+
 #include <GL/gl.h>
 
 #include "Singleton.h"
+#include "Vectors.h"
 
 class Skylium;
-class FontBase;
+class HudData;
 
 
 class Hud : public Singleton< Hud > {
@@ -36,7 +39,7 @@ public:
 	 * Konstruktor, który pobiera wskaźnik na instancję Skyliuma
 	 * oraz inicjalizuje fonta.
 	 */
-	Hud(const FontBase* = NULL);
+	Hud();
 	
 	/**
 	 * Desktruktor, który w sumie nic nie robi, prócz wywalania loga.
@@ -49,17 +52,32 @@ public:
 	void draw();
 	
 	/**
+	 * Jeżeli włączony - wyłącza, jeżeli wyłączony - włącza.
+	 */
+	void toggle() { __visible = !__visible; }
+	
+	/**
+	 * Zwraca true, jeżeli włączony.
+	 */
+	bool visible() { return __visible; }
+	
+	void attachData(HudData*);
+	
+private:
+	
+	/**
 	 * Ustawia odpowiednią macierz projekcji w zależności o d parametru.
 	 * @param flag Jeżeli true, to przygotowuje projekcję pod wyświetlenie HUDa. Jeżeli false, to
 	 * wraca do standardowej projekcji 3D.
 	 */
-	void hudMode(bool);
+	void __hudMode(bool);
 	
-private:
+	bool __visible;
 	
-	Skylium * __instance;
+	std::vector< HudData* > __toDisplay;
 	
-	const FontBase * __font;
+	std::vector< HudData* >::const_iterator __displayList;
+	
 };
 
 #endif // HUD_H

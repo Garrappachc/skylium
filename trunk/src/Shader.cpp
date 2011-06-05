@@ -34,8 +34,8 @@ Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileNam
 		__vertFile(_vertFileName),
 		__fragFile(_fragFileName),
 		__isRunning(false) {
-	__vertexShader = glCreateShader(GL_VERTEX_SHADER_ARB);
-	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER_ARB);
+	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 }
 
 Shader::~Shader() {
@@ -182,7 +182,7 @@ Shader::setUniform4f(const string &_name, const sVec4D< GLfloat > &_params) {
 	glUniform4f(location, _params[0], _params[1], _params[2], _params[3]);
 	GLenum err = glGetError(); // pobieramy błędy
 	while (err != GL_NO_ERROR) {
-		cout << "Błąd! Numer błędu: " << err << endl;
+		cout << LOG_WARN << "setUniform4f: Błąd! Numer błędu: " << err << endl;
 		err = glGetError();
 	}
 	return true;

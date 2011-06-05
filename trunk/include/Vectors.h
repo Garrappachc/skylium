@@ -149,6 +149,7 @@ public:
 	}
 };
 
+typedef sVec2D< GLfloat > sXY;
 
 
 template < typename T >

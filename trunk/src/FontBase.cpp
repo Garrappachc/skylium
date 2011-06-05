@@ -76,14 +76,14 @@ FontBase::FontBase(const FontBase &_orig) :
 
 FontBase::~FontBase() {
 #ifdef __DEBUG__
-	cout << LOG_INFO << "Desktruktor: ~FontBase()";
+	cout << LOG_INFO << "Destruktor: ~FontBase()";
 #endif
 	glDeleteLists(__base, __characters);
 }
 
 void
 FontBase::print(const GLfloat &_x, const GLfloat &_y, const string &_text) const {
-	glColor4f(0.0, 0.0, 0.0, 1.0);
+	//glColor4f(0.0, 0.0, 0.0, 1.0);
 	//glPushMatrix();
 		glPushAttrib(GL_LIST_BIT);
 			glListBase(__base - ' ');

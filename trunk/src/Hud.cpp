@@ -20,69 +20,91 @@
 #include "../include/Hud.h"
 #include "../include/Skylium.h"
 #include "../include/FontBase.h"
+#include "../include/HudData.h"
 
 #include "../include/defines.h"
 
 using namespace std;
 
-Hud::Hud(const FontBase *_font) : 
-		__instance(Skylium::GetSingletonPtr()),
-		__font(_font) {
+Hud::Hud() :
+		__visible(false),
+		__toDisplay(0) {
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Hud()";
 #endif
 }
 
 Hud::~Hud() {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Desktruktor: ~Hud()";
+#ifdef __DEBUG_STRONG__
+	cout << LOG_INFO << "Destruktor: ~Hud()";
 #endif
 }
 
 void
 Hud::draw() {
 	// włączamy Hud Mode
-	hudMode(true);
+	__hudMode(true);
 	
-	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	glColor4f(1.0f, 0.0f, 0.0f, 0.6f);
 	glBegin(GL_QUADS);
-		glVertex3f(0.2, 0.0, 0.0);
-		glVertex3f(0.2, 0.4, 0.0);
-		glVertex3f(0.8, 0.4, 0.0);
-		glVertex3f(0.8, 0.0, 0.0);
+		glVertex2f(-0.8, 1.0);
+		glVertex2f(-0.8, 0.6);
+		glVertex2f(0.8, 0.6);
+		glVertex2f(0.8, 1.0);
 	glEnd();
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 	glLineWidth(2.0f);
 	glBegin(GL_LINE_LOOP);
-		glVertex2f(0.2, 0.0);
-		glVertex2f(0.2, 0.4);
-		glVertex2f(0.8, 0.4);
-		glVertex2f(0.8, 0.0);
+		glVertex2f(-0.8, 1.0);
+		glVertex2f(-0.8, 0.6);
+		glVertex2f(0.8, 0.6);
+		glVertex2f(0.8, 1.0);
 	glEnd();
 	
-	__font -> print(0.0f, 0.0f, "aaabbb");
+	__displayList = __toDisplay.begin();
+	while (__displayList != __toDisplay.end()) {
+		glColor4f(
+				(*__displayList) -> color.r,
+				(*__displayList) -> color.g,
+				(*__displayList) -> color.b,
+				(*__displayList) -> color.a
+			);
+		(*__displayList) -> font -> print(
+				(*__displayList) -> position.x,
+				(*__displayList) -> position.y,
+				(*__displayList) -> text
+		);
+		__displayList++;
+	}
 	
-	hudMode(false);
+	__hudMode(false);
 }
 
 void
-Hud::hudMode(bool flag) {
+Hud::attachData(HudData *_newdata) {
+	__toDisplay.push_back(_newdata);
+}
+
+void
+Hud::__hudMode(bool flag) {
 	if (flag) {
-		int w, h;
-		__instance -> getWindowSize(w, h);
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		glOrtho(0, w, h, 0, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
 		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_COLOR_MATERIAL);
+		glDisable(GL_LIGHTING);
 	} else {
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_COLOR_MATERIAL);
+		glEnable(GL_LIGHTING);
 	}
 }
+

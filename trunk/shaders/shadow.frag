@@ -1,3 +1,5 @@
+uniform vec4 sDefColor;
+
 varying vec3 N;
 varying vec3 v;
 
@@ -14,7 +16,7 @@ void main() {
 	vec4 Ispec = gl_FrontLightProduct[0].specular * pow(max(dot(R, E), 0.0), 0.3 * gl_FrontMaterial.shininess);
 	Ispec = clamp(Ispec, 0.0, 1.0);
 	
-	gl_FragColor = (gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) * gl_Color;
+	gl_FragColor = (gl_FrontLightModelProduct.sceneColor + Iamb + Idiff + Ispec) * sDefColor;
 
 
 }

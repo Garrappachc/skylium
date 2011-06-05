@@ -87,10 +87,11 @@ void
 Object::show() {
 	glPushMatrix();
 		
-		if (__shader)
+		if (__shader) {
 			__shader -> toggle();
-
-		glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
+			__shader -> setUniform4f("sDefColor", __defColor);
+		} else
+			glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
