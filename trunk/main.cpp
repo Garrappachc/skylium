@@ -97,7 +97,7 @@ main() {
 	Timer *zegarek_dla_taba = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
 	Timer *zegarek_dla_huda = new Timer();
 	
-	FontBase *foncik = new FontBase(); // tworzymy nowego fonta
+	FontBase *foncik = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1"); // tworzymy nowego fonta
 	
 	HudData fpsCounter(sXY(-0.75, 0.9), sColor(1.0, 1.0, 1.0, 1.0), "", foncik);  // Tworzymy "paczkę" danych dla Huda -
 													// pozycję tekstu, kolor tekstu, tekst (póki co
