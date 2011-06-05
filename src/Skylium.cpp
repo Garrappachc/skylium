@@ -32,7 +32,7 @@
 using namespace std;
 
 /**
- * Funkcje pomocnicze.
+ * Funkcja pomocnicza.
  */
 template < typename T >
 inline T string2T(const std::string &_s) {
@@ -42,18 +42,21 @@ inline T string2T(const std::string &_s) {
 	return temp;
 }
 
+
+
 Skylium::Skylium() : 
 		Scenes(__sceneManagement),
 		Textures(__textureManagement),
-		__sceneManagement(NULL),
+		TheHud(__hud),
+		__sceneManagement(new SceneManager()),
+		__textureManagement(new TextureManager()),
 		__pendingKeys(KEY_NOKEY),
 		__isMouseMotionEnabled(false),
 		__surfDisplay(NULL),
 		__lastMousePositionX(0),
 		__lastMousePositionY(0),
-		__shaderList(0) {
-	__sceneManagement = new SceneManager();
-	__textureManagement = new TextureManager();
+		__shaderList(0),
+		__hud(new Hud()) {
 	
 #ifdef __DEBUG__
 	cout << LOG_INFO << "Konstruktor: Skylium()";
@@ -71,6 +74,10 @@ Skylium::~Skylium() {
 	// Niszczymy SceneMangagera i TextureManagera
 	delete __textureManagement;
 	delete __sceneManagement;
+	delete __hud;
+	
+	while (!__shaderList.empty())
+		delete __shaderList.back(), __shaderList.pop_back();
 	
 #ifdef __DEBUG__
 	cout << LOG_INFO << "C'ya!\n";
@@ -139,9 +146,12 @@ Skylium::init(const string &_windowName) {
 	// inicjalizujemy GLEWa
 	glewInit();
 	
-	glClearColor(1, 1, 1, 1);
-	glViewport(0, 0, __windowWidth, __windowHeight);
-	glLoadIdentity();
+	glShadeModel(GL_SMOOTH);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
 	return true;
 	
@@ -151,6 +161,8 @@ void
 Skylium::execute() {
 	__catchEvents();
 	__render();
+	if (TheHud -> visible())
+		TheHud -> draw();
 }
 
 Scene *
@@ -216,14 +228,6 @@ Skylium::isSupported(char *_ext) {
 
 void
 Skylium::__render() {
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_DEPTH_TEST);
-	
-	glDisable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_FRONT_AND_BACK);
-	
-	glEnable(GL_POLYGON_SMOOTH);
 	
 	__sceneManagement -> displayActiveScene();
 	
@@ -267,6 +271,9 @@ Skylium::__catchEvents() {
 						break;
 					case SDLK_F2:
 						__pendingKeys = KEY_F2;
+						break;
+					case SDLK_BACKQUOTE:
+						__pendingKeys = KEY_BACKQUOTE;
 						break;
 					default:
 						break;

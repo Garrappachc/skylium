@@ -52,7 +52,11 @@ SceneManager::createScene(const string &_name) {
 
 void
 SceneManager::displayActiveScene() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glColor4f(1.0, 1.0, 1.0, 1.0);
+	//glLoadIdentity( );
+	
 	
 	if (__activeScene) {
 		__activeScene -> show();	

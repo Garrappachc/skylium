@@ -63,13 +63,14 @@ Scene::~Scene() {
 
 void
 Scene::show() {
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
 	if (__activeCamera)
 		__activeCamera -> setView();
 	
-	if (__isLightOn)
+	if (__isLightOn) {
 		glEnable(GL_LIGHTING);
+		glEnable(GL_COLOR_MATERIAL);
+	}
 	
 	__setLights();
 	

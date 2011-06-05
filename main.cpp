@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "include/Vectors.h"
 #include "include/Camera.h"
 #include "include/Light.h"
 #include "include/Object.h"
@@ -15,15 +16,25 @@
 #include "include/Material.h"
 #include "include/FontBase.h"
 #include "include/Hud.h"
+#include "include/HudData.h"
 
 using namespace std;
+
+template < typename T >
+string T2String(const T &_orig) {
+	stringstream ss;
+	string output;
+	ss << _orig;
+	ss >> output;
+	return output;
+}
 
 int
 main() {
 	
 	Skylium *s_main = new Skylium();
 	
-	if (!s_main -> init("Skylium")) { // tworzy okno, false - okno, true - fullscreen
+	if (!s_main -> init("Skylium")) {
 		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
 	}
@@ -84,10 +95,21 @@ main() {
 	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
 	Timer *zegarek_dla_fps = new Timer(); // liczymy fps'y
 	Timer *zegarek_dla_taba = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
+	Timer *zegarek_dla_huda = new Timer();
 	
-	//FontBase *foncik = new FontBase();
+	FontBase *foncik = new FontBase(); // tworzymy nowego fonta
 	
-	//Hud *hudzik = new Hud(foncik);
+	HudData fpsCounter(sXY(-0.75, 0.9), sColor(1.0, 1.0, 1.0, 1.0), "", foncik);  // Tworzymy "paczkę" danych dla Huda -
+													// pozycję tekstu, kolor tekstu, tekst (póki co
+													// pusty, w pętli renderującej będzie apdejtowany)
+													// oraz czcionkę.
+	s_main -> TheHud -> attachData(&fpsCounter); // TheHud jest referencją do wskaźnika na instancję Huda, do którego to dołączmy
+								// dopiero co utworzoną paczkę.
+	
+	
+	HudData cameraInfo(sXY(-0.75, 0.8), sColor(1.0, 1.0, 1.0, 1.0), "Camera: FPP", foncik);
+	s_main -> TheHud -> attachData(&cameraInfo);
+	
 	
 	short fps = 0; // licznik fps.
 	
@@ -107,10 +129,16 @@ main() {
 			scenka -> getActiveCamera() -> moveCamera(0.0, -0.5, 0.0);
 		if (klawisz == KEY_X)
 			scenka -> getActiveCamera() -> moveCamera(0.0, 0.5, 0.0);
-		if (klawisz == KEY_F1)
+		if (klawisz == KEY_F1) {
 			scenka -> setActiveCamera(kamerka_fpp);
-		if (klawisz == KEY_F2)
+			cameraInfo.text = "Camera: FPP";
+		}
+		if (klawisz == KEY_F2) {
 			scenka -> setActiveCamera(kamerka_kula);
+			cameraInfo.text = "Camera: SPHERICAL";
+		}
+		if (klawisz == KEY_BACKQUOTE && zegarek_dla_huda -> passed(250000, MICROSECONDS))
+			s_main -> TheHud -> toggle();
 		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
@@ -133,13 +161,11 @@ main() {
 		fps++;
 		
 		if (zegarek_dla_fps -> passed(1, SECONDS)) {
-			cout << "\n	FPS: " << fps;
+			fpsCounter.text = "FPS: " + T2String< short >(fps) + " (approximately)";
 			fps = 0;
 		}
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
-		
-		//hudzik -> draw();
 		
 		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
 		
@@ -149,6 +175,8 @@ main() {
 	delete zegarek_dla_animacji;
 	delete zegarek_dla_fps;
 	delete zegarek_dla_taba;
+	delete zegarek_dla_huda;
+	delete foncik;
 	
 	// całą resztę wywali za nas Skylium.
 	delete s_main;

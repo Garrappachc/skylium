@@ -27,6 +27,7 @@
 #include "TextureManager.h"
 #include "Scene.h"
 #include "Shader.h"
+#include "Hud.h"
 
 /* Obsługa klawiszy */
 typedef enum {
@@ -40,7 +41,8 @@ typedef enum {
 	KEY_X = 64,
 	KEY_Z = 128,
 	KEY_F1 = 256,
-	KEY_F2 = 512
+	KEY_F2 = 512,
+	KEY_BACKQUOTE = 1024
 } sKey;
 
 /* Róże typy shaderów */
@@ -102,6 +104,7 @@ public:
 	/* Dostęp do manadżerów z zewnątrze */
 	SceneManager*& Scenes;
 	TextureManager*& Textures;
+	Hud*& TheHud;
 	
 	
 private:
@@ -153,6 +156,9 @@ private:
 	int __windowHeight;
 	
 	std::vector< Shader* > __shaderList;
+	
+	/* Jedyna instancja huda */
+	Hud * __hud;
 	
 };
 

@@ -1,3 +1,5 @@
+uniform vec4 sDefColor;
+
 varying vec3 N; /* Normalna */
 varying vec3 v;
 
@@ -7,5 +9,5 @@ void main() {
 	N = normalize(gl_NormalMatrix * gl_Normal);
 	
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	gl_FrontColor = gl_Color;
+	gl_FrontColor = sDefColor;
 }
