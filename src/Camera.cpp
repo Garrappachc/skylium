@@ -157,6 +157,18 @@ Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 #endif
 }
 
+sVector
+Camera::getEye() {
+	if (__type == FPP)
+		return __eye;
+	else 
+		return __eye + __center;
+}
 
-
-
+sVector
+Camera::getCenter() {
+	if (__type == FPP)
+		return __center + __eye;
+	else
+		return __center;
+}

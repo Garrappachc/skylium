@@ -107,6 +107,18 @@ public:
 	 * @param z Pozycja Z.
 	 */
 	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
+	
+	/**
+	 * Zwraca punkt __eye, odpowiednio przeliczony (na gluLookAt).
+	 * @return Współrzędne eye.
+	 */
+	sVector getEye();
+	
+	/**
+	 * Zwraca punkt __center, odpowiednio przeliczony (na gluLookAt).
+	 * @return Współrzędne center.
+	 */
+	sVector getCenter();
 
 
 private:
