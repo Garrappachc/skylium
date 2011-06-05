@@ -110,6 +110,14 @@ main() {
 	HudData cameraInfo(sXY(-0.75, 0.8), sColor(1.0, 1.0, 1.0, 1.0), "Camera: FPP", foncik);
 	s_main -> TheHud -> attachData(&cameraInfo);
 	
+	HudData cameraLookAt(sXY(0.0, 0.9), sColor(1.0, 1.0, 1.0, 1.0), "LookAt: ", foncik);
+	s_main -> TheHud -> attachData(&cameraLookAt);
+	sVector camLookAt;
+	
+	HudData cameraCenter(sXY(0.0, 0.8), sColor(1.0, 1.0, 1.0, 1.0), "Center: ", foncik);
+	s_main -> TheHud -> attachData(&cameraCenter);
+	sVector camCenter;
+	
 	
 	short fps = 0; // licznik fps.
 	
@@ -164,6 +172,16 @@ main() {
 			fpsCounter.text = "FPS: " + T2String< short >(fps) + " (approximately)";
 			fps = 0;
 		}
+		
+		camLookAt = scenka -> getActiveCamera() -> getCenter();
+		cameraLookAt.text = "LookAt: (" + T2String< float >(camLookAt.x) +
+				", " + T2String< float >(camLookAt.y) +
+				", " + T2String< float >(camLookAt.z) + ")";
+		
+		camCenter = scenka -> getActiveCamera() -> getEye();
+		cameraCenter.text = "Center: (" + T2String< float >(camCenter.x) +
+				", " + T2String< float >(camCenter.y) +
+				", " + T2String< float >(camCenter.z) + ")";
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
 		
