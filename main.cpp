@@ -198,6 +198,8 @@ main() {
 	
 	// całą resztę wywali za nas Skylium.
 	delete s_main;
+	
+	cout << endl;
 
 	return 0;
 	

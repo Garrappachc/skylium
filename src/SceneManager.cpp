@@ -21,21 +21,20 @@
 #include "../include/SceneManager.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
 SceneManager::SceneManager() :
 		__sceneList(0),
 		__activeScene(NULL) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: SceneManager()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: SceneManager()";
 }
 
 SceneManager::~SceneManager() {
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: ~SceneManager()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~SceneManager()";
 	
 	while (!__sceneList.empty())
 		delete __sceneList.back(), __sceneList.pop_back(); // wywalamy cały wektor
@@ -66,9 +65,8 @@ SceneManager::displayActiveScene() {
 bool
 SceneManager::setActive(const Scene *_toSet) {
 	if (__sceneList.size() == 1) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << "Nie mam żadnych scen! Nowa aktywna scena NIE została ustawiona.";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Nie mam żadnych scen! Nowa aktywna scena NIE została ustawiona.";
 		return false;
 	}
 	
@@ -78,8 +76,7 @@ SceneManager::setActive(const Scene *_toSet) {
 			return true;
 		}
 	}
-#ifdef __DEBUG__
-	cout << LOG_WARN << "Nie mam takiej sceny w bazie! Proszę tworzyć nowe sceny poprzez metodę Skylium::createScene.";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+		cout << LOG_WARN << "Nie mam takiej sceny w bazie! Proszę tworzyć nowe sceny poprzez metodę Skylium::createScene().";
 	return false;
 }

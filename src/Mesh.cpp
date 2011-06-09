@@ -23,6 +23,7 @@
 #include "../include/Mesh.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 // pomocne makro do obliczania pozycji
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -39,7 +40,11 @@ Mesh::Mesh(const string &_name) :
 		__material(NULL),
 		__smooth(false),
 		__usage(GL_STATIC_DRAW),
-		__mode(GL_TRIANGLES) {}
+		__mode(GL_TRIANGLES) {
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Mesh(\"" << name << "\")";
+
+}
 
 Mesh::Mesh(const Mesh &_orig) :
 		name(_orig.name),
@@ -52,14 +57,16 @@ Mesh::Mesh(const Mesh &_orig) :
 		__smooth(_orig.__smooth),
 		__usage(_orig.__usage),
 		__mode(_orig.__mode) {
+	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor kopiujący: Mesh(\"" << name << "\")";
+	
 	/* FIXME: Why, the hell, we are making the new material? */
 	__material = new Material(*_orig.__material);
 }
 
 Mesh::~Mesh() {
-#ifdef __DEBUG__STRONG__
-	cout << "Destruktor: ~Mesh(name = \"" << name << "\".";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Mesh(name = \"" << name << "\").";
 	if (__vboID != 0)
 		glDeleteBuffers(1, &__vboID);
 	if (__vboIndexID != 0)
@@ -176,10 +183,12 @@ Mesh::loadIntoVbo() {
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * __index.size(), &__index[0]);
 	int bufferSize_i;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_i);
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): mesh w VBO. Rozmiar: " << bufferSize_v + bufferSize_i << " B.";
-	cout.flush();
-#endif
+	
+	if ((sGlobalConfig::DEBUGGING & D_BUFFER) == D_BUFFER) {
+		cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): mesh w VBO. Rozmiar: " << bufferSize_v + bufferSize_i << " B.";
+		cout.flush();
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

@@ -23,21 +23,20 @@
 #include "../include/HudData.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
 Hud::Hud() :
 		__visible(false),
 		__toDisplay(0) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Hud()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Hud()";
 }
 
 Hud::~Hud() {
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: ~Hud()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Hud()";
 }
 
 void
@@ -83,6 +82,8 @@ Hud::draw() {
 void
 Hud::attachData(HudData *_newdata) {
 	__toDisplay.push_back(_newdata);
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+		cout << LOG_INFO << "Hud: dołączono (\"" << _newdata -> text << "\")";
 }
 
 void

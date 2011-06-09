@@ -25,6 +25,7 @@
 #include "../include/Shader.h"
 #include "../include/Vectors.h"
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
@@ -46,30 +47,26 @@ Shader::~Shader() {
 
 	glDeleteShader(__vertexShader);
 	glDeleteShader(__fragmentShader);
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: Shader(\"" << __vertFile << "\", \"" << __fragFile << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: Shader(\"" << __vertFile << "\", \"" << __fragFile << "\")";
 
 }
 
 bool
 Shader::make() {
 	if (!__fileExists(__vertFile)) {
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << __vertFile << ".";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << __vertFile << ".";
 		return false;
 	}
 	if (!__fileExists(__fragFile)) {
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << __fragFile << ".";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Nie znaleziono pliku z kodem źródłowym shadera! Szukano: " << __fragFile << ".";
 		return false;
 	}
 	
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Odczytywanie źródeł shaderów... ";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
+		cout << LOG_INFO << "Odczytywanie źródeł shaderów... ";
 	ifstream vertFile(__vertFile.c_str());
 	string vertData = "";
 	while (!vertFile.eof()) {
@@ -87,9 +84,8 @@ Shader::make() {
 		fragData += temp;
 	}
 	fragFile.close();
-#ifdef __DEBUG__
-	cout << "Odczytano." << LOG_INFO << "Kompilowanie programów shaderów... ";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
+		cout << "Odczytano." << LOG_INFO << "Kompilowanie programów shaderów... ";
 
 	const char *vert = vertData.c_str();
 	const char *frag = fragData.c_str();
@@ -107,9 +103,8 @@ Shader::make() {
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
 		glGetShaderInfoLog(__vertexShader, MAX_LOG_SIZE, NULL, msg);
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Błąd kompilacji vertex shadera! Log kompilacji:\n" << msg << endl;
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Błąd kompilacji vertex shadera! Log kompilacji:\n" << msg << endl;
 		return 0;
 	}
 
@@ -118,9 +113,8 @@ Shader::make() {
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
 		glGetShaderInfoLog(__fragmentShader, MAX_LOG_SIZE, NULL, msg);
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Błąd kompilacji fragment shadera! Log kompilacji:\n" << msg << endl;
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Błąd kompilacji fragment shadera! Log kompilacji:\n" << msg << endl;
 		return 0;
 	}
 
@@ -134,15 +128,14 @@ Shader::make() {
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
 		glGetProgramInfoLog(__shaderProgram, MAX_LOG_SIZE, NULL, msg);
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Błąd przy linkowaniu shadera! Log linkera:\n" << msg << endl;
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Błąd przy linkowaniu shadera! Log linkera:\n" << msg << endl;
 		return false;
 	}
 
-#ifdef __DEBUG__
-	cout << "Zrobione!";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
+		cout << "Zrobione!";
+	
 	return true;
 
 }

@@ -21,6 +21,7 @@
 #include "../include/Scene.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
@@ -44,15 +45,13 @@ Scene::Scene(const string &_name) :
 		__lightList(8, (Light*)NULL),
 		__lightIterator(),
 		__isLightOn(false) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Scene(name = \"" << _name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Scene(\"" << _name << "\")";
 }
 
 Scene::~Scene() {
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: ~Scene(name = \"" << name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Scene(\"" << name << "\")";
 	while (!__objectList.empty())
 		delete __objectList.back(), __objectList.pop_back();
 	while (!__cameraList.empty())
@@ -146,15 +145,13 @@ Scene::createLight(const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
 bool
 Scene::setAmbientLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym ID! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym ID! (" << _id << ")";
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
-#ifdef __DEBUG__
-		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 		return false;
 	}
 	__lightList[_id] -> setAmbient(sColor(_R, _G, _B, _A));
@@ -164,15 +161,13 @@ Scene::setAmbientLight(const int &_id, const GLfloat &_R, const GLfloat &_G, con
 bool
 Scene::setDiffuseLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
-#ifdef __DEBUG__
-		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 		return false;
 	}
 	__lightList[_id] -> setDiffuse(sColor(_R, _G, _B, _A));
@@ -182,15 +177,13 @@ Scene::setDiffuseLight(const int &_id, const GLfloat &_R, const GLfloat &_G, con
 bool
 Scene::setSpecularLight(const int &_id, const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
-#ifdef __DEBUG__
-		cout << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 		return false;
 	}
 	__lightList[_id] -> setSpecular(sColor(_R, _G, _B, _A));
@@ -200,9 +193,8 @@ Scene::setSpecularLight(const int &_id, const GLfloat &_R, const GLfloat &_G, co
 bool
 Scene::setLightPosition(const int &_id, const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 		return false;
 	}
 	
@@ -213,9 +205,8 @@ Scene::setLightPosition(const int &_id, const GLfloat &_x, const GLfloat &_y, co
 bool
 Scene::moveLight(const int &_id, const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 		return false;
 	}
 	__lightList[_id] -> __lightSrc += sVec3D< GLfloat >(_x, _y, _z);
@@ -225,20 +216,20 @@ Scene::moveLight(const int &_id, const GLfloat &_x, const GLfloat &_y, const GLf
 void
 Scene::toggleLight() {
 	__isLightOn = !__isLightOn;
-#ifdef __DEBUG__
-	if (__isLightOn)
-		cout << LOG_INFO << "Światła włączone.";
-	else
-		cout << LOG_INFO << "Światła wyłączone.";
-#endif
+
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
+		if (__isLightOn)
+			cout << LOG_INFO << "Światła włączone.";
+		else
+			cout << LOG_INFO << "Światła wyłączone.";
+	}
 }
 
 bool
 Scene::toggleLight(const int &_id) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 		return false;
 	}
 	__lightList[_id] -> toggle();
@@ -248,9 +239,8 @@ Scene::toggleLight(const int &_id) {
 bool
 Scene::removeLight(const int &_id) {
 	if (_id >= static_cast< int >(__lightList.size()) || __lightList[_id] == 0) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
 		return false;
 	}
 	if (_id == -1) {

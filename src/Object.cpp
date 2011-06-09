@@ -48,9 +48,8 @@ Object::Object(const string &_name) :
 		 __meshes(0),
 		 __meshesIterator(),
 		 __materials(0) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Object(name = \"" << _name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Object(\"" << _name << "\")";
 }
 
 Object::Object(const Object &_orig) :
@@ -69,13 +68,16 @@ Object::Object(const Object &_orig) :
 	for (unsigned i = 0; i < _orig.__materials.size(); i++) {
 		__materials.push_back(new Material(*_orig.__materials[i]));
 	}
+	
+	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor kopiujący: Object(\"" << name << "\")";
+	
 }
 
 
 Object::~Object() {
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: ~Object(name = \"" << name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Object(\"" << name << "\")";
 
 	while (!__meshes.empty())
 		delete __meshes.back(), __meshes.pop_back();
@@ -154,14 +156,12 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_A)
 
 bool
 Object::loadFromObj(const string &_objFile, const unsigned &_whatToLoad) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Wczytywanie obiektu: " << name << "... ";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+		cout << LOG_INFO << "Object::loadFromObj: wczytywanie obiektu: " << name << "... ";
 	
 	if (!__fileExists(_objFile)) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << name << ": nie znalazłem pliku: " << _objFile;
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << name << ": nie znalazłem pliku: " << _objFile;
 		return false;
 	}
 	
@@ -347,9 +347,8 @@ Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
 			(*__meshesIterator) -> enableNormals(), __meshesIterator++;
 	}
 
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Wczytano " << p << " wierzchołków.";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+		cout << LOG_INFO << "Wczytano " << p << " wierzchołków.";
 }
 
 void
@@ -397,9 +396,8 @@ Object::__parseMtl(const string &_fileName) {
 			string texfile;
 			line >> temp >>texfile;
 			if (!__fileExists("texture/" + texfile)) {
-#ifdef __DEBUG__
-				cout << LOG_WARN << "Nie znalazłem tekstury: " << "texture/" << texfile;
-#endif
+				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+					cout << LOG_WARN << "Nie znalazłem tekstury: " << "texture/" << texfile;
 			}
 			Texture *newTex = new Texture("texture/" + texfile);
 			current -> appendTexture(newTex);
