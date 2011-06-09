@@ -21,7 +21,9 @@
 #include <SDL/SDL.h>
 
 #include "../include/Camera.h"
+
 #include "../include/defines.h"
+#include "../include/config.h"
 
 static const double PI = 3.1415265359;
 static const double PIdiv180 = PI/180.0;
@@ -37,9 +39,8 @@ Camera::Camera(const cType &_type) :
 		__eye(0, 0, 0),
 		__center(0, 0, 0),
 		__up(0, 1, 0) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Camera()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Camera()";
 }
 
 Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z, const cType &_type) :
@@ -54,15 +55,13 @@ Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z, const
 		__eye.normalize();
 		__eye *= 20;
 	}
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Camera(" << __eye.x << ", " << __eye.y << ", " << __eye.z << ")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Camera(" << __eye.x << ", " << __eye.y << ", " << __eye.z << ")";
 }
 
 Camera::~Camera() {
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: ~Camera()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Camera()";
 }
 
 void
@@ -152,9 +151,8 @@ Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
 		__center += __eye;
 		__center.normalize();
 	}
-#ifdef __DEBUG__
-	cout << LOG_INFO << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z;
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+		cout << LOG_INFO << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z;
 }
 
 sVector

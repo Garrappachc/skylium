@@ -22,6 +22,7 @@
 #include "../include/Texture.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
@@ -33,9 +34,8 @@ Material::Material(const string &_name) :
 		__mAlpha(1.0),
 		__mShininess(0),
 		__textures(0) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Material(name = \"" << name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Material(\"" << name << "\")";
 }
 
 Material::Material(const Material &_orig) :
@@ -47,15 +47,13 @@ Material::Material(const Material &_orig) :
 		__mShininess(0),
 		__textures(0) {
 	__textures = _orig.__textures;
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Konstruktor: Material(orig.name = \"" << name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor kopiujący: Material(\"" << name << "\")";
 }
 
 Material::~Material() {
-#ifdef __DEBUG_STRONG__
-	cout << LOG_INFO << "Destruktor: ~Material(name = \"" << name << "\")";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Material(name = \"" << name << "\")";
 }
 
 void

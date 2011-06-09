@@ -25,6 +25,7 @@
 #include "../include/TextureManager.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
@@ -35,9 +36,8 @@ Texture::Texture(const string &_fileName) :
 		__wrapping(GL_CLAMP_TO_BORDER),
 		__file(_fileName),
 		__boss(TextureManager::GetSingletonPtr()) {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Ładowanie tekstury: " << _fileName << "... ";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Ładowanie tekstury: " << _fileName << "... ";
 	
 	if (!__fileExists(_fileName))
 		throw "File " + _fileName + " was not found!";
@@ -55,17 +55,15 @@ Texture::Texture(const string &_fileName) :
 		);
 	
 	if (!__texture) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << "Nie udało się załadować tekstury!";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Nie udało się załadować tekstury!";
 		throw "Nie udało się załadować tekstury!";
 	}
 	
 	__boss -> pushBack(this);
 	
-#ifdef __DEBUG__
-	cout << "Załadowano.";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << "Załadowano.";
 }
 
 Texture::~Texture() {

@@ -32,7 +32,7 @@
 using namespace std;
 
 /**
- * Funkcja pomocnicza.
+ * Funkcje pomocnicze.
  */
 template < typename T >
 inline T string2T(const std::string &_s) {
@@ -40,6 +40,22 @@ inline T string2T(const std::string &_s) {
 	istringstream ss(_s);
 	ss >> temp;
 	return temp;
+}
+
+void explode(const std::string &_text, char _delim, std::vector< std::string > &_dest) {
+	_dest.clear();
+	string temp = "";
+	
+	for (unsigned i = 0; i < _text.length(); i++) {
+		if (_text[i] == _delim) {
+			_dest.push_back(temp);
+			temp = "";
+		} else {
+			temp += _text[i];
+		}
+	}
+	if (temp != "")
+		_dest.push_back(temp);
 }
 
 
@@ -58,15 +74,14 @@ Skylium::Skylium() :
 		__shaderList(0),
 		__hud(new Hud()) {
 	
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Konstruktor: Skylium()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Konstruktor: Skylium()";
 }
 
 Skylium::~Skylium() {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Destruktor: ~Skylium()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~Skylium()";
+
 	// Uwalniamy kontekst renderowania
 	SDL_FreeSurface(__surfDisplay);
 	SDL_Quit();
@@ -78,10 +93,6 @@ Skylium::~Skylium() {
 	
 	while (!__shaderList.empty())
 		delete __shaderList.back(), __shaderList.pop_back();
-	
-#ifdef __DEBUG__
-	cout << LOG_INFO << "C'ya!\n";
-#endif
 }
 
 bool
@@ -90,9 +101,8 @@ Skylium::init(const string &_windowName) {
 	__loadConfig("skylium.cfg");
 	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
 		return false;
 	}
 	
@@ -107,9 +117,8 @@ Skylium::init(const string &_windowName) {
 	const SDL_VideoInfo *info = SDL_GetVideoInfo();
 	
 	if (!info) {
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
 		return false;
 	}
 	
@@ -131,9 +140,8 @@ Skylium::init(const string &_windowName) {
 	}
 	
 	if ((__surfDisplay = SDL_SetVideoMode(__windowWidth, __windowHeight, bpp, flags)) == NULL) {
-#ifdef __DEBUG__
-		cout << LOG_ERROR << "Nie udało się utworzyć okna! Zamykam.";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Nie udało się utworzyć okna! Zamykam.";
 		return false;
 	}
 	
@@ -305,10 +313,9 @@ void
 Skylium::__loadConfig(const string &_fileName) {
 	
 	if (!__fileExists(_fileName)) {
-#ifdef __DEBUG__
-		cout << LOG_WARN << "Nie znaleziono pliku konfiguracyjnego! W użyciu wartości domyślne.";
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Nie znaleziono pliku konfiguracyjnego! W użyciu wartości domyślne.";
 		return;
-#endif
 	}
 	
 	fstream configFile(_fileName.c_str(), ios::in);
@@ -344,6 +351,50 @@ Skylium::__loadConfig(const string &_fileName) {
 				sGlobalConfig::USING_VBO = true;
 			else
 				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"using_vbo\" to 0, 1, false lub true.";
+		} else if (param == "tellmeabout") {
+			sGlobalConfig::DEBUGGING = D_NOTHING;
+			
+			vector< string > flags;
+			
+			explode(value, ',', flags);
+			
+			for (vector< string >::const_iterator it = flags.begin(); it != flags.end(); it++) {
+				if (*it == "nothing") {
+					sGlobalConfig::DEBUGGING = D_NOTHING;
+					break;
+				} else if (*it == "constructors")
+					sGlobalConfig::DEBUGGING |= D_CONSTRUCTORS;
+				else if (*it == "all_constructors")
+					sGlobalConfig::DEBUGGING |= D_ALL_CONSTRUCTORS;
+				else if (*it == "destructors")
+					sGlobalConfig::DEBUGGING |= D_DESTRUCTORS;
+				else if (*it == "params")
+					sGlobalConfig::DEBUGGING |= D_PARAMS;
+				else if (*it == "all_params")
+					sGlobalConfig::DEBUGGING |= D_ALL_PARAMS;
+				else if (*it == "shaders")
+					sGlobalConfig::DEBUGGING |= D_SHADERS;
+				else if (*it == "buffer")
+					sGlobalConfig::DEBUGGING |= D_BUFFER;
+				else if (*it == "warnings")
+					sGlobalConfig::DEBUGGING |= D_WARNINGS;
+				else if (*it == "errors")
+					sGlobalConfig::DEBUGGING |= D_ERRORS;
+				else if (*it == "everything") {
+					sGlobalConfig::DEBUGGING = D_CONSTRUCTORS |
+									D_ALL_CONSTRUCTORS |
+									D_DESTRUCTORS |
+									D_PARAMS |
+									D_ALL_PARAMS |
+									D_SHADERS |
+									D_BUFFER |
+									D_WARNINGS |
+									D_ERRORS;
+					break;
+				} else {
+					cout << LOG_WARN << "ConfigParser: nierozpoznana opcja: " << *it;
+				}
+			}
 		} else
 			continue;
 	}

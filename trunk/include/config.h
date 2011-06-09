@@ -19,7 +19,25 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+enum {
+	D_NOTHING			= 0,
+	D_CONSTRUCTORS		= 1,
+	D_ALL_CONSTRUCTORS	= 2,
+	D_DESTRUCTORS		= 4,
+	D_PARAMS			= 8,
+	D_ALL_PARAMS		= 16,
+	D_SHADERS			= 32,
+	D_BUFFER			= 64,
+	D_WARNINGS			= 128,
+	D_ERRORS			= 256,
+	D_EVERYTHING		= 512
+};
+
 struct sGlobalConfig {
+	
+	/* Definiuje (za pomocą enuma) elementy do wyświetlania na standardowym
+	 * wyjściu. */
+	static unsigned	DEBUGGING;
 	
 	/* Jeżeli true, Skylium będzie używało VBO. Jeżeli false, wszystkie
 	 * dane do renderowania będą przechowywane w pamięci RAM. Jeżeli karta

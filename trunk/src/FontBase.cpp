@@ -21,6 +21,7 @@
 #include "../include/FontBase.h"
 
 #include "../include/defines.h"
+#include "../include/config.h"
 
 using namespace std;
 
@@ -38,20 +39,17 @@ FontBase::FontBase(const string &_fontName, const int &_characters) :
 	fontInfo = XLoadQueryFont(dpy, _fontName.c_str());
 	
 	if (fontInfo == NULL) { // nie udało się
-#ifdef __DEBUG__
-		cout << LOG_WARN << "Nie znaleziono czcionki: " << _fontName << ".";
-#endif
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Nie znaleziono czcionki: " << _fontName << ".";
 		fontInfo = XLoadQueryFont(dpy, "fixed"); // coś musimy mieć
 		if (fontInfo != NULL) {
-#ifdef __DEBUG__
-			cout << LOG_WARN << "Załadowano: \"fixed\".";
-#endif
+			if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+				cout << LOG_WARN << "Załadowano: \"fixed\".";
 		} else throw;
 	} else {
-#ifdef __DEBUG__
-		cout << LOG_INFO << "Załadowano czcionkę: " << _fontName << ".";
+		if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+			cout << LOG_INFO << "Załadowano czcionkę: " << _fontName << ".";
 		cout.flush();
-#endif
 	}
 	
 	__font = fontInfo -> fid;
@@ -75,9 +73,8 @@ FontBase::FontBase(const FontBase &_orig) :
 		__characters(_orig.__characters) {}
 
 FontBase::~FontBase() {
-#ifdef __DEBUG__
-	cout << LOG_INFO << "Destruktor: ~FontBase()";
-#endif
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Destruktor: ~FontBase()";
 	glDeleteLists(__base, __characters);
 }
 
