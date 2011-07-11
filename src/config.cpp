@@ -1,5 +1,10 @@
 /*
-    config.cpp
+                  __ _                     
+     __ ___ _ _  / _(_)__ _   __ _ __ _ __ 
+    / _/ _ \ ' \|  _| / _` |_/ _| '_ \ '_ \
+    \__\___/_||_|_| |_\__, (_)__| .__/ .__/
+                      |___/     |_|  |_|   
+    
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -23,3 +28,4 @@ bool		sGlobalConfig::USING_VBO = true;
 unsigned	sGlobalConfig::MAX_VBO_SIZE = 268435456;
 unsigned	sGlobalConfig::MIN_VBO_SIZE = 256;
 bool		sGlobalConfig::FULLSCREEN_RENDERING = false;
+bool		sGlobalConfig::HUD_EXISTS = true;

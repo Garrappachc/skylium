@@ -1,5 +1,9 @@
 /*
-    Texture.h
+     _____        _                  _    
+    |_   _|____ _| |_ _  _ _ _ ___  | |_  
+      | |/ -_) \ /  _| || | '_/ -_)_| ' \ 
+      |_|\___/_\_\\__|\_,_|_| \___(_)_||_|
+                                
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

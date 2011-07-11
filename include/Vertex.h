@@ -1,5 +1,9 @@
 /*
-    Vertex.h
+    __   __       _             _    
+    \ \ / /__ _ _| |_ _____ __ | |_  
+     \ V / -_) '_|  _/ -_) \ /_| ' \ 
+      \_/\___|_|  \__\___/_\_(_)_||_|
+                      
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

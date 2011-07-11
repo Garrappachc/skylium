@@ -68,6 +68,11 @@ public:
 	 */
 	void useMtl(Material*);
 	
+	/*
+	 * Zwraca wskaźnik na aktywny dla siebie materiał.
+	 */
+	Material * getMaterialPtr() { return __material; }
+	
 	/**
 	 * Jeżeli true, włącza smooth shading.
 	 */

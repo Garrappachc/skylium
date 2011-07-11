@@ -1,5 +1,10 @@
 /*
-    Skylium.cpp
+     ___ _        _ _                           
+    / __| |___  _| (_)_  _ _ __    __ _ __ _ __ 
+    \__ \ / / || | | | || | '  \ _/ _| '_ \ '_ \
+    |___/_\_\\_, |_|_|\_,_|_|_|_(_)__| .__/ .__/
+             |__/                    |_|  |_|   
+
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -28,36 +33,9 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
-
-/**
- * Funkcje pomocnicze.
- */
-template < typename T >
-inline T string2T(const std::string &_s) {
-	T temp;
-	istringstream ss(_s);
-	ss >> temp;
-	return temp;
-}
-
-void explode(const std::string &_text, char _delim, std::vector< std::string > &_dest) {
-	_dest.clear();
-	string temp = "";
-	
-	for (unsigned i = 0; i < _text.length(); i++) {
-		if (_text[i] == _delim) {
-			_dest.push_back(temp);
-			temp = "";
-		} else {
-			temp += _text[i];
-		}
-	}
-	if (temp != "")
-		_dest.push_back(temp);
-}
-
 
 
 Skylium::Skylium() : 
@@ -351,6 +329,13 @@ Skylium::__loadConfig(const string &_fileName) {
 				sGlobalConfig::USING_VBO = true;
 			else
 				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"using_vbo\" to 0, 1, false lub true.";
+		} else if (param == "hud_exists") {
+			if (value == "false" || value == "0")
+				sGlobalConfig::HUD_EXISTS = false;
+			else if (value == "true" || value == "1")
+				sGlobalConfig::HUD_EXISTS = true;
+			else
+				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"hud_exists\" to 0, 1, false lub true.";
 		} else if (param == "tellmeabout") {
 			sGlobalConfig::DEBUGGING = D_NOTHING;
 			
@@ -395,8 +380,9 @@ Skylium::__loadConfig(const string &_fileName) {
 					cout << LOG_WARN << "ConfigParser: nierozpoznana opcja: " << *it;
 				}
 			}
-		} else
-			continue;
+		} else if (param != "") {
+			cout << LOG_WARN << "ConfigParser: nierozpoznana opcja: \"" << param << "\"";
+		}
 	}
 	configFile.close();
 }

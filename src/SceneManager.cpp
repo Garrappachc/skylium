@@ -1,5 +1,10 @@
 /*
-    SceneManager.cpp
+     ___                  __  __                                           
+    / __| __ ___ _ _  ___|  \/  |__ _ _ _  __ _ __ _ ___ _ _  __ _ __ _ __ 
+    \__ \/ _/ -_) ' \/ -_) |\/| / _` | ' \/ _` / _` / -_) '_|/ _| '_ \ '_ \
+    |___/\__\___|_||_\___|_|  |_\__,_|_||_\__,_\__, \___|_|(_)__| .__/ .__/
+                                               |___/            |_|  |_|   
+                                               
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

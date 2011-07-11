@@ -1,5 +1,10 @@
 /*
-    Object.cpp
+      ___  _     _        _                  
+     / _ \| |__ (_)___ __| |_   __ _ __ _ __ 
+    | (_) | '_ \| / -_) _|  _|_/ _| '_ \ '_ \
+     \___/|_.__// \___\__|\__(_)__| .__/ .__/
+              |__/                |_|  |_| 
+              
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -15,8 +20,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef __NO_OBJECT_MANAGEMENT__
 
 #include <iostream>
 #include <fstream>
@@ -52,8 +55,8 @@ Object::Object(const string &_name) :
 		cout << LOG_INFO << "Konstruktor: Object(\"" << _name << "\")";
 }
 
-Object::Object(const Object &_orig) :
-		name(_orig.name),
+Object::Object(const Object &_orig, const string &_name) :
+		name(_name),
 		__defColor(_orig.__defColor),
 		__mov(_orig.__mov),
 		__rot(_orig.__rot),
@@ -63,10 +66,10 @@ Object::Object(const Object &_orig) :
 		__meshesIterator(),
 		__materials(0) {
 	for (unsigned i = 0; i < _orig.__meshes.size(); i++) {
-		__meshes.push_back(new Mesh(*_orig.__meshes[i]));
-	}
-	for (unsigned i = 0; i < _orig.__materials.size(); i++) {
-		__materials.push_back(new Material(*_orig.__materials[i]));
+		Mesh *tempMtl = new Mesh(*_orig.__meshes[i]);
+		__meshes.push_back(tempMtl);
+		__materials.push_back(tempMtl -> getMaterialPtr());
+		
 	}
 	
 	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
@@ -146,9 +149,9 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_A)
 		return false;
 	
 	__defColor = sColor(
-			(GLfloat)_R / 255,
-			(GLfloat)_G / 255,
-			(GLfloat)_B / 255,
+			static_cast< GLfloat >(_R) / 255,
+			static_cast< GLfloat >(_G) / 255,
+			static_cast< GLfloat >(_B) / 255,
 			_A
 		);
 	return true;
@@ -416,5 +419,3 @@ Object::__fileExists(const string &_fileName) {
 	else
 		return 0;
 }
-
-#endif

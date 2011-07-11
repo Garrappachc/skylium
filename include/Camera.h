@@ -1,5 +1,9 @@
 /*
-    Camera.h
+      ___                           _    
+     / __|__ _ _ __  ___ _ _ __ _  | |_  
+    | (__/ _` | '  \/ -_) '_/ _` |_| ' \ 
+     \___\__,_|_|_|_\___|_| \__,_(_)_||_|
+
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -15,8 +19,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef __NO_CAMERA_MANAGEMENT__
 
 #ifndef CAMERA_H
 #define CAMERA_H
@@ -88,7 +90,7 @@ public:
 	 * @param movY oś Y;
 	 * @param movZ oś Z.
 	 */
-	void moveCamera(const GLdouble&, const GLdouble&, const GLdouble&);
+	void moveCamera(GLdouble, GLdouble, GLdouble);
 
 	/**
 	 * Obraca kamerę w jednym miejscu - obsługa myszy.
@@ -96,7 +98,7 @@ public:
 	 * @param y;
 	 * @param z.
 	 */
-	void rotateCamera(const GLdouble&, const GLdouble&, const GLdouble&);
+	void rotateCamera(GLdouble, GLdouble, GLdouble);
 
 	/**
 	 * Ustawia punkt, na który patrzy się kamera.
@@ -106,7 +108,7 @@ public:
 	 * @param y Pozycja Y.
 	 * @param z Pozycja Z.
 	 */
-	void lookAt(const GLdouble&, const GLdouble&, const GLdouble&);
+	void lookAt(GLdouble, GLdouble, GLdouble);
 	
 	/**
 	 * Zwraca punkt __eye, odpowiednio przeliczony (na gluLookAt).
@@ -151,4 +153,3 @@ private:
 };
 
 #endif // CAMERA_H
-#endif //__NO_CAMERA_MANAGEMENT__

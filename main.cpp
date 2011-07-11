@@ -17,17 +17,9 @@
 #include "include/FontBase.h"
 #include "include/Hud.h"
 #include "include/HudData.h"
+#include "include/utils.h"
 
 using namespace std;
-
-template < typename T >
-string T2String(const T &_orig) {
-	stringstream ss;
-	string output;
-	ss << _orig;
-	ss >> output;
-	return output;
-}
 
 int
 main() {
@@ -46,7 +38,7 @@ main() {
 	
 	Scene *scenka = s_main -> createScene("Scenka"); // tworzymy scenę
 
-	Object *surface = scenka -> createObject("surface1");
+	Object *surface = scenka -> createObject("surface_0");
 	if (!surface -> loadFromObj("objects/surface.obj", GET_VERTICES | GET_NORMALS | GET_TEXTURE | GET_MATERIAL))
 		exit(1);
 	
@@ -57,7 +49,7 @@ main() {
 	for (int k = 0; k < 5; k++ ) {
 		for (int i = -1; i < 4; i++) {
 			ostringstream temp;
-			temp << i;
+			temp << (int)((i+2) + k * 5);
 			string str = "surface_" + temp.str();
 			Object *surface_new = scenka -> createObject(str, surface);
 			surface_new -> move(6*i, 0, 6*k);
@@ -99,7 +91,7 @@ main() {
 	
 	FontBase *foncik = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1"); // tworzymy nowego fonta
 	
-	HudData fpsCounter(sXY(-0.75, 0.9), sColor(1.0, 1.0, 1.0, 1.0), "", foncik);  // Tworzymy "paczkę" danych dla Huda -
+	HudData fpsCounter(sXY(-0.75, 0.9), sColor(SCOLORS_WHITE), "", foncik);  // Tworzymy "paczkę" danych dla Huda -
 													// pozycję tekstu, kolor tekstu, tekst (póki co
 													// pusty, w pętli renderującej będzie apdejtowany)
 													// oraz czcionkę.
@@ -107,14 +99,14 @@ main() {
 								// dopiero co utworzoną paczkę.
 	
 	
-	HudData cameraInfo(sXY(-0.75, 0.8), sColor(1.0, 1.0, 1.0, 1.0), "Camera: FPP", foncik);
+	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_GREEN), "Camera: FPP", foncik);
 	s_main -> TheHud -> attachData(&cameraInfo);
 	
-	HudData cameraLookAt(sXY(0.0, 0.9), sColor(1.0, 1.0, 1.0, 1.0), "LookAt: ", foncik);
+	HudData cameraLookAt(sXY(0.0, 0.9), sColor(SCOLORS_BLUE), "LookAt: ", foncik);
 	s_main -> TheHud -> attachData(&cameraLookAt);
 	sVector camLookAt;
 	
-	HudData cameraCenter(sXY(0.0, 0.8), sColor(1.0, 1.0, 1.0, 1.0), "Center: ", foncik);
+	HudData cameraCenter(sXY(0.0, 0.8), sColor(SCOLORS_YELLOW), "Center: ", foncik);
 	s_main -> TheHud -> attachData(&cameraCenter);
 	sVector camCenter;
 	

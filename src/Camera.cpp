@@ -1,5 +1,10 @@
 /*
-    Camera.cpp
+      ___                                        
+     / __|__ _ _ __  ___ _ _ __ _   __ _ __ _ __ 
+    | (__/ _` | '  \/ -_) '_/ _` |_/ _| '_ \ '_ \
+     \___\__,_|_|_|_\___|_| \__,_(_)__| .__/ .__/
+                                      |_|  |_|   
+                                      
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -96,7 +101,7 @@ Camera::setView() {
 }
 
 void
-Camera::moveCamera(const GLdouble &movX, const GLdouble &movY, const GLdouble &movZ) {
+Camera::moveCamera(GLdouble movX, GLdouble movY, GLdouble movZ) {
 	if (__type == FPP) {
 		__eye.x += (__center.x * movZ);
 		__eye.z += (__center.z * movZ);
@@ -113,7 +118,7 @@ Camera::moveCamera(const GLdouble &movX, const GLdouble &movY, const GLdouble &m
 }
 
 void
-Camera::rotateCamera(const GLdouble& _x, const GLdouble& _y, const GLdouble&) {
+Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
 	if (__type == FPP) {
 		/* Apdejtujemy nasz kąt */
 		__angle.x -= (GLdouble)(_x / 100);
@@ -145,7 +150,7 @@ Camera::rotateCamera(const GLdouble& _x, const GLdouble& _y, const GLdouble&) {
 }
 
 void
-Camera::lookAt(const GLdouble &x, const GLdouble &y, const GLdouble &z) {
+Camera::lookAt(GLdouble x, GLdouble y, GLdouble z) {
 	__center = sVector(x, y, z);
 	if (__type == FPP) {
 		__center += __eye;

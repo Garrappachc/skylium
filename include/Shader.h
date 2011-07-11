@@ -1,6 +1,10 @@
 /*
-    Shader.h
-    Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
+     ___ _            _          _    
+    / __| |_  __ _ __| |___ _ _ | |_  
+    \__ \ ' \/ _` / _` / -_) '_|| ' \ 
+    |___/_||_\__,_\__,_\___|_|(_)_||_|
+   
+   Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

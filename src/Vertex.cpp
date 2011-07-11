@@ -1,5 +1,10 @@
 /*
-    Vertex.cpp
+    __   __       _                          
+    \ \ / /__ _ _| |_ _____ __  __ _ __ _ __ 
+     \ V / -_) '_|  _/ -_) \ /_/ _| '_ \ '_ \
+      \_/\___|_|  \__\___/_\_(_)__| .__/ .__/
+                                  |_|  |_|   
+                                  
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

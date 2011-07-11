@@ -1,5 +1,10 @@
 /*
-    Mesh.cpp
+     __  __        _                   
+    |  \/  |___ __| |_    __ _ __ _ __ 
+    | |\/| / -_|_-< ' \ _/ _| '_ \ '_ \
+    |_|  |_\___/__/_||_(_)__| .__/ .__/
+                            |_|  |_|   
+
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -59,8 +64,6 @@ Mesh::Mesh(const Mesh &_orig) :
 		__mode(_orig.__mode) {
 	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
 		cout << LOG_INFO << "Konstruktor kopiujący: Mesh(\"" << name << "\")";
-	
-	/* FIXME: Why, the hell, we are making the new material? */
 	__material = new Material(*_orig.__material);
 }
 

@@ -1,5 +1,10 @@
 /*
-    Singleton.h
+     ___ _           _     _              _    
+    / __(_)_ _  __ _| |___| |_ ___ _ _   | |_  
+    \__ \ | ' \/ _` | / -_)  _/ _ \ ' \ _| ' \ 
+    |___/_|_||_\__, |_\___|\__\___/_||_(_)_||_|
+               |___/     
+    
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

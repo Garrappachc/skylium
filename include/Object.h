@@ -1,5 +1,10 @@
 /*
-    Object.h
+      ___  _     _        _     _    
+     / _ \| |__ (_)___ __| |_  | |_  
+    | (_) | '_ \| / -_) _|  _|_| ' \ 
+     \___/|_.__// \___\__|\__(_)_||_|
+              |__/                   
+
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -52,7 +57,7 @@ public:
 	/**
 	 * Konstruktor kopiujący.
 	 */
-	Object(const Object&);
+	Object(const Object&, const std::string& = "");
 	
 	/**
 	 * Niszczy wszystkie meshe oraz materiały.
