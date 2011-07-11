@@ -23,9 +23,15 @@
 
 #include "../include/config.h"
 
-unsigned	sGlobalConfig::DEBUGGING = D_ERRORS | D_WARNINGS;
-bool		sGlobalConfig::USING_VBO = true;
-unsigned	sGlobalConfig::MAX_VBO_SIZE = 268435456;
-unsigned	sGlobalConfig::MIN_VBO_SIZE = 256;
-bool		sGlobalConfig::FULLSCREEN_RENDERING = false;
-bool		sGlobalConfig::HUD_EXISTS = true;
+unsigned	sGlobalConfig::DEBUGGING				= D_ERRORS | D_WARNINGS;
+bool		sGlobalConfig::USING_VBO				= true;
+unsigned	sGlobalConfig::MAX_VBO_SIZE			= 268435456;
+unsigned	sGlobalConfig::MIN_VBO_SIZE			= 256;
+bool		sGlobalConfig::FULLSCREEN_RENDERING	= false;
+bool		sGlobalConfig::HUD_EXISTS			= true;
+bool		sGlobalConfig::ENABLE_KEY_REPEAT		= true;
+bool		sGlobalConfig::MOUSE_VISIBLE			= true;
+short	sGlobalConfig::GL_RED_SIZE			= 5;
+short	sGlobalConfig::GL_GREEN_SIZE			= 5;
+short	sGlobalConfig::GL_BLUE_SIZE			= 5;
+short	sGlobalConfig::GL_DEPTH_SIZE			= 16;

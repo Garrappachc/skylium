@@ -27,7 +27,6 @@ main() {
 	Skylium *s_main = new Skylium();
 	
 	if (!s_main -> init("Skylium")) {
-		cout << "Błąd przy Skylium::init(). Przerywam.\n\n";
 		return 1;
 	}
 	
@@ -99,14 +98,14 @@ main() {
 								// dopiero co utworzoną paczkę.
 	
 	
-	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_GREEN), "Camera: FPP", foncik);
+	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_WHITE), "Camera: FPP", foncik);
 	s_main -> TheHud -> attachData(&cameraInfo);
 	
-	HudData cameraLookAt(sXY(0.0, 0.9), sColor(SCOLORS_BLUE), "LookAt: ", foncik);
+	HudData cameraLookAt(sXY(0.0, 0.9), sColor(SCOLORS_WHITE), "LookAt: ", foncik);
 	s_main -> TheHud -> attachData(&cameraLookAt);
 	sVector camLookAt;
 	
-	HudData cameraCenter(sXY(0.0, 0.8), sColor(SCOLORS_YELLOW), "Center: ", foncik);
+	HudData cameraCenter(sXY(0.0, 0.8), sColor(SCOLORS_WHITE), "Center: ", foncik);
 	s_main -> TheHud -> attachData(&cameraCenter);
 	sVector camCenter;
 	

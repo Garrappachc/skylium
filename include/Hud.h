@@ -58,7 +58,7 @@ public:
 	/**
 	 * Jeżeli włączony - wyłącza, jeżeli wyłączony - włącza.
 	 */
-	void toggle() { __visible = !__visible; }
+	void toggle();
 	
 	/**
 	 * Zwraca true, jeżeli włączony.

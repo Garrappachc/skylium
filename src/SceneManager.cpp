@@ -69,7 +69,7 @@ SceneManager::displayActiveScene() {
 
 bool
 SceneManager::setActive(const Scene *_toSet) {
-	if (__sceneList.size() == 1) {
+	if (__sceneList.size() <= 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
 			cout << LOG_WARN << "Nie mam żadnych scen! Nowa aktywna scena NIE została ustawiona.";
 		return false;

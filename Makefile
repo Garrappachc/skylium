@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-g -Wall -pipe -D__DEBUG__ `sdl-config --cflags` -std=c++0x
+CXXFLAGS=-g -Wall -pipe `sdl-config --cflags` -std=c++0x
 
 LSOIL=-lSOIL
 LSDL=`sdl-config --libs`
