@@ -80,23 +80,24 @@ Skylium::init(const string &_windowName) {
 	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
+			cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.\n";
 		return false;
 	}
 	
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5 );
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
-	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, sGlobalConfig::GL_RED_SIZE );
+	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, sGlobalConfig::GL_GREEN_SIZE );
+	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, sGlobalConfig::GL_BLUE_SIZE );
+	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, sGlobalConfig::GL_DEPTH_SIZE );
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-	SDL_EnableKeyRepeat(1, 1);
+	if (sGlobalConfig::ENABLE_KEY_REPEAT)
+		SDL_EnableKeyRepeat(1, 1);
 	
 	const SDL_VideoInfo *info = SDL_GetVideoInfo();
 	
 	if (!info) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.";
+			cout << LOG_ERROR << "Nie udało się utworzyć kontekstu renderowania! Zamykam.\n";
 		return false;
 	}
 	
@@ -119,14 +120,15 @@ Skylium::init(const string &_windowName) {
 	
 	if ((__surfDisplay = SDL_SetVideoMode(__windowWidth, __windowHeight, bpp, flags)) == NULL) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Nie udało się utworzyć okna! Zamykam.";
+			cout << LOG_ERROR << "Nie udało się utworzyć okna! Zamykam.\n";
 		return false;
 	}
 	
 	SDL_WM_SetCaption(_windowName.c_str(), NULL);
-#ifndef __DEBUG__
-	SDL_ShowCursor(SDL_DISABLE);
-#endif
+
+	if (!sGlobalConfig::MOUSE_VISIBLE)
+		SDL_ShowCursor(SDL_DISABLE);
+
 	SDL_WarpMouse(__windowWidth / 2, __windowHeight / 2);
 	
 	// inicjalizujemy GLEWa
@@ -321,21 +323,56 @@ Skylium::__loadConfig(const string &_fileName) {
 			else if (value == "true" || value == "1")
 				sGlobalConfig::FULLSCREEN_RENDERING = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"fullscreen\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Nieznana wartość " << value <<
+					". Dostępne wartości dla parametru \"fullscreen\" to 0, 1, false lub true.";
 		} else if (param == "using_vbo") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::USING_VBO = false;
 			else if (value == "true" || value == "1")
 				sGlobalConfig::USING_VBO = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"using_vbo\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Nieznana wartość " << value <<
+					". Dostępne wartości dla parametru \"using_vbo\" to 0, 1, false lub true.";
 		} else if (param == "hud_exists") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::HUD_EXISTS = false;
 			else if (value == "true" || value == "1")
 				sGlobalConfig::HUD_EXISTS = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value << ". Dostępne wartości dla parametru \"hud_exists\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Nieznana wartość " << value <<
+					". Dostępne wartości dla parametru \"hud_exists\" to 0, 1, false lub true.";
+		} else if (param == "enable_key_repeat") {
+			if (value == "false" || value == "0")
+				sGlobalConfig::ENABLE_KEY_REPEAT = false;
+			else if (value == "true" || value == "1")
+				sGlobalConfig::ENABLE_KEY_REPEAT = true;
+			else
+				cout << LOG_ERROR << "Nieznana wartość " << value <<
+					". Dostępne wartości dla parametru \"" << param << "\" to 0, 1, false lub true.";
+		} else if (param == "mouse_visible") {
+			if (value == "false" || value == "0")
+				sGlobalConfig::MOUSE_VISIBLE = false;
+			else if (value == "true" || value == "1")
+				sGlobalConfig::MOUSE_VISIBLE = true;
+			else
+				cout << LOG_ERROR << "Nieznana wartość " << value <<
+					". Dostępne wartości dla parametru \"" << param << "\" to 0, 1, false lub true.";
+		} else if (param == "gl_red_size") {
+			sGlobalConfig::GL_RED_SIZE = string2T< short >(value);
+			if (sGlobalConfig::GL_RED_SIZE < 0)
+				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+		} else if (param == "gl_blue_size") {
+			sGlobalConfig::GL_BLUE_SIZE = string2T< short >(value);
+			if (sGlobalConfig::GL_BLUE_SIZE < 0)
+				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+		} else if (param == "gl_green_size") {
+			sGlobalConfig::GL_GREEN_SIZE = string2T< short >(value);
+			if (sGlobalConfig::GL_GREEN_SIZE < 0)
+				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+		} else if (param == "gl_depth_size") {
+			sGlobalConfig::GL_DEPTH_SIZE = string2T< short >(value);
+			if (sGlobalConfig::GL_DEPTH_SIZE < 0)
+				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
 		} else if (param == "tellmeabout") {
 			sGlobalConfig::DEBUGGING = D_NOTHING;
 			

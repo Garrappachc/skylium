@@ -85,6 +85,12 @@ Hud::draw() {
 }
 
 void
+Hud::toggle() {
+	if (sGlobalConfig::HUD_EXISTS)
+		__visible = !__visible;
+}
+
+void
 Hud::attachData(HudData *_newdata) {
 	__toDisplay.push_back(_newdata);
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)

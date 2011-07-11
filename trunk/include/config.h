@@ -65,6 +65,24 @@ struct sGlobalConfig {
 	
 	/* Jeżeli true, hud będzie wyświetlany. */
 	static bool		HUD_EXISTS;
+	
+	/* Jeżeli true, przytrzymanie klawisza będzie brane jako
+	 * wielkrotnie jego naciskanie. */
+	static bool		ENABLE_KEY_REPEAT;
+	
+	/* Jeżeli true, myszka jest widoczna w kontekście renderowania. */
+	static bool		MOUSE_VISIBLE;
+	
+	/* Rozmiar poszczególnych buforów.
+	 * Jest to minimalna wartość potrzebna do uruchomienia naszej aplikacji,
+	 * więc jeżeli karta graficzna obsługuje więcej bitów, OpenGL
+	 * automatycznie wykorzysta wszystkie. */
+	static short		GL_RED_SIZE;
+	static short		GL_GREEN_SIZE;
+	static short		GL_BLUE_SIZE;
+	static short		GL_DEPTH_SIZE;
+	
+	
 };
 
 #endif
