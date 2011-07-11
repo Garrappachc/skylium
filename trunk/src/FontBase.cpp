@@ -1,5 +1,10 @@
 /*
-    FontBase.cpp
+     ___        _   ___                              
+    | __|__ _ _| |_| _ ) __ _ ___ ___   __ _ __ _ __ 
+    | _/ _ \ ' \  _| _ \/ _` (_-</ -_)_/ _| '_ \ '_ \
+    |_|\___/_||_\__|___/\__,_/__/\___(_)__| .__/ .__/
+                                          |_|  |_|  
+                                          
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -80,12 +85,9 @@ FontBase::~FontBase() {
 
 void
 FontBase::print(const GLfloat &_x, const GLfloat &_y, const string &_text) const {
-	//glColor4f(0.0, 0.0, 0.0, 1.0);
-	//glPushMatrix();
-		glPushAttrib(GL_LIST_BIT);
+	glPushAttrib(GL_LIST_BIT);
 			glListBase(__base - ' ');
 			glRasterPos3f(_x, _y, 0.0f);
 			glCallLists(_text.length(), GL_BYTE, _text.c_str());
 		glPopAttrib();
-	//glPopMatrix();
 }

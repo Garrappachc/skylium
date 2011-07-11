@@ -1,5 +1,10 @@
 /*
-    Scene.cpp
+     ___                                 
+    / __| __ ___ _ _  ___   __ _ __ _ __ 
+    \__ \/ _/ -_) ' \/ -_)_/ _| '_ \ '_ \
+    |___/\__\___|_||_\___(_)__| .__/ .__/
+                              |_|  |_|  
+                              
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -82,8 +87,7 @@ Scene::createObject(const string &_name, const Object *_orig) {
 	if (_orig == NULL) // wartość domyślna
 		newObject = new Object(_name);
 	else {
-		newObject = new Object(*_orig);
-		newObject -> name = _name;
+		newObject = new Object(*_orig, _name);
 	}
 	__objectList.push_back(newObject);
 	return newObject;

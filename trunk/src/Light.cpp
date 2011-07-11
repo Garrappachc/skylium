@@ -1,5 +1,10 @@
 /*
-    Light.cpp
+     _    _      _   _                  
+    | |  (_)__ _| |_| |_   __ _ __ _ __ 
+    | |__| / _` | ' \  _|_/ _| '_ \ '_ \
+    |____|_\__, |_||_\__(_)__| .__/ .__/
+           |___/             |_|  |_|   
+       
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -15,8 +20,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#ifndef __NO_LIGHTING_MANAGEMENT__
 
 #include <iostream>
 
@@ -98,4 +101,3 @@ Light::toggle() {
 	__working = !__working;
 }
 
-#endif // __NO_LIGHTING_MANAGEMENT__

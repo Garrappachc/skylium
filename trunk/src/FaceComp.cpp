@@ -1,5 +1,10 @@
 /*
-    FaceComp.cpp
+     ___             ___                               
+    | __|_ _ __ ___ / __|___ _ __  _ __   __ _ __ _ __ 
+    | _/ _` / _/ -_) (__/ _ \ '  \| '_ \_/ _| '_ \ '_ \
+    |_|\__,_\__\___|\___\___/_|_|_| .__(_)__| .__/ .__/
+                                  |_|       |_|  |_|  
+                                  
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

@@ -1,5 +1,10 @@
 /*
-    Light.h
+     _    _      _   _     _    
+    | |  (_)__ _| |_| |_  | |_  
+    | |__| / _` | ' \  _|_| ' \ 
+    |____|_\__, |_||_\__(_)_||_|
+           |___/                
+
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

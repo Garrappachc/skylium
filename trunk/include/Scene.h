@@ -1,5 +1,9 @@
 /*
-    Scene.h
+     ___                    _    
+    / __| __ ___ _ _  ___  | |_  
+    \__ \/ _/ -_) ' \/ -_)_| ' \ 
+    |___/\__\___|_||_\___(_)_||_|
+                  
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

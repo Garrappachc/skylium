@@ -1,5 +1,9 @@
 /*
-    Vectors.h
+    __   __      _                _    
+    \ \ / /__ __| |_ ___ _ _ ___ | |_  
+     \ V / -_) _|  _/ _ \ '_(_-<_| ' \ 
+      \_/\___\__|\__\___/_| /__(_)_||_|
+                            
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -19,7 +23,6 @@
 #ifndef VECTORS_H
 #define VECTORS_H
 
-#include <vector>
 #include <cstring>
 
 #include <math.h>
@@ -59,7 +62,7 @@ public:
 			y(__data[1]),
 			u(__data[0]),
 			v(__data[1]) {
-		memcpy(__data, _orig, sizeof(T*)*2);
+		memcpy(__data, _orig, sizeof(T)*2);
 	}
 	
 	operator T*() {
@@ -180,7 +183,7 @@ public:
 			x(__data[0]),
 			y(__data[1]),
 			z(__data[2]) {
-		memcpy(__data, _orig, sizeof(T*)*3);
+		memcpy(__data, _orig, sizeof(T)*3);
 	}
 	
 	sVec3D(const sVec3D< T > &_orig) :
@@ -350,7 +353,7 @@ public:
 			g(__data[1]),
 			b(__data[2]),
 			a(__data[3]) {
-		memcpy(__data, _orig, sizeof(T*)*4);
+		memcpy(__data, _orig, sizeof(T)*4);
 	}
 	
 	sVec4D(const sVec4D< T > &_orig) :

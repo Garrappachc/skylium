@@ -1,5 +1,10 @@
 /*
-    config.h
+                  __ _        _    
+     __ ___ _ _  / _(_)__ _  | |_  
+    / _/ _ \ ' \|  _| / _` |_| ' \ 
+    \__\___/_||_|_| |_\__, (_)_||_|
+                      |___/  
+    
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -57,6 +62,9 @@ struct sGlobalConfig {
 	
 	/* Jeżeli true, Skylium będzie renderował na fullscreenie. */
 	static bool		FULLSCREEN_RENDERING;
+	
+	/* Jeżeli true, hud będzie wyświetlany. */
+	static bool		HUD_EXISTS;
 };
 
 #endif

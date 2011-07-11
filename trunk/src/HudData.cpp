@@ -1,6 +1,11 @@
 /*
-    <one line to give the program's name and a brief idea of what it does.>
-    Copyright (C) 2011  <copyright holder> <email>
+     _  _         _ ___       _                       
+    | || |_  _ __| |   \ __ _| |_ __ _   __ _ __ _ __ 
+    | __ | || / _` | |) / _` |  _/ _` |_/ _| '_ \ '_ \
+    |_||_|\_,_\__,_|___/\__,_|\__\__,_(_)__| .__/ .__/
+                                           |_|  |_|   
+                                           
+    Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

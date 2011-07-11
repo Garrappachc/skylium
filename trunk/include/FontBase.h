@@ -1,5 +1,9 @@
 /*
-    FontBase.h
+     ___        _   ___                 _    
+    | __|__ _ _| |_| _ ) __ _ ___ ___  | |_  
+    | _/ _ \ ' \  _| _ \/ _` (_-</ -_)_| ' \ 
+    |_|\___/_||_\__|___/\__,_/__/\___(_)_||_|                                     
+
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
