@@ -1,0 +1,46 @@
+#labels Featured,Phase-Deploy
+= skylium.cfg file description =
+
+There are several settings for Skylium that are read in during Skylium::init(). The config file should be placed in a main directory (where the main.cpp is) and named *skylium.cfg*. The possible variables are:
+<ul>
+<li> *tellmeabout* - configures the output verbosity. Posiible settings are: everything, constructors, all_constructors, destructors, params, all_params, shaders, buffer, warnings, errors. Default:
+{{{
+tellmeabout warnings,errors
+}}}
+</li>
+<li> *using_vbo* - if true, skylium will load _some_ meshes into GPU buffer (VBO), if false - rendering data will be taken from RAM, which is much slower. Objects that are in VBO has their copy in RAM.
+{{{
+using_vbo true
+}}}
+</li>
+<li> *min_vbo_size* - if one mesh is smaller, it will be not loaded into VBO. Some graphic cards prefers different settings than others. Data is given in bytes. Default:
+{{{
+min_vbo_size 256
+}}}
+</li>
+<li> *max_vbo_size* - one mesh cannot be larger to be loaded into VBO. It _not_ defines the maximum size of memory that will be located on GPU's buffer. Default value is 256 MB:
+{{{
+max_vbo_size 268435456
+}}}
+</li>
+<li> *fullscreen* - there's probably nothing to explain. True/false. Default:
+{{{
+fullscreen false
+}}}
+</li>
+<li> *hud_exists* - if true, hud exists. If false, hud still exists, but can't be showed - to be fixed soon. Default:
+{{{
+hud_exists true
+}}}
+</li>
+<li> *enable_key_repeat* - if true, keeping key pressed will be interpreted as many single presses. Default:
+{{{
+enable_key_repeat true
+}}}
+</li>
+<li> *mouse_visible* - if true, the mouse will be showed - useful in debugging. Default:
+{{{
+mouse_visible true
+}}}
+</li>
+</ul>
