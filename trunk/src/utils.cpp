@@ -42,9 +42,3 @@ void explode(const std::string &_text, char _delim, std::vector< std::string > &
 	if (temp != "")
 		_dest.push_back(temp);
 }
-
-void submitError(const string &_errorMsg) {
-	if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-		cout << _errorMsg << endl;
-	exit(1);
-}

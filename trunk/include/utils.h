@@ -52,6 +52,4 @@ std::string T2String(const T &_orig) {
 
 void explode(const std::string&, char, std::vector< std::string >&);
 
-void submitError(const std::string&);
-
 #endif // UTILS_H

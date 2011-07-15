@@ -6,18 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "include/Vectors.h"
-#include "include/Camera.h"
-#include "include/Light.h"
-#include "include/Object.h"
-#include "include/Scene.h"
-#include "include/Skylium.h"
-#include "include/Timer.h"
-#include "include/Material.h"
-#include "include/FontBase.h"
-#include "include/Hud.h"
-#include "include/HudData.h"
-#include "include/utils.h"
+#include <skylium.h>
 
 using namespace std;
 
