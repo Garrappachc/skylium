@@ -58,12 +58,6 @@ enum {
 	CUSTOM
 };
 
-#define SCOLORS_WHITE	1.0, 1.0, 1.0, 1.0
-#define SCOLORS_BLUE	0.0, 0.0, 0.1, 1.0
-#define SCOLORS_RED		1.0, 0.0, 0.0, 1.0
-#define SCOLORS_GREEN	0.0, 1.0, 0.0, 1.0
-#define SCOLORS_YELLOW	1.0, 1.0, 0.0, 1.0
-
 class Skylium : public Singleton < Skylium > {
 
 public:
