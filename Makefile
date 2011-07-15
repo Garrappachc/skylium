@@ -35,7 +35,7 @@ D = include
 
 INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h $(D)/FaceComp.h \
 	$(D)/FontBase.h $(D)/Hud.h $(D)/HudData.h $(D)/Light.h $(D)/Material.h \
-	$(D)/Matrices.h $(D)/Mesh.h $(D)/Object.h $(D)/Scene.h $(D)/SceneManager.h \
+	$(D)/Mesh.h $(D)/Object.h $(D)/Scene.h $(D)/SceneManager.h \
 	$(D)/Shader.h $(D)/Singleton.h $(D)/Skylium.h $(D)/Texture.h \
 	$(D)/TextureManager.h $(D)/Timer.h $(D)/utils.h	$(D)/Vectors.h $(D)/Vertex.h
 
