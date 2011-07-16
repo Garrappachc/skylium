@@ -1,7 +1,7 @@
 #labels Featured,Phase-Deploy
 = skylium.cfg file description =
 
-There are several settings for Skylium that are read in during Skylium::init(). The config file should be placed in a main directory (where the main.cpp is) and named *skylium.cfg*. The possible variables are:
+There are several settings for Skylium that are read during Skylium::init(). The config file should be placed in a main directory (where the main.cpp is) and named *skylium.cfg*. The possible variables are:
 <ul>
 <li> *tellmeabout* - configures the output verbosity. Posiible settings are: everything, constructors, all_constructors, destructors, params, all_params, shaders, buffer, warnings, errors. Default:
 {{{
