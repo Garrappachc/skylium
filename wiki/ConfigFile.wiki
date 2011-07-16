@@ -3,22 +3,22 @@
 
 There are several settings for Skylium that are read during Skylium::init(). The config file should be placed in a main directory (where the main.cpp is located) and named *skylium.cfg*. The possible variables are:
 <ul>
-<li> *tellmeabout* - configures the output verbosity. Posiible settings are: everything, constructors, all_constructors, destructors, params, all_params, shaders, buffer, warnings, errors. Default:
+<li> *tellmeabout* - configures the output verbosity. Possible settings are: everything, constructors, all_constructors, destructors, params, all_params, shaders, buffer, warnings, errors. Default:
 {{{
 tellmeabout warnings,errors
 }}}
 </li>
-<li> *using_vbo* - if true, skylium will load _some_ meshes into GPU buffer (VBO), if false - rendering data will be taken from RAM, which is much slower. Objects that are in VBO has their copy in RAM.
+<li> *using_vbo* - if true, skylium will load _some_ meshes into the GPU buffer (VBO), if false - rendering data will be taken from RAM, what is much slower. Objects that are in VBO have their copy in RAM.
 {{{
 using_vbo true
 }}}
 </li>
-<li> *min_vbo_size* - if one mesh is smaller, it will be not loaded into VBO. Some graphic cards prefers different settings than others. Data is given in bytes. Default:
+<li> *min_vbo_size* - if a single mesh is smaller, it will be not loaded into VBO. Some graphic cards prefers different settings than others. Data is given in bytes. Default:
 {{{
 min_vbo_size 256
 }}}
 </li>
-<li> *max_vbo_size* - one mesh cannot be larger to be loaded into VBO. It _not_ defines the maximum size of memory that will be located on GPU's buffer. Default value is 256 MB:
+<li> *max_vbo_size* - specifies the maximum size of a single mesh to be loaded into VBO. It does _not_ define the maximum size of memory that will be located on GPU's buffer. Default value is 256 MB:
 {{{
 max_vbo_size 268435456
 }}}
@@ -38,7 +38,7 @@ hud_exists true
 enable_key_repeat true
 }}}
 </li>
-<li> *mouse_visible* - if true, the mouse will be showed - useful in debugging. Default:
+<li> *mouse_visible* - if true, the mouse pointer will be showed - useful in debugging. Default:
 {{{
 mouse_visible true
 }}}
