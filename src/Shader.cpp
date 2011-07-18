@@ -21,10 +21,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <GLee.h>
 #include <iostream>
 #include <string>
 #include <fstream>
+
+#include <GL/glew.h>
 #include <sys/stat.h>
 
 #include "../include/Shader.h"
@@ -113,7 +114,7 @@ Shader::make() {
 		return 0;
 	}
 
-	glCompileShaderARB(__fragmentShader);
+	glCompileShader(__fragmentShader);
 	glGetShaderiv(__fragmentShader, GL_COMPILE_STATUS, &result);
 	if (!result) {
 		char msg[MAX_LOG_SIZE];

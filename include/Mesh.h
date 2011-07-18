@@ -1,5 +1,9 @@
 /*
-    Mesh.h
+     __  __        _      _    
+    |  \/  |___ __| |_   | |_  
+    | |\/| / -_|_-< ' \ _| ' \ 
+    |_|  |_\___/__/_||_(_)_||_|
+                           
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify

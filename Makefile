@@ -41,7 +41,7 @@ INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h $(D)/FaceComp.h \
 
 SKYLIUM_MAIN = skylium.h
 
-LDLIBS = -lGLee -lGL -lGLU -lGLEW -lskylium -lSOIL `sdl-config --libs`
+LDLIBS = -lGL -lGLU -lGLEW -lSOIL `sdl-config --libs`
 
 LFLAGS = -Wl,-soname,$(LIB)
 
@@ -49,7 +49,7 @@ LFLAGS = -Wl,-soname,$(LIB)
 all: $(LIB)
 
 $(LIB): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(CXXLFLAGS) $(LFLAGS) -o $(LIB) $^
+	$(CXX) $(CXXFLAGS) $(CXXLFLAGS) $(LFLAGS) $(LDLIBS) -o $(LIB) $^
 
 $(OBJS): %.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXLFLAGS) -c $< -o $@
@@ -69,8 +69,11 @@ uninstall:
 	$(RM) $(DESTDIR)/$(LIB_B)
 	$(RM) $(DESTDIR)/$(LIB_A)
 
+disaster: clean
+	$(RM) $(LIB) $(NAME)
+
 sample:
-	$(CXX) $(CXXFLAGS) main.cpp -o skylium $(LDLIBS)
+	$(CXX) $(CXXFLAGS) main.cpp -o $(NAME) -lskylium -lSOIL
 
 clean:
 	rm -f *.o

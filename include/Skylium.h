@@ -103,7 +103,7 @@ public:
 	/**
 	 * Sprawdza, czy dane rozszerzenie jest dostępne.
 	 */
-	bool isSupported(char*);
+	bool isSupported(const std::string&);
 	
 	
 	/* Dostęp do manadżerów z zewnątrze */
