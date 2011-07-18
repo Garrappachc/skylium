@@ -200,11 +200,8 @@ Object::getMaterialByName(const string &_name) {
 
 void
 Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
-	unsigned int lastSlash = 0; // potrzebujemy lokalizacji na dysku
-	while (_fileName.find('/', lastSlash+1) != string::npos) {
-		lastSlash = _fileName.find('/', lastSlash+1);
-	}
-	string loc = _fileName.substr(0, lastSlash+1);
+	unsigned int lastSlash = _fileName.rfind('/'); // potrzebujemy lokalizacji na dysku
+	string loc = (lastSlash == string::npos) ? "" : _fileName.substr(0, lastSlash+1);
 	
 	// kilka tymczasowych zmiennych
 	typedef map< Face, long, FaceComp > faceMap;

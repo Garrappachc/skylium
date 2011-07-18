@@ -63,6 +63,13 @@ private:
 	 */
 	bool __fileExists(const std::string&);
 	
+	/**
+	 * Ładuje teksturę.
+	 * @param fileName Nazwa pliku z teksturą.
+	 * @return Tekstura.
+	 */
+	GLuint __loadTexture(const std::string&);
+	
 	/* Wskaźnik na teksturę OpenGLa */
 	GLuint __texture;
 	
