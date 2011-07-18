@@ -48,16 +48,10 @@ Texture::Texture(const string &_fileName) :
 		throw "File " + _fileName + " was not found!";
 	
 	unsigned lastDot = 0;
-	while (_fileName.find('.', lastDot + 1) != string::npos)
-		lastDot = _fileName.find('.', lastDot + 1);
-	name = _fileName.substr(0, lastDot + 1);
+	lastDot = _fileName.rfind('.');
+		name = (lastDot != string::npos) ? _fileName.substr(0, lastDot + 1) : _fileName;
 
-	__texture = SOIL_load_OGL_texture(
-			_fileName.c_str(),
-			4,
-			0,
-			SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS
-		);
+	__texture = __loadTexture(_fileName);
 	
 	if (!__texture) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
@@ -89,6 +83,16 @@ Texture::__fileExists(const string &_fileName) {
 		return 1;
 	else
 		return 0;
+}
+
+GLuint
+Texture::__loadTexture(const string &_fileName) {
+	return SOIL_load_OGL_texture(
+		_fileName.c_str(),
+		4,
+		0,
+		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS
+	);
 }
 
 
