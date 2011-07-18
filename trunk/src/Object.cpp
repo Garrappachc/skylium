@@ -360,7 +360,7 @@ Object::__parseMtl(const string &_fileName) {
 	
 	string buffer, temp;
 	
-	Material *current;
+	Material *current = (Material*)NULL;
 	
 	while (!mtlFile.eof()) {
 		getline (mtlFile, buffer);

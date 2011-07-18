@@ -191,27 +191,13 @@ Skylium::createShader(const unsigned &_type, const string &_vertFile, const stri
 }
 
 bool
-Skylium::isSupported(char *_ext) {
-	const unsigned char *pszExtensions = NULL, *pszStart;
-	unsigned char *pszWhere, *pszTerminator;
-	pszWhere = (unsigned char *) strchr(_ext, ' ' );
-	if( pszWhere || *_ext == '\0' )
+Skylium::isSupported(const string &_ext) {
+	const char *pszExtensions = (const char*)glGetString( GL_EXTENSIONS );
+	string allExtensions(pszExtensions);
+	if (allExtensions.find(_ext) == string::npos)
 		return false;
-      // Pobierz łańcuch z rozszerzeniami dostępnymi na danej karcie graficznej
-	pszExtensions = glGetString( GL_EXTENSIONS );
-      // Sprawdź, czy w łańcuchu z rozszerzeniami jest dokładna kopia szTargetExtension
-	pszStart = pszExtensions;
-	for(;;) {
-		pszWhere = (unsigned char *)strstr((const char *) pszStart, _ext);
-		if(!pszWhere)
-			break;
-		pszTerminator = pszWhere + strlen(_ext);
-		if(pszWhere == pszStart || *(pszWhere - 1) == ' ')
-			if(*pszTerminator == ' ' || *pszTerminator == '\0')
-				return true;
-		pszStart = pszTerminator;
-	}
-	return false;
+	else
+		return true;
 }
 
 void
