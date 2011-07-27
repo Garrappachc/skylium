@@ -31,6 +31,11 @@
 #include "Vertex.h"
 #include "Material.h"
 
+#define GL_ARRAY_BUFFER 0x8892
+#define GL_BUFFER_SIZE 0x8764
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+#define GL_STATIC_DRAW 0x88E4
+
 class Mesh {
 	
 public:
@@ -106,6 +111,8 @@ public:
 	
 private:
 	
+	void __initGLExtensionsPointers();
+	
 	/* Wektor wierzchołków */
 	std::vector< Vertex > __vertices;
 	
@@ -132,6 +139,14 @@ private:
 	
 	/* http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml */
 	GLenum __mode;
+	
+	/* Wskaźniki na rozszerzenia OpenGL'a */
+	void	(*glBindBuffer) (GLenum, GLuint);
+	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
+	void	(*glGenBuffers) (GLsizei, GLuint*);
+	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
+	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
+	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
 	
 };
 

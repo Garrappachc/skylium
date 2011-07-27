@@ -29,6 +29,7 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -64,6 +65,7 @@ Hud::draw() {
 		glVertex2f(0.8, 0.6);
 		glVertex2f(0.8, 1.0);
 	glEnd();
+	checkGLErrors(AT);
 	
 	__displayList = __toDisplay.begin();
 	while (__displayList != __toDisplay.end()) {
@@ -118,5 +120,6 @@ Hud::__hudMode(bool flag) {
 		glEnable(GL_COLOR_MATERIAL);
 		glEnable(GL_LIGHTING);
 	}
+	checkGLErrors(AT);
 }
 

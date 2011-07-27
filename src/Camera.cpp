@@ -26,9 +26,11 @@
 #include <SDL/SDL.h>
 
 #include "../include/Camera.h"
+#include "../include/Skylium.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 static const double PI = 3.1415265359;
 static const double PIdiv180 = PI/180.0;
@@ -71,20 +73,25 @@ Camera::~Camera() {
 
 void
 Camera::setProjection() {
-	const SDL_VideoInfo *info = SDL_GetVideoInfo();
-	__windowWidth = info -> current_w;
-	__windowHeight = info -> current_h;
+	__windowWidth = Skylium::GetSingletonPtr() -> getContextPtr() -> winWidth;
+	__windowHeight = Skylium::GetSingletonPtr() -> getContextPtr() -> winHeight;
 	glMatrixMode(GL_PROJECTION);
+	checkGLErrors(AT);
 	glLoadIdentity();
+	checkGLErrors(AT);
 	GLdouble aspect = (GLdouble) __windowWidth / __windowHeight;
 	glViewport(0, 0, __windowWidth, __windowHeight);
+	checkGLErrors(AT);
 	gluPerspective(__fovy, aspect, __zNear, __zFar);
+	checkGLErrors(AT);
 }
 
 void
 Camera::setView() {
 	glMatrixMode(GL_MODELVIEW);
+	checkGLErrors(AT);
 	glLoadIdentity();
+	checkGLErrors(AT);
 	if (__type == FPP) {
 		gluLookAt(
 				__eye.x, __eye.y, __eye.z,
@@ -98,6 +105,7 @@ Camera::setView() {
 				__up.x, __up.y, __up.z
 			);
 	}
+	checkGLErrors(AT);
 }
 
 void

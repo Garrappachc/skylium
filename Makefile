@@ -9,7 +9,7 @@ LIB_B = $(LIBNAME).so.1
 LIB_C = $(LIBNAME).so
 
 CXX = g++
-CXXFLAGS += -O2 -g -Wall -pipe -std=c++0x `sdl-config --cflags`
+CXXFLAGS += -O2 -g -Wall -pipe -std=c++0x
 CXXLFLAGS = -fPIC -shared
 
 CP = cp
@@ -41,7 +41,7 @@ INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h $(D)/FaceComp.h \
 
 SKYLIUM_MAIN = skylium.h
 
-LDLIBS = -lGL -lGLU -lGLEW -lSOIL `sdl-config --libs`
+LDLIBS = -lGL -lGLU -lSOIL
 
 LFLAGS = -Wl,-soname,$(LIB)
 

@@ -68,7 +68,7 @@ private:
 	 * @param fileName Nazwa pliku z teksturą.
 	 * @return Tekstura.
 	 */
-	GLuint __loadTexture(const std::string&);
+	GLuint __loadImage(const std::string&);
 	
 	/* Wskaźnik na teksturę OpenGLa */
 	GLuint __texture;
@@ -92,6 +92,9 @@ private:
 	
 	/* Lokalizacja pliku z teksturą - być może się przyda */
 	std::string __file;
+	
+	/* Channels, default 4 (RGBA) */
+	GLint __channels;
 	
 	/* Instancja TextureManagera */
 	TextureManager * __boss;

@@ -27,6 +27,7 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -60,6 +61,7 @@ SceneManager::displayActiveScene() {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	//glLoadIdentity( );
+	checkGLErrors(AT);
 	
 	
 	if (__activeScene) {

@@ -66,10 +66,6 @@ struct sGlobalConfig {
 	/* Jeżeli true, hud będzie wyświetlany. */
 	static bool		HUD_EXISTS;
 	
-	/* Jeżeli true, przytrzymanie klawisza będzie brane jako
-	 * wielkrotnie jego naciskanie. */
-	static bool		ENABLE_KEY_REPEAT;
-	
 	/* Jeżeli true, myszka jest widoczna w kontekście renderowania. */
 	static bool		MOUSE_VISIBLE;
 	
@@ -81,6 +77,13 @@ struct sGlobalConfig {
 	static short		GL_GREEN_SIZE;
 	static short		GL_BLUE_SIZE;
 	static short		GL_DEPTH_SIZE;
+	
+	/* Wersja OpenGL'a do inicjalizacji */
+	static unsigned	OPENGL_VERSION_MAJOR;
+	static unsigned	OPENGL_VERSION_MINOR;
+	
+	/* Jeżeli true, skylium będzie generował mipmapy dla każdej tekstury. */
+	static bool		CREATE_MIPMAPS;
 	
 	
 };

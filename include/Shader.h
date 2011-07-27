@@ -29,6 +29,11 @@
 #include "Object.h"
 #include "Vectors.h"
 
+#define GL_FRAGMENT_SHADER 0x8B30
+#define GL_VERTEX_SHADER	0x8B31
+#define GL_COMPILE_STATUS 0x8B81
+#define GL_LINK_STATUS 0x8B82
+
 /**
  * Program shadera wysokopoziomowego.
  */
@@ -91,6 +96,8 @@ private:
 	GLint __shaderProgram;
 
 	GLboolean __isRunning;
+	
+	void __initGLExtensionsPointers();
 
 	/**
 	 * Funkcja pomocnicza - sprawdza, czy istnieje podany plik.
@@ -98,7 +105,25 @@ private:
 	 * @return True, jeżeli istnieje, w przeciwnym przypadku false.
 	 */
 	bool __fileExists(const std::string&);
-
+	
+	/* Wskaźniki na rozszerzenia GL-a */
+	GLuint	(*glCreateShader) (GLenum);
+	void		(*glDetachShader) (GLuint, GLuint);
+	void		(*glDeleteProgram) (GLuint);
+	void		(*glDeleteShader) (GLuint);
+	void		(*glShaderSource) (GLuint, GLsizei, const GLchar**, const GLint*);
+	void		(*glCompileShader) (GLuint);
+	void		(*glGetShaderiv) (GLuint, GLenum, GLint*);
+	void		(*glGetShaderInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
+	GLuint	(*glCreateProgram) (void);
+	void		(*glAttachShader) (GLuint, GLuint);
+	void		(*glLinkProgram) (GLuint);
+	void		(*glGetProgramiv) (GLuint, GLenum, GLint*);
+	void		(*glGetProgramInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
+	void		(*glUseProgram) (GLuint);
+	GLint	(*glGetUniformLocation) (GLuint, const GLchar*);
+	void		(*glUniform4f) (GLint, GLfloat, GLfloat, GLfloat, GLfloat);
+	
 };
 
 #endif // SHADER_H
