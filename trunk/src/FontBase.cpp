@@ -24,9 +24,11 @@
 #include <iostream>
 
 #include "../include/FontBase.h"
+#include "../include/Skylium.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -34,12 +36,12 @@ FontBase::FontBase(const string &_fontName, const int &_characters) :
 		__font(0),
 		__base(0),
 		__characters(_characters) {
-	Display *dpy; // ekran X
+	Display *dpy = Skylium::GetSingletonPtr() -> getContextPtr() -> display;
 	XFontStruct *fontInfo; // info o nowej czcionce
 	
 	/* Miejsce na 96 znaków */
 	__base = glGenLists(__characters);
-	dpy = XOpenDisplay(NULL);
+	checkGLErrors(AT);
 	
 	fontInfo = XLoadQueryFont(dpy, _fontName.c_str());
 	
@@ -60,16 +62,9 @@ FontBase::FontBase(const string &_fontName, const int &_characters) :
 	__font = fontInfo -> fid;
 	glXUseXFont(__font, ' ', _characters, __base);
 	
-	GLenum err = glGetError(); // pobieramy błędy
-	while (err != GL_NO_ERROR) {
-		cout << err << endl;
-		cout.flush();
-		err = glGetError();
-	}
+	checkGLErrors(AT);
 	
 	XFreeFont(dpy, fontInfo); // zwalniamy niepotrzebną pamięć
-	
-	XCloseDisplay(dpy); // zamykamy tymczasowy ekran
 }
 
 FontBase::FontBase(const FontBase &_orig) :

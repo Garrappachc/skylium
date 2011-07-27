@@ -31,6 +31,7 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -40,6 +41,7 @@ Texture::Texture(const string &_fileName) :
 		__type(GL_TEXTURE_2D),
 		__wrapping(GL_CLAMP_TO_BORDER),
 		__file(_fileName),
+		__channels(4),
 		__boss(TextureManager::GetSingletonPtr()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Ładowanie tekstury: " << _fileName << "... ";
@@ -51,7 +53,7 @@ Texture::Texture(const string &_fileName) :
 	lastDot = _fileName.rfind('.');
 		name = (lastDot != string::npos) ? _fileName.substr(0, lastDot + 1) : _fileName;
 
-	__texture = __loadTexture(_fileName);
+	__texture = __loadImage(_fileName);
 	
 	if (!__texture) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
@@ -72,8 +74,11 @@ Texture::~Texture() {
 void
 Texture::setTexture() {
 	glBindTexture(__type, __texture);
+	checkGLErrors(AT);
 	glTexParameteri(__type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	checkGLErrors(AT);
 	glTexParameteri(__type, GL_TEXTURE_WRAP_S, __wrapping);
+	checkGLErrors(AT);
 }
 
 bool
@@ -86,14 +91,18 @@ Texture::__fileExists(const string &_fileName) {
 }
 
 GLuint
-Texture::__loadTexture(const string &_fileName) {
+Texture::__loadImage(const string &_fileName) {
+	unsigned flags = SOIL_FLAG_POWER_OF_TWO;
+	if (sGlobalConfig::CREATE_MIPMAPS)
+		flags |= SOIL_FLAG_MIPMAPS;
 	return SOIL_load_OGL_texture(
 		_fileName.c_str(),
-		4,
+		__channels,
 		0,
-		SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_MIPMAPS
+		flags
 	);
 }
+		
 
 
 /* TODO: Bump texture (normal map). */

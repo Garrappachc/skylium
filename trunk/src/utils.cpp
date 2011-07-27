@@ -21,6 +21,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <GL/glu.h>
 
 #include "../include/utils.h"
 #include "../include/config.h"
@@ -41,4 +42,23 @@ void explode(const std::string &_text, char _delim, std::vector< std::string > &
 	}
 	if (temp != "")
 		_dest.push_back(temp);
+}
+
+void checkGLErrors(const string &_at) {
+#ifdef __DEBUG__
+	bool iserror = false;
+	GLenum err = glGetError(); // pobieramy błędy
+	while (err != GL_NO_ERROR) {
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS) {
+			cout << "\n\e[33m(WW)\e[0m " << "Błąd OpenGL!" 
+				<< "\nGdzie: " << _at << "\nKod błędu: " << err
+				<< "\nRozwinięcie błędu: " << gluErrorString(err) << endl;
+			cout.flush();
+		}
+		err = glGetError();
+		iserror = true;
+	}
+	if (iserror)
+		sleep(2);
+#endif
 }

@@ -27,6 +27,7 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -74,6 +75,7 @@ Scene::show() {
 	if (__isLightOn) {
 		glEnable(GL_LIGHTING);
 		glEnable(GL_COLOR_MATERIAL);
+		checkGLErrors(AT);
 	}
 	
 	__setLights();
@@ -286,10 +288,15 @@ Scene::__setLights() {
 				glEnable(lights[i]);
 			else
 				glDisable(lights[i]);
+			checkGLErrors(AT);
 			glLightfv(lights[i],	GL_AMBIENT,	&(*__lightIterator)->__ambientLight[0]);
+			checkGLErrors(AT);
 			glLightfv(lights[i],	GL_DIFFUSE,	&(*__lightIterator)->__diffuseLight[0]);
+			checkGLErrors(AT);
 			glLightfv(lights[i],	GL_SPECULAR,	&(*__lightIterator)->__specularLight[0]);
+			checkGLErrors(AT);
 			glLightfv(lights[i],	GL_POSITION,	&(*__lightIterator)->__lightSrc[0]);
+			checkGLErrors(AT);
 			i++;
 		}
 		__lightIterator++;

@@ -23,13 +23,13 @@
 
 #include <iostream>
 
-#include <GL/glew.h>
 #include <GL/gl.h>
 
 #include "../include/Mesh.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 // pomocne makro do obliczania pozycji
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -47,6 +47,7 @@ Mesh::Mesh(const string &_name) :
 		__smooth(false),
 		__usage(GL_STATIC_DRAW),
 		__mode(GL_TRIANGLES) {
+	__initGLExtensionsPointers();
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Konstruktor: Mesh(\"" << name << "\")";
 
@@ -103,6 +104,7 @@ Mesh::show() {
 	// renderujemy!
 	if (__vboID != 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, __vboID); // ustawiamy aktywny wskaźnik na odpowiednim buforze
+		checkGLErrors(AT);
 	
 		if (__material && __material -> hasAnyTexture())
 			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // gdzie są koordynaty tekstur
@@ -111,6 +113,7 @@ Mesh::show() {
 			glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // gdzie normalne
 
 		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // i gdzie wierzchołki
+		checkGLErrors(AT);
 	} else {
 		if (__material && __material -> hasAnyTexture())
 			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &__vertices[0].textureCoords);
@@ -119,10 +122,12 @@ Mesh::show() {
 			glNormalPointer(GL_FLOAT, sizeof(Vertex), &__vertices[0].normalVector);
 		
 		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &__vertices[0]);
+		checkGLErrors(AT);
 	}
 	
 	if (__vboIndexID != 0) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID); // teraz chcemy bufor z indeksami
+		checkGLErrors(AT);
 
 		// Teraz rysujemy wszystko za jednym zamachem.
 		// __mode - defaultowo GL_TRIANGLES. Tryb rysowania;
@@ -131,14 +136,10 @@ Mesh::show() {
 		// 	właśnie unsigned short;
 		// BUFFER_OFFSET(0) - mówimy, skąd chcemy zacząć pobierać indeksy wierzchołków.
 		glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+		checkGLErrors(AT);
 	} else {
 		glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, &__index[0]);
-	}
-	
-	GLenum err = glGetError(); // pobieramy błędy
-	while (err != GL_NO_ERROR) {
-		cout << err << endl;
-		err = glGetError();
+		checkGLErrors(AT);
 	}
 	
 	if (__material && __material -> hasAnyTexture()) // blokujemy
@@ -153,6 +154,7 @@ Mesh::show() {
 		glBindBuffer(GL_ARRAY_BUFFER, 0); // bufor już nam nie będzie potrzebny - wracamy ze wskaźnikiem do ramu
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
+	checkGLErrors(AT);
 	
 	glShadeModel(GL_FLAT); // zawsze!
 }
@@ -162,16 +164,21 @@ Mesh::loadIntoVbo() {
 	
 	// generujemy VBO ID
 	glGenBuffers(1, &__vboID);
+	checkGLErrors(AT);
 	// ustawiamy aktywny wskaźnik
 	glBindBuffer(GL_ARRAY_BUFFER, __vboID);
+	checkGLErrors(AT);
 	
 	// rezerwujemy miejsce w buforze
 	// Moglibyśmy juz tutaj wysłać tablicę wierzchołków, ale ponoć jest to mniej wydajne.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * __vertices.size(), NULL, __usage);
+	checkGLErrors(AT);
 	// wysyłamy tablicę wierzchołków do bufora
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * __vertices.size(), &__vertices[0]);
+	checkGLErrors(AT);
 	int bufferSize_v;
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_v);
+	checkGLErrors(AT);
 	
 	// mówimy, gdzie co jest
 	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // 12 = rozmiar Position
@@ -180,13 +187,18 @@ Mesh::loadIntoVbo() {
 	
 	// generujemy VBO ID dla indeksów, ustawiamy aktywny wskaźnik
 	glGenBuffers(1, &__vboIndexID);
+	checkGLErrors(AT);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID);
+	checkGLErrors(AT);
 	
 	// wysyłamy tablicę indeksów do karty graficznej
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * __index.size(), NULL, __usage);
+	checkGLErrors(AT);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * __index.size(), &__index[0]);
+	checkGLErrors(AT);
 	int bufferSize_i;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_i);
+	checkGLErrors(AT);
 	
 	if ((sGlobalConfig::DEBUGGING & D_BUFFER) == D_BUFFER) {
 		cout << LOG_INFO << "Mesh::loadIntoVbo(" << name << "): mesh w VBO. Rozmiar: " << bufferSize_v + bufferSize_i << " B.";
@@ -195,6 +207,7 @@ Mesh::loadIntoVbo() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	checkGLErrors(AT);
 }
 
 void
@@ -216,4 +229,14 @@ Mesh::push_back(const Vertex &_v) {
 void
 Mesh::addNewIdx(const int &_idx) {
 	__index.push_back(_idx);
+}
+
+void
+Mesh::__initGLExtensionsPointers() {
+	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
+	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");
+	glGenBuffers = getProcAddr< decltype(glGenBuffers) >("glGenBuffersARB");
+	glBufferData = getProcAddr< decltype(glBufferData) >("glBufferDataARB");
+	glBufferSubData = getProcAddr< decltype(glBufferSubData) >("glBufferSubDataARB");
+	glGetBufferParameteriv = getProcAddr< decltype(glGetBufferParameteriv) >("glGetBufferParameterivARB");
 }

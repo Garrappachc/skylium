@@ -114,9 +114,9 @@ main() {
 		if (klawisz == KEY_LEFT)
 			scenka -> getActiveCamera() -> moveCamera(-0.1, 0.0, 0.0); // D
 		if (klawisz == KEY_Z)
-			scenka -> getActiveCamera() -> moveCamera(0.0, -0.5, 0.0);
+ 			scenka -> getActiveCamera() -> moveCamera(0.0, -0.7, 0.0);
 		if (klawisz == KEY_X)
-			scenka -> getActiveCamera() -> moveCamera(0.0, 0.5, 0.0);
+			scenka -> getActiveCamera() -> moveCamera(0.0, 0.7, 0.0);
 		if (klawisz == KEY_F1) {
 			scenka -> setActiveCamera(kamerka_fpp);
 			cameraInfo.text = "Camera: FPP";

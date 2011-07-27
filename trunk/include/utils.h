@@ -30,6 +30,16 @@
 #include <string>
 #include <vector>
 
+#include <GL/gl.h>
+#include <GL/glx.h>
+
+#include "config.h"
+#include "defines.h"
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define AT __FILE__ " : " TOSTRING(__LINE__)
+
 /**
  * Funkcje pomocnicze.
  */
@@ -50,6 +60,19 @@ std::string T2String(const T &_orig) {
 	return output;
 }
 
+template< typename T >
+T getProcAddr(const std::string &_procName) {
+	T temp = (T)glXGetProcAddress((GLubyte*)_procName.c_str());
+	if (temp == (T)NULL) {
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			std::cout << LOG_WARN << "Błąd przy pobieraniu wskaźnika na funkcję \"" << _procName << "\"!" <<
+				LOG_WARN << "Bardzo prawdopodobne jest, iż nastąpi naruszenie ochrony pamięci.";
+	}
+	return temp;		
+}
+
 void explode(const std::string&, char, std::vector< std::string >&);
+
+void checkGLErrors(const std::string&);
 
 #endif // UTILS_H

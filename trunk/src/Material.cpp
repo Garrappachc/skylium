@@ -28,6 +28,7 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -97,6 +98,7 @@ Material::setMaterial() {
 	glMaterialfv(GL_FRONT, GL_SPECULAR, &__mSpecular[0]);
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	glMateriali(GL_FRONT, GL_SHININESS, __mShininess);
+	checkGLErrors(AT);
 }
 
 void

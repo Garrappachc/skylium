@@ -27,7 +27,6 @@
 #include <map>
 
 #include <sys/stat.h>
-#include <GLee.h>
 
 #include "../include/Object.h"
 #include "../include/Vertex.h"
@@ -38,6 +37,7 @@
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -100,6 +100,7 @@ Object::show() {
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		checkGLErrors(AT);
 		
 		glTranslated(__mov.x, __mov.y, __mov.z);
 		
@@ -108,6 +109,7 @@ Object::show() {
 		glRotated(__rot.x, 1.0, 0.0, 0.0);
 		glRotated(__rot.y, 0.0, 1.0, 0.0);
 		glRotated(__rot.z, 0.0, 0.0, 1.0);
+		checkGLErrors(AT);
 		
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end())
@@ -117,6 +119,7 @@ Object::show() {
 			__shader -> toggle();
 		
 	glPopMatrix();
+	checkGLErrors(AT);
 }
 
 void

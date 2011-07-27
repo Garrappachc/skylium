@@ -25,7 +25,7 @@
 #ifndef SKYLIUM_H
 #define SKYLIUM_H
 
-#include <SDL/SDL.h>
+#include <GL/glx.h>
 
 #include "Singleton.h"
 #include "SceneManager.h"
@@ -85,7 +85,7 @@ public:
 	/**
 	 * Przestawia bufory.
 	 */
-	void swapBuffers() { SDL_GL_SwapBuffers(); }
+	void swapBuffers();
 	
 	sKey sEvent() { return __pendingKeys; }
 	
@@ -104,6 +104,38 @@ public:
 	 * Sprawdza, czy dane rozszerzenie jest dostępne.
 	 */
 	bool isSupported(const std::string&);
+	
+	/* Sktruktura przechowująca informacje o kontekście renderowania X.
+	 * Aktualny kontekst jest dostępny poprzez funkcje getContext()
+	 * oraz getContextPtr(). */
+	typedef struct sContextStruct {
+		
+		/* Wskaźnik na aktywny ekran serwera X */
+		Display *	display;
+		
+		/* Wersja GLX */
+		int	GLXVersionMajor;
+		int	GLXVersionMinor;
+		
+		/* Atrybuty okna */
+		XSetWindowAttributes	winAttribs;
+		
+		/* Wskaźnik do okna */
+		Window	window;
+		
+		/* Rozmiary okna */
+		int	winHeight;
+		int	winWidth;
+		
+		int	mousePosX;
+		int	mousePosY;
+		
+		GLXContext	context;
+		
+	} sContextStruct;
+	
+	const sContextStruct & getContext() { return __GLXContext; }
+	const sContextStruct * getContextPtr() { return &__GLXContext; }
 	
 	
 	/* Dostęp do manadżerów z zewnątrze */
@@ -133,6 +165,15 @@ private:
 	void __loadConfig(const std::string&);
 	
 	/**
+	 * Ustawia wskaźniki na potrzebne funkcje.
+	 */
+	void __earlyInitGLXFnPointers();
+	
+	/**
+	 * Pobiera listę dostępnych rozszerzeń */
+	void __getExtensionList();
+	
+	/**
 	 * Zwraca false, jeżeli plik nie istnieje.
 	 */
 	bool __fileExists(const std::string&);
@@ -143,27 +184,37 @@ private:
 	/* Instancja TextureManagera */
 	TextureManager * __textureManagement;
 	
+	/* Przechowuje kontekst renderowania */
+	sContextStruct __GLXContext;
+	
 	/* Przechowuje wciśnięte klawisze. Patrz metoda sEvent(). */
 	sKey __pendingKeys;
 	
 	/* Do kamerki z myszką. */
 	bool __isMouseMotionEnabled;
 	
-	/* Kontekst renderowania SDLa */
-	SDL_Surface * __surfDisplay;
-	
 	/* Przechowuje pozycję x i y myszy. */
 	int __lastMousePositionX;
 	int __lastMousePositionY;
 	
 	/* Przechowuje rozmiary okna. */
-	int __windowWidth;
-	int __windowHeight;
+	int & __windowWidth;
+	int & __windowHeight;
 	
 	std::vector< Shader* > __shaderList;
 	
 	/* Jedyna instancja huda */
 	Hud * __hud;
+	
+	/* Wektor z dostępnymi rozszerzeniami */
+	std::vector< std::string* > __extensions;
+	
+	/* Wskaźniki na kilka potrzebnych funkcji */
+	GLXContext	(*glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
+	GLXFBConfig *	(*glXChooseFBConfig)(Display*, int, const int*, int*);
+	XVisualInfo *	(*glXGetVisualFromFBConfig)(Display*, GLXFBConfig);
+	int			(*glXGetFBConfigAttrib)(Display*, GLXFBConfig, int, int*);
+	const GLubyte *	(*glGetStringi)(GLenum, GLuint);
 	
 };
 

@@ -1,3 +1,5 @@
+#version 330
+
 uniform vec4 sDefColor;
 
 varying vec3 N; /* Normalna */
