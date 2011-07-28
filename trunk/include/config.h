@@ -33,7 +33,7 @@ enum {
 	D_ALL_PARAMS		= 16,
 	D_SHADERS			= 32,
 	D_BUFFER			= 64,
-	D_WARNINGS			= 128,
+	D_WARNINGS		= 128,
 	D_ERRORS			= 256,
 	D_EVERYTHING		= 512
 };

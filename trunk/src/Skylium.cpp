@@ -82,6 +82,9 @@ Skylium::~Skylium() {
 	
 	XCloseDisplay(__GLXContext.display);
 	__GLXContext.display = 0;
+	
+	while (!__extensions.empty())
+		delete __extensions.back(), __extensions.pop_back();
 }
 
 bool
@@ -220,21 +223,30 @@ Skylium::init(const string &_windowName) {
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << "Inicjalizacja OpenGL " << sGlobalConfig::OPENGL_VERSION_MAJOR
 			<< "." << sGlobalConfig::OPENGL_VERSION_MINOR;
-			
-	GLint attribs[] = {
-		GLX_CONTEXT_MAJOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MAJOR,
-		GLX_CONTEXT_MINOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MINOR,
-		//GLX_CONTEXT_FLAGS_ARB,			GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-		0 };
 	
-	rcx->context = glXCreateContextAttribsARB(rcx->display, bestFbConfig,
-									  0, True, attribs);
-	XSync(rcx->display, False);
-	checkGLErrors(AT);
+	if (glXCreateContextAttribsARB) {
+		GLint attribs[] = {
+			GLX_CONTEXT_MAJOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MAJOR,
+			GLX_CONTEXT_MINOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MINOR,
+			//GLX_CONTEXT_FLAGS_ARB,			GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+			0 };
+	
+		rcx->context = glXCreateContextAttribsARB(rcx->display, bestFbConfig,
+									  0, True, attribs);	
+		XSync(rcx->display, False);
+		checkGLErrors(AT);
+	} else {
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "Nie znaleziono glXCreateContextAttribsARB(). W użyciu starsza funkcja.";
+		rcx->context = glXCreateNewContext(rcx->display, bestFbConfig, GLX_RGBA_TYPE, 0, True);
+	}
 	
 	glXMakeCurrent(rcx->display, rcx->window, rcx->context);
 	checkGLErrors(AT);
 	
+	__getExtensionList();
+	
+	// chowany kursor
 	if (!sGlobalConfig::MOUSE_VISIBLE) {
 		Cursor invisibleCursor;
 		Pixmap bitmapEmpty;
@@ -256,11 +268,8 @@ Skylium::init(const string &_windowName) {
 	checkGLErrors(AT);
 	
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	checkGLErrors(AT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	checkGLErrors(AT);
 	glEnable(GL_DEPTH_TEST);
-	checkGLErrors(AT);
 	glDepthFunc(GL_LEQUAL);
 	checkGLErrors(AT);
 	
@@ -562,11 +571,40 @@ Skylium::__earlyInitGLXFnPointers() {
 
 void
 Skylium::__getExtensionList() {
-	int n;
-	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
-	for (int i = 0; i < n; i++) {
-		const char *temp = (const char*)glGetStringi(GL_EXTENSIONS, i);
-		__extensions.push_back(new string(temp));
+	if (sGlobalConfig::OPENGL_VERSION_MAJOR >= 3) {
+		int n;
+		glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+		checkGLErrors(AT);
+		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+			cout << LOG_INFO << "Liczba dostępnych rozszerzeń: " << n;
+		for (int i = 0; i < n; i++) {
+			const char *temp = (const char*)glGetStringi(GL_EXTENSIONS, i);
+			__extensions.push_back(new string(temp));
+			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+				cout << LOG_INFO << "Znaleziono rozszerzenie: " << temp;
+		}
+	} else {
+		const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
+		checkGLErrors(AT);
+		string tempExt(pszExtensions);
+		string temp = "";
+		for (unsigned i = 0; i < tempExt.length(); i++) {
+			if (tempExt[i] == ' ') {
+				__extensions.push_back(new string(temp));
+				if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+					cout << LOG_INFO << "Znaleziono rozszerznie: " << temp;
+				cout.flush();
+				temp = "";
+			} else {
+				temp += tempExt[i];
+			}
+		}
+		
+		if (temp != "") {
+			__extensions.push_back(new string(temp));
+			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+					cout << LOG_INFO << "Znaleziono rozszerznie: " << temp;
+		}
 	}
 	
 	auto comparator = [](string *a, string *b) -> bool {
