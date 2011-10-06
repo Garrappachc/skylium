@@ -333,9 +333,7 @@ Skylium::isSupported(const string &_ext) {
 		return (*a) < (*b);
 	};
 	
-	if (binary_search(__extensions.begin(), __extensions.end(), &_ext, comparator))
-		return true;
-	return false;
+	return binary_search(__extensions.begin(), __extensions.end(), &_ext, comparator);
 }
 
 void
