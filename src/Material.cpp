@@ -63,7 +63,7 @@ Material::~Material() {
 }
 
 void
-Material::loadMaterial(const sColor &_param, const unsigned int &_type) {
+Material::loadMaterial(const sColor &_param, unsigned _type) {
 	if (_type & MATERIAL_AMBIENT)
 		__mAmbient = _param;
 	else if (_type & MATERIAL_DIFFUSE)
@@ -73,12 +73,12 @@ Material::loadMaterial(const sColor &_param, const unsigned int &_type) {
 }
 
 void
-Material::loadAlpha(const GLfloat &_alpha) {
+Material::loadAlpha(GLfloat _alpha) {
 	__mAlpha = _alpha;
 }
 
 void
-Material::loadShininess(const GLint &_shininess) {
+Material::loadShininess(GLint _shininess) {
 	__mShininess = _shininess;
 }
 

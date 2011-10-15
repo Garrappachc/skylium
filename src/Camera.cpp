@@ -50,7 +50,7 @@ Camera::Camera(const cType &_type) :
 		cout << LOG_INFO << "Konstruktor: Camera()";
 }
 
-Camera::Camera(const GLdouble& _x, const GLdouble& _y, const GLdouble& _z, const cType &_type) :
+Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
 		__type(_type),
 		__fovy(45.0),
 		__zNear(1.0),

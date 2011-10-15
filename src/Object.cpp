@@ -123,22 +123,22 @@ Object::show() {
 }
 
 void
-Object::move(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
+Object::move(GLdouble _x, GLdouble _y, GLdouble _z) {
 	__mov += sVector(_x, _y, _z);
 }
 
 void
-Object::scale(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
+Object::scale(GLdouble _x, GLdouble _y, GLdouble _z) {
 	__scale += sVector(_x, _y, _z);
 }
 
 void
-Object::rotate(const GLdouble &_x, const GLdouble &_y, const GLdouble &_z) {
+Object::rotate(GLdouble _x, GLdouble _y, GLdouble _z) {
 	__rot += sVector(_x, _y, _z);
 }
 
 bool
-Object::setColor(const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const GLfloat &_A) {
+Object::setColor(GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1)
 		return false;
 	
@@ -147,7 +147,7 @@ Object::setColor(const GLfloat &_R, const GLfloat &_G, const GLfloat &_B, const 
 }
 
 bool
-Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_A) {
+Object::setColor(int _R, int _G, int _B, GLfloat _A) {
 	if (_R < 0 || _R > 255 || _G < 0 || _G > 255 || _B < 0 || _B > 255 || _A < 0 || _A > 1)
 		return false;
 	
@@ -161,7 +161,7 @@ Object::setColor(const int &_R, const int &_G, const int &_B, const GLfloat &_A)
 }
 
 bool
-Object::loadFromObj(const string &_objFile, const unsigned &_whatToLoad) {
+Object::loadFromObj(const string &_objFile, unsigned _whatToLoad) {
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << "Object::loadFromObj: wczytywanie obiektu: " << name << "... ";
 	
@@ -202,7 +202,7 @@ Object::getMaterialByName(const string &_name) {
 }
 
 void
-Object::__parseObj(const string &_fileName, const unsigned &_whatToLoad) {
+Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 	unsigned int lastSlash = _fileName.rfind('/'); // potrzebujemy lokalizacji na dysku
 	string loc = (lastSlash == string::npos) ? "" : _fileName.substr(0, lastSlash+1);
 	

@@ -32,7 +32,7 @@ Timer::Timer() :
 			{}
 
 long long int
-Timer::update(const unsigned &_clock) {
+Timer::update(unsigned _clock) {
 	gettimeofday(&__tv, NULL);
 
 	__curtime = __tv.tv_sec;
@@ -44,7 +44,7 @@ Timer::update(const unsigned &_clock) {
 }
 
 bool
-Timer::passed(const long int &_howMuch, const unsigned &_clock) {
+Timer::passed(const long int &_howMuch, unsigned _clock) {
 	long long temp = this -> update(_clock);
 	bool result = false;
 	

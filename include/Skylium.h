@@ -58,6 +58,7 @@ enum {
 	CUSTOM
 };
 
+
 class Skylium : public Singleton < Skylium > {
 
 public:

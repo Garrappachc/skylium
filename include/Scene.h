@@ -79,7 +79,7 @@ public:
 	 * @param z Współrzędna z położenia kamery.
 	 * @return Wskaźnik do nowo utworzonej kamery.
 	 */
-	Camera * createCamera(const GLdouble&, const GLdouble&, const GLdouble&, const cType& = FPP);
+	Camera * createCamera(GLdouble, GLdouble, GLdouble, const cType& = FPP);
 	
 	/**
 	 * Ustawia aktywną kamerę na tą podaną w argumencie.
@@ -88,7 +88,7 @@ public:
 	 * 				co przy częstych zmianach kamery pozwala na zwiększenie wydajności.
 	 * @return False, jeżeli checking = true i nie znaleziono danej kamery w wektorze.
 	 */
-	bool setActiveCamera(Camera*, const bool& = true);
+	bool setActiveCamera(Camera*, bool = true);
 	
 	/**
 	 * Zwraca wskaźnik na aktywną kamerę.
@@ -109,7 +109,7 @@ public:
 	 * @param z Współrzędna z źródła światła.
 	 * @return Indeks nowego światła.
 	 */
-	short createLight(const GLfloat& = 0, const GLfloat& = 0, const GLfloat& = 0);
+	short createLight(GLfloat = 0, GLfloat = 0, GLfloat = 0);
 	
 	/**
 	 * Ustawia parametry światła otoczenia.
@@ -120,7 +120,7 @@ public:
 	 * @param A Natężenie światła. 
 	 * @return False, jeżeli nie znaleziono światła o podanym ID.
 	 */
-	bool setAmbientLight(const int&, const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat&);
+	bool setAmbientLight(int, GLfloat, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Ustawia parametry światła rozproszonego.
@@ -131,7 +131,7 @@ public:
 	 * @param A Natężenie światła. 
 	 * @return False, jeżeli nie znaleziono światła o podanym ID.
 	 */
-	bool setDiffuseLight(const int&, const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat&);
+	bool setDiffuseLight(int, GLfloat, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Ustawia parametry światła odbicia.
@@ -142,7 +142,7 @@ public:
 	 * @param A Natężenie światła. 
 	 * @return False, jeżeli nie znaleziono światła o podanym ID.
 	 */
-	bool setSpecularLight(const int&, const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat&);
+	bool setSpecularLight(int, GLfloat, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Ustawia położenie źródła światła.
@@ -152,7 +152,7 @@ public:
 	 * @param Z <i>Z</i>.
 	 * @return False, jeżeli nie znaleziono światła o podanym ID.
 	 */
-	bool setLightPosition(const int&, const GLfloat&, const GLfloat&, const GLfloat&);
+	bool setLightPosition(int, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Przesuwa dane światło o podany wektor.
@@ -162,7 +162,7 @@ public:
 	 * @param Z Składowa Z wektora przesunięcia.
 	 * @return False, jeżeli nie znaleziono światła o podanym ID.
 	 */
-	bool moveLight(const int&, const GLfloat&, const GLfloat&, const GLfloat&);
+	bool moveLight(int, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Włącza lub wyłącza oświetlenie całej sceny.
@@ -174,7 +174,7 @@ public:
 	 * @param id ID światła.
 	 * @return False, jeżeli światła nie znaleziono.
 	 */
-	bool toggleLight(const int&);
+	bool toggleLight(int);
 	
 	/**
 	 * Usuwa światło ze sceny. Jeżeli usunięte zostaje światło ze środka, id pozostałych
@@ -185,7 +185,7 @@ public:
 	 * @param id ID światła do usunięcia. Domyślna wartość to ostatnie znane światło.
 	 * @return False, jeżeli nie ma światła o podanym id.
 	 */
-	bool removeLight(const int& = -1);
+	bool removeLight(int = -1);
 	
 	/* Nazwa sceny */
 	std::string name;

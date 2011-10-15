@@ -216,7 +216,7 @@ Mesh::useMtl(Material *_mtl) {
 }
 
 void
-Mesh::smooth(const bool &_s) {
+Mesh::smooth(bool _s) {
 	__smooth = _s;
 }
 
@@ -227,7 +227,7 @@ Mesh::push_back(const Vertex &_v) {
 }
 
 void
-Mesh::addNewIdx(const int &_idx) {
+Mesh::addNewIdx(int _idx) {
 	__index.push_back(_idx);
 }
 
