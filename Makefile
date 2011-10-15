@@ -73,7 +73,7 @@ disaster: clean
 	$(RM) $(LIB) $(NAME)
 
 sample:
-	$(CXX) $(CXXFLAGS) main.cpp -o $(NAME) -lskylium -lSOIL
+	$(CXX) $(CXXFLAGS) main.cpp -o $(NAME) -lskylium $(LDLIBS)
 
 clean:
 	rm -f *.o

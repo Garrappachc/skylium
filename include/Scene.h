@@ -58,6 +58,7 @@ public:
 	/**
 	 * Tworzy nowy obiekt o podanej nazwie i zwraca wskaźnik do niego.
 	 * @param name Nazwa nowego obiektu.
+	 * @param orig Wskaźnik na obiekt, który ma zostać skopiowany.
 	 * @return Wskaźnik do nowo utworzonego obiektu.
 	 */
 	Object * createObject(const std::string&, const Object* = (Object*)NULL);
