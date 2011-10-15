@@ -75,7 +75,7 @@ public:
 	 * @param y;
 	 * @param z;
 	 */
-	void move(const GLdouble&, const GLdouble&, const GLdouble&);
+	void move(GLdouble, GLdouble, GLdouble);
 	
 	/**
 	 * Skaluje obiekt o podane wartości.
@@ -83,7 +83,7 @@ public:
 	 * @param y;
 	 * @param z;
 	 */
-	void scale(const GLdouble&, const GLdouble&, const GLdouble&);
+	void scale(GLdouble, GLdouble, GLdouble);
 	
 	/**
 	 * Obraca obiekt.
@@ -91,7 +91,7 @@ public:
 	 * @param rotY Kąt obrotu wokół osi Y.
 	 * @param rotZ Kąt obrotu wokół osi Z.
 	 */
-	void rotate(const GLdouble&, const GLdouble&, const GLdouble&);
+	void rotate(GLdouble, GLdouble, GLdouble);
 	
 	/**
 	 * Ustawia ogólny kolor obiektu.
@@ -101,7 +101,7 @@ public:
 	 * @param T Przezroczystość obiektu.
 	 * @return false, jeżeli wartość R, G, B lub A jest większa niż 1 i mniejsza niż 0.
 	 */
-	bool setColor(const GLfloat&, const GLfloat&, const GLfloat&, const GLfloat& = 1.0);
+	bool setColor(GLfloat, GLfloat, GLfloat, GLfloat = 1.0);
 	
 	/**
 	 * Ustawia ogólny kolor obiektu.
@@ -111,7 +111,7 @@ public:
 	 * @param T Przezroczystość obiektu.
 	 * @return false, jeżeli wartość R, G lub B jest większa niż 255 i mniejsza niż 0 lub A jest spoza przedziału <0; 1>.
 	 */
-	bool setColor(const int&, const int&, const int&, const GLfloat& = 1.0);
+	bool setColor(int, int, int, GLfloat = 1.0);
 	
 	/**
 	 * Wczytuje dane obiektu z pliku .obj i .mtl.
@@ -123,7 +123,7 @@ public:
 	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
 	 * @return false, jeżeli cokolwiek poszło nie tak.
 	 */
-	bool loadFromObj(const std::string&, const unsigned&);
+	bool loadFromObj(const std::string&, unsigned);
 	
 	/**
 	 * Ładuje cały obiekt do bufora karty graficznej.
@@ -161,7 +161,7 @@ private:
 	
 	bool __fileExists(const std::string&);
 	
-	void __parseObj(const std::string&, const unsigned&);
+	void __parseObj(const std::string&, unsigned);
 	
 	void __parseMtl(const std::string&);
 	

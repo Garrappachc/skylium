@@ -32,7 +32,7 @@
 
 using namespace std;
 
-FontBase::FontBase(const string &_fontName, const int &_characters) :
+FontBase::FontBase(const string &_fontName, int _characters) :
 		__font(0),
 		__base(0),
 		__characters(_characters) {
@@ -79,7 +79,7 @@ FontBase::~FontBase() {
 }
 
 void
-FontBase::print(const GLfloat &_x, const GLfloat &_y, const string &_text) const {
+FontBase::print(GLfloat _x, GLfloat _y, const string &_text) const {
 	glPushAttrib(GL_LIST_BIT);
 			glListBase(__base - ' ');
 			glRasterPos3f(_x, _y, 0.0f);

@@ -33,7 +33,7 @@ typedef struct Position {
 	
 	Position();
 	Position(const Position&);
-	Position(const GLfloat&, const GLfloat&, const GLfloat&);
+	Position(GLfloat, GLfloat, GLfloat);
 } Position;
 
 typedef struct TexCoords {
@@ -42,7 +42,7 @@ typedef struct TexCoords {
 	
 	TexCoords();
 	TexCoords(const TexCoords&);
-	TexCoords(const GLfloat&, const GLfloat&);
+	TexCoords(GLfloat, GLfloat);
 } TexCoords;
 
 typedef struct Normal {
@@ -52,7 +52,7 @@ typedef struct Normal {
 	
 	Normal();
 	Normal(const Normal&);
-	Normal(const GLfloat&, const GLfloat&, const GLfloat&);
+	Normal(GLfloat, GLfloat, GLfloat);
 } Normal;
 
 

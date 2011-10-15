@@ -50,7 +50,7 @@ Light::Light(const sPosition &_position) :
 		cout << LOG_INFO << "Konstruktor: Light( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ")";
 }
 
-Light::Light(const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) :
+Light::Light(GLfloat _x, GLfloat _y, GLfloat _z) :
 		__working(true),
 		__ambientLight(1.0, 1.0, 1.0, 0.0),
 		__diffuseLight(1.0, 1.0, 1.0, 0.0),

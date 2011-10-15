@@ -59,7 +59,7 @@ public:
 	 * @param z Współrzędna z.
 	 * @param type Typ kamery. FPP | SPHERICAL | TPP
 	 */
-	Camera(const GLdouble&, const GLdouble&, const GLdouble&, const cType& = FPP);
+	Camera(GLdouble, GLdouble, GLdouble, const cType& = FPP);
 	
 	/**
 	 * Destruktor wywala tylko log na ekran.

@@ -33,7 +33,7 @@ Position::Position(const Position &_orig) :
 		y(_orig.y),
 		z(_orig.z) {}
 
-Position::Position(const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) :
+Position::Position(GLfloat _x, GLfloat _y, GLfloat _z) :
 		x(_x),
 		y(_y),
 		z(_z) {}
@@ -46,7 +46,7 @@ TexCoords::TexCoords(const TexCoords &_orig) :
 		u(_orig.u),
 		v(_orig.v) {}
 
-TexCoords::TexCoords(const GLfloat &_u, const GLfloat &_v) :
+TexCoords::TexCoords(GLfloat _u, GLfloat _v) :
 		u(_u),
 		v(_v) {}
 
@@ -60,7 +60,7 @@ Normal::Normal(const Normal &_orig) :
 		y(_orig.y),
 		z(_orig.z) {}
 
-Normal::Normal(const GLfloat &_x, const GLfloat &_y, const GLfloat &_z) :
+Normal::Normal(GLfloat _x, GLfloat _y, GLfloat _z) :
 		x(_x),
 		y(_y),
 		z(_z) {}

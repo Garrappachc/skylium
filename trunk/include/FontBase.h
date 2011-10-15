@@ -33,13 +33,13 @@ class FontBase {
 	
 public:
 	
-	FontBase(const std::string& = "-*-courier-bold-r-normal--14-*-*-*-*-*-*-*", const int& = 96);
+	FontBase(const std::string& = "-*-courier-bold-r-normal--14-*-*-*-*-*-*-*", int = 96);
 	
 	FontBase(const FontBase&);
 	
 	virtual ~FontBase();
 	
-	void print(const GLfloat&, const GLfloat&, const std::string&) const;
+	void print(GLfloat, GLfloat, const std::string&) const;
 	
 private:
 	

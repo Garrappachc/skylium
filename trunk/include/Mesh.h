@@ -85,7 +85,7 @@ public:
 	/**
 	 * Jeżeli true, włącza smooth shading.
 	 */
-	void smooth(const bool& = true);
+	void smooth(bool = true);
 	
 	/**
 	 * Wrzuca do wektora nowy wierzchołek i zwraca jego indeks.
@@ -95,7 +95,7 @@ public:
 	/**
 	 * Wrzuca do wektora nowy indeks.
 	 */
-	void addNewIdx(const int&);
+	void addNewIdx(int);
 	
 	/**
 	 * Ustawia __hasNormals na true.

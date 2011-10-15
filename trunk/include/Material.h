@@ -68,19 +68,19 @@ public:
 	 *		&bump; MATERIAL_DIFFUSE - wartość mDiffuse;
 	 *		&bump; MATERIAL_SPECULAR - wartość mSpecular.
 	 */
-	void loadMaterial(const sColor&, const unsigned&);
+	void loadMaterial(const sColor&, unsigned);
 	
 	/**
 	 * Ustawia parametr mAlpha_.
 	 * @param alpha Przezroczystość ([0; 1]).
 	 */
-	void loadAlpha(const GLfloat&);
+	void loadAlpha(GLfloat);
 	
 	/**
 	 * Ustawia odbicie.
 	 * @param shininess Odbijanie materiału.
 	 */
-	void loadShininess(const GLint&);
+	void loadShininess(GLint);
 	
 	/**
 	 * Sprawdza, czy materiał posiada jakąś teksturę.

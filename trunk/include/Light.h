@@ -49,7 +49,7 @@ public:
 	 * @param y Współrzędna y źródła światła.
 	 * @param z Współrzędna z źródła światła.
 	 */
-	Light(const GLfloat&, const GLfloat&, const GLfloat&);
+	Light(GLfloat, GLfloat, GLfloat);
 	
 	virtual ~Light();
 	

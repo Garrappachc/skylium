@@ -45,7 +45,7 @@ public:
 	 * @param clock Dokładność mierzenia rzasu - SECONDS lub MICROSECONDS.
 	 * @return Czas.
 	 */
-	long long int update(const unsigned&);
+	long long int update(unsigned);
 	
 	/**
 	 * Sprawdza, czy od ostatniego wywołania funkcji minęła określona długość
@@ -54,7 +54,7 @@ public:
 	 * @param clock Dokładność mierzenia czasu - SECONDS lub MICROSECONDS.
 	 * @return True, jeżeli minęło już tyle czasu, w przeciwnym wypadku - false.
 	 */
-	bool passed(const long int&, const unsigned&);
+	bool passed(const long int&, unsigned);
 	
 private:
 	
