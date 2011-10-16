@@ -48,6 +48,8 @@ Object::Object(const string &_name) :
 		 __rot(0, 0, 0),
 		 __scale(1, 1, 1),
 		 __shader(NULL),
+		 __children(0),
+		__childrenIterator(),
 		 __meshes(0),
 		 __meshesIterator(),
 		 __materials(0) {
@@ -62,6 +64,8 @@ Object::Object(const Object &_orig, const string &_name) :
 		__rot(_orig.__rot),
 		__scale(_orig.__scale),
 		__shader(_orig.__shader),
+		__children(0),
+		__childrenIterator(),
 		__meshes(0),
 		__meshesIterator(),
 		__materials(0) {
@@ -82,6 +86,8 @@ Object::~Object() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Destruktor: ~Object(\"" << name << "\")";
 
+	//while (!__children.empty())
+	//	delete __children.back(), __children.pop_back();
 	while (!__meshes.empty())
 		delete __meshes.back(), __meshes.pop_back();
 	while (!__materials.empty())
@@ -113,10 +119,18 @@ Object::show() {
 		
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end())
-			(*__meshesIterator) -> show(), __meshesIterator++;
+			(*__meshesIterator) -> show(), ++__meshesIterator;
+		
+		if (!__children.empty()) {
+			__childrenIterator = __children.begin();
+			while (__childrenIterator != __children.end())
+				(*__childrenIterator) -> show(), ++__childrenIterator;
+		}
 		
 		if (__shader)
 			__shader -> toggle();
+		
+		__wasShown = true;
 		
 	glPopMatrix();
 	checkGLErrors(AT);
@@ -199,6 +213,11 @@ Object::getMaterialByName(const string &_name) {
 			return __materials[i];
 	}
 	return (Material*)0;
+}
+
+void
+Object::addChild(Object* _childPtr) {
+	__children.push_back(_childPtr);
 }
 
 void

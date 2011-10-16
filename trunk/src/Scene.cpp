@@ -81,16 +81,22 @@ Scene::show() {
 	__setLights();
 	
 	__setObjects();
+	
+	__endFrame();
 }
 
 Object *
-Scene::createObject(const string &_name, const Object *_orig) {
+Scene::createObject(const string &_name, const Object *_orig, Object *_parent) {
 	Object *newObject;
 	if (_orig == NULL) // wartość domyślna
 		newObject = new Object(_name);
 	else {
 		newObject = new Object(*_orig, _name);
 	}
+	
+	if (_parent != NULL)
+		_parent -> addChild(newObject);
+	
 	__objectList.push_back(newObject);
 	return newObject;
 }
@@ -273,7 +279,8 @@ Scene::__setObjects() {
 	
 	__objectIterator = __objectList.begin();
 	while(__objectIterator != __objectList.end()) {
-		(*__objectIterator) -> show();
+		if (!(*__objectIterator) -> wasShown())
+			(*__objectIterator) -> show();
 		__objectIterator++;
 	}
 }
@@ -302,4 +309,11 @@ Scene::__setLights() {
 		__lightIterator++;
 	}
 	
+}
+
+void
+Scene::__endFrame() {
+	__objectIterator = __objectList.begin();
+	while (__objectIterator != __objectList.end())
+		(*__objectIterator) -> endFrame(), __objectIterator++;
 }

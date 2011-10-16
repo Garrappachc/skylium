@@ -21,8 +21,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __NO_OBJECT_MANAGEMENT__
-
 #ifndef OBJECT_H
 #define OBJECT_H
 
@@ -60,7 +58,7 @@ public:
 	Object(const Object&, const std::string& = "");
 	
 	/**
-	 * Niszczy wszystkie meshe oraz materiały.
+	 * Niszczy wszystkie dzieci, meshe oraz materiały.
 	 */
 	virtual ~Object();
 	
@@ -137,6 +135,22 @@ public:
 	 */
 	Material * getMaterialByName(const std::string&);
 	
+	/**
+	 * Dodaje wskaźnik na dany obiekt do wektora dzieci.
+	 * @param childPtr Wskaźnik na dziecko.
+	 */
+	void addChild(Object*);
+	
+	/**
+	 * @return True, jeżeli obiekt został już wyrenderowany.
+	 */
+	bool wasShown() { return __wasShown; }
+	
+	/**
+	 * Ustawia __wasShown na false. Funkcja wywoływana przez Scene pod koniec renderowania każdej ramki.
+	 */
+	void endFrame() { __wasShown = false; }
+	
 	std::string name;
 	
 protected:
@@ -151,7 +165,14 @@ protected:
 	
 	Shader * __shader;
 	
+	bool __wasShown;
+	
 private:
+	
+	/* Wektor wskaźników na dzieci obiektu. */
+	std::vector< Object* > __children;
+	
+	std::vector< Object* >::const_iterator __childrenIterator;
 	
 	std::vector< Mesh* > __meshes;
 	
@@ -170,4 +191,3 @@ private:
 };
 
 #endif // OBJECT_H
-#endif // __NO_OBJECT_MANAGEMENT__

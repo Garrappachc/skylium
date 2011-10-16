@@ -59,9 +59,10 @@ public:
 	 * Tworzy nowy obiekt o podanej nazwie i zwraca wskaźnik do niego.
 	 * @param name Nazwa nowego obiektu.
 	 * @param orig Wskaźnik na obiekt, który ma zostać skopiowany.
+	 * @param parent Wskaźnik na obiekt, który ma być rodzicem.
 	 * @return Wskaźnik do nowo utworzonego obiektu.
 	 */
-	Object * createObject(const std::string&, const Object* = (Object*)NULL);
+	Object * createObject(const std::string&, const Object* = (Object*)NULL, Object* = (Object*)NULL);
 	
 	/**
 	 * Przeczesuje wektor w poszukiwaniu obiektu o zadanej nazwie.
@@ -199,7 +200,11 @@ private:
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glLight.xml */
 	void __setLights();
 	
-	/* Wektor obiektów, które przynależą do sceny */
+	/* Kończy renderowanie ramki, ustawia wasShown = false
+	 * dla wszystkich obiektów. */
+	void __endFrame();
+	
+	/* Wektor obiektów - rodziców, które przynależą do sceny.*/
 	std::vector< Object* > __objectList;
 	
 	/* Iterator po wszystkich obiektach.
