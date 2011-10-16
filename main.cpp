@@ -31,7 +31,7 @@ main() {
 		exit(1);
 	
 	surface -> move(-6, -2.65, -10);
-	surface -> scale(2, 2, 2);
+	surface -> scale(4, 4, 4);
 	
 	// we crate the larger surface
 	for (int k = 0; k < 5; k++ ) {
@@ -40,7 +40,7 @@ main() {
 			temp << (int)((i+2) + k * 5);
 			string str = "surface_" + temp.str();
 			Object *surface_new = scenka -> createObject(str, surface);
-			surface_new -> move(6*i, 0, 6*k);
+			surface_new -> move(10*i, 0, 10*k);
 		}
 	}
 	
