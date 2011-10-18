@@ -27,6 +27,8 @@
 #include <iostream>
 #include <cstring>
 
+#include <assert.h>
+
 template < typename T, int N >
 class sMatrix {
 	
@@ -35,19 +37,13 @@ private:
 	
 public:
 	sMatrix() {
-		memset(__data, 0, N * sizeof(T));
+		memset(__data, 0, N * N * sizeof(T));
 	}
 	
-	sMatrix(const T *_orig) {
-		memcpy(__data, _orig, N * sizeof(T));
-	}
+	// Let the GCC make the copy ctor
+	sMatrix(const sMatrix< T, N >&) = default;
 	
-	T & operator =(const sMatrix< T, N > &_orig) {
-		if (_orig != *this)
-			for (int i = 0; i < N; i++)
-				__data[i] = _orig[i];
-		return *__data;
-	}
+	sMatrix< T, N> & operator =(const sMatrix< T, N >&) = default;
 	
 	operator T*() {
 		return __data;
@@ -59,36 +55,32 @@ public:
 	
 	operator T**() {
 		T** ptr = new T*[N];
-		for (int i = 0; i < N; i++)
-			ptr[i] = &__data[N * i];
+			for (int i = 0; i < N; i++)
+				ptr[i] = &__data[N * i];
 		return ptr;
 	}
 	
 	operator const T**() const {
 		const T** ptr = new const T*[N];
-		for (int i = 0; i < N; i++)
-			ptr[i] = &__data[N * i];
+			for (int i = 0; i < N; i++)
+				ptr[i] = &__data[N * i];
 		return ptr;
 	}
 	
 	T& operator [](int _pos) {
+		assert(_pos < N*N);
 		return __data[_pos];
 	}
 	
 	const T& operator [](int _pos) const {
+		assert(_pos < N*N);
 		return __data[_pos];
 	}
 	
 	void loadIdentity() {
-		int k = 0;
-		for (int i = 0; i < N * N; ++i) {
-			if ((i - k) % N == 0)
-				__data[i] = 1;
-			else
-				__data[i] = 0;
-			if ((i + 1) % N == 0)
-				++k;
-		}
+		memset(__data, 0, N * N * sizeof(T));
+		for (int i = 0; i < N; ++i)
+			__data[i * N + i] = 1;
 	}
 	
 	friend std::ostream& operator <<(std::ostream &_result, sMatrix< T, N > &_orig) {
