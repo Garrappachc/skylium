@@ -1,9 +1,10 @@
 /*
-        _      __ _               _    
-     __| |___ / _(_)_ _  ___ ___ | |_  
-    / _` / -_)  _| | ' \/ -_|_-<_| ' \ 
-    \__,_\___|_| |_|_||_\___/__(_)_||_|
-
+	 _                   _      __  _    
+	| |_____ _  _ ___ __| |___ / _|| |_  
+	| / / -_) || (_-</ _` / -_)  _|| ' \ 
+	|_\_\___|\_, /__/\__,_\___|_|(_)_||_|
+	         |__/                                
+             
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -20,11 +21,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DEFINES_H
-#define DEFINES_H
+#ifndef KEYSDEF_H
+#define KEYSDEF_H
 
-#define LOG_INFO "\n\e[36m(II)\e[0m "
-#define LOG_ERROR "\n\e[31m(EE)\e[0m "
-#define LOG_WARN "\n\e[33m(WW)\e[0m "
+/* Obsługa klawiszy */
+typedef enum {
+	KEY_NOKEY = 0,
+	KEY_ESC,
+	KEY_UP,
+	KEY_DOWN,
+	KEY_RIGHT,
+	KEY_LEFT,
+	KEY_TAB,
+	KEY_X,
+	KEY_Z,
+	KEY_F1,
+	KEY_F2,
+	KEY_BACKQUOTE
+} sKey;
 
-#endif  /* DEFINES_H */
+#endif

@@ -27,6 +27,7 @@
 #include <GL/glu.h>
 
 #include "Vectors.h"
+#include "Matrices.h"
 
 /* Typy kamer */
 typedef enum {
@@ -121,6 +122,16 @@ public:
 	 * @return Współrzędne center.
 	 */
 	sVector getCenter();
+	
+	/**
+	 * @return Macierz ModelView.
+	 */
+	sMat16 getModelViewMatrix() { return __modelViewMatrix; }
+	
+	/**
+	 * @return Macierz projekcji.
+	 */
+	sMat16 getProjectionMatrix() { return __projectionMatrix; }
 
 
 private:
@@ -146,6 +157,12 @@ private:
 	
 	/* Kąt, pod którym kamera znajduje się w stosunku do osi -z i osi y */
 	sVector __angle;
+	
+	/* Macierz ModelView */
+	sMat16 __modelViewMatrix;
+	
+	/* Macierz Projection */
+	sMat16 __projectionMatrix;
 	
 	/* Przyda się przy setOrtho() */
 	int __windowHeight;
