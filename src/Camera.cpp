@@ -77,12 +77,18 @@ Camera::setProjection() {
 	__windowHeight = Skylium::GetSingletonPtr() -> getContextPtr() -> winHeight;
 	glMatrixMode(GL_PROJECTION);
 	checkGLErrors(AT);
+	
 	glLoadIdentity();
 	checkGLErrors(AT);
 	GLdouble aspect = (GLdouble) __windowWidth / __windowHeight;
 	glViewport(0, 0, __windowWidth, __windowHeight);
 	checkGLErrors(AT);
+	
 	gluPerspective(__fovy, aspect, __zNear, __zFar);
+	checkGLErrors(AT);
+	
+	// pobieramy macierz ModelView
+	glGetFloatv(GL_MODELVIEW_MATRIX, __modelViewMatrix);
 	checkGLErrors(AT);
 }
 
@@ -105,6 +111,10 @@ Camera::setView() {
 				__up.x, __up.y, __up.z
 			);
 	}
+	checkGLErrors(AT);
+	
+	// uaktualniamy macierz projekcji
+	glGetFloatv(GL_PROJECTION_MATRIX, __projectionMatrix);
 	checkGLErrors(AT);
 }
 
