@@ -57,6 +57,20 @@ public:
 		return __data;
 	}
 	
+	operator T**() {
+		T** ptr = new T*[N];
+		for (int i = 0; i < N; i++)
+			ptr[i] = &__data[N * i];
+		return ptr;
+	}
+	
+	operator const T**() const {
+		const T** ptr = new const T*[N];
+		for (int i = 0; i < N; i++)
+			ptr[i] = &__data[N * i];
+		return ptr;
+	}
+	
 	T& operator [](int _pos) {
 		return __data[_pos];
 	}
