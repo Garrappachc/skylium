@@ -35,7 +35,8 @@ using namespace std;
 
 Hud::Hud() :
 		__visible(false),
-		__toDisplay(0) {
+		__toDisplay(0),
+		__background(1.0f, 0.0f, 0.0f, 0.6f) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Konstruktor: Hud()";
 }
@@ -50,7 +51,7 @@ Hud::draw() {
 	// włączamy Hud Mode
 	__hudMode(true);
 	
-	glColor4f(1.0f, 0.0f, 0.0f, 0.6f);
+	glColor4f(__background.r, __background.g, __background.b, __background.a);
 	glBegin(GL_QUADS);
 		glVertex2f(-0.8, 1.0);
 		glVertex2f(-0.8, 0.6);
