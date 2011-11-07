@@ -27,17 +27,17 @@
 /* Obsługa klawiszy */
 typedef enum {
 	KEY_NOKEY = 0,
-	KEY_ESC,
-	KEY_UP,
-	KEY_DOWN,
-	KEY_RIGHT,
-	KEY_LEFT,
-	KEY_TAB,
-	KEY_X,
-	KEY_Z,
-	KEY_F1,
-	KEY_F2,
-	KEY_BACKQUOTE
+	
+	KEY_Esc, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9,
+		KEY_F10, KEY_F11, KEY_F12,
+	
+	KEY_backquote, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0,
+	
+	KEY_Tab, KEY_q, KEY_w, KEY_e, KEY_r, KEY_t, KEY_y, KEY_u, KEY_i, KEY_o, KEY_p,
+	KEY_a, KEY_s, KEY_d, KEY_f, KEY_g, KEY_h, KEY_j, KEY_k, KEY_l,
+	KEY_z, KEY_x, KEY_c, KEY_v, KEY_b, KEY_n, KEY_m,
+															 KEY_UP,
+				KEY_Space,							KEY_LEFT, KEY_DOWN, KEY_RIGHT,
 } sKey;
 
 #endif

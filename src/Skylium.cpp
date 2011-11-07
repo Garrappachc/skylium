@@ -37,6 +37,7 @@
 #include "../include/defines.h"
 #include "../include/config.h"
 #include "../include/utils.h"
+#include "../include/keysfunc.h"
 
 using namespace std;
 
@@ -354,7 +355,9 @@ Skylium::__catchEvents() {
 		
 		switch (xev.type) {
 			case  KeyPress:
-				switch(XLookupKeysym(&xev.xkey, 0)) {
+				doYourJob(XLookupKeysym(&xev.xkey, 0), __pendingKeys);
+				
+				/*switch(XLookupKeysym(&xev.xkey, 0)) {
 					case XK_Escape:
 						__pendingKeys = KEY_ESC;
 						break;
@@ -391,6 +394,7 @@ Skylium::__catchEvents() {
 					default:
 						break;
 				}
+				*/
 				break;
 			case MotionNotify:
 				if (__isMouseMotionEnabled) {
