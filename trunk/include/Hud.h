@@ -67,6 +67,8 @@ public:
 	
 	void attachData(HudData*);
 	
+	void setColor(const sColor& _c) { __background = _c; }
+	
 private:
 	
 	/**
@@ -81,6 +83,8 @@ private:
 	std::vector< HudData* > __toDisplay;
 	
 	std::vector< HudData* >::const_iterator __displayList;
+	
+	sColor __background;
 	
 };
 

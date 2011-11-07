@@ -98,6 +98,8 @@ main() {
 	s_main -> TheHud -> attachData(&cameraCenter);
 	sVector camCenter;
 	
+	s_main -> TheHud -> setColor(sColor(0.0f, 0.0f, 1.0f, 0.5f));
+	
 	
 	short fps = 0; // licznik fps.
 	
