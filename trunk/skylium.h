@@ -47,6 +47,8 @@
 
 /* Other includes */
 #include <skylium/config.h>
+#include <skylium/keysdef.h>
+#include <skylium/keysfunc.h>
 #include <skylium/defines.h>
 #include <skylium/utils.h>
 

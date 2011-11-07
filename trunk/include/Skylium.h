@@ -34,21 +34,7 @@
 #include "Shader.h"
 #include "Hud.h"
 
-/* Obsługa klawiszy */
-typedef enum {
-	KEY_NOKEY = 0,
-	KEY_ESC = 1,
-	KEY_UP = 2,
-	KEY_DOWN = 4,
-	KEY_RIGHT = 8,
-	KEY_LEFT = 16,
-	KEY_TAB = 32,
-	KEY_X = 64,
-	KEY_Z = 128,
-	KEY_F1 = 256,
-	KEY_F2 = 512,
-	KEY_BACKQUOTE = 1024
-} sKey;
+#include "keysdef.h"
 
 /* Róże typy shaderów */
 enum {

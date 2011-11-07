@@ -106,18 +106,18 @@ main() {
 	s_main -> toggleMouseCamera(); // Ha! Włączamy obracanie kamerą za pomocą myszy
 	
 	sKey klawisz; // tutaj przechwytujemy klawisze
-	while ((klawisz = s_main -> sEvent()) != KEY_ESC) { // żeby się dało czymś wyjść
-		if (klawisz == KEY_DOWN)
-			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, -0.1); // KEY_DOWN to nie kursor w dół, tylko S
-		if (klawisz == KEY_UP)
-			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, 0.1); // W
-		if (klawisz == KEY_RIGHT)
-			scenka -> getActiveCamera() -> moveCamera(0.1, 0.0, 0.0); // A
-		if (klawisz == KEY_LEFT)
-			scenka -> getActiveCamera() -> moveCamera(-0.1, 0.0, 0.0); // D
-		if (klawisz == KEY_Z)
+	while ((klawisz = s_main -> sEvent()) != KEY_Esc) { // żeby się dało czymś wyjść
+		if (klawisz == KEY_s)
+			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, -0.1);
+		if (klawisz == KEY_w)
+			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, 0.1);
+		if (klawisz == KEY_d)
+			scenka -> getActiveCamera() -> moveCamera(0.1, 0.0, 0.0);
+		if (klawisz == KEY_a)
+			scenka -> getActiveCamera() -> moveCamera(-0.1, 0.0, 0.0);
+		if (klawisz == KEY_z)
  			scenka -> getActiveCamera() -> moveCamera(0.0, -0.7, 0.0);
-		if (klawisz == KEY_X)
+		if (klawisz == KEY_x)
 			scenka -> getActiveCamera() -> moveCamera(0.0, 0.7, 0.0);
 		if (klawisz == KEY_F1) {
 			scenka -> setActiveCamera(kamerka_fpp);
@@ -127,9 +127,9 @@ main() {
 			scenka -> setActiveCamera(kamerka_kula);
 			cameraInfo.text = "Camera: SPHERICAL";
 		}
-		if (klawisz == KEY_BACKQUOTE && zegarek_dla_huda -> passed(250000, MICROSECONDS))
+		if (klawisz == KEY_backquote && zegarek_dla_huda -> passed(250000, MICROSECONDS))
 			s_main -> TheHud -> toggle();
-		if (klawisz == KEY_TAB && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
+		if (klawisz == KEY_Tab && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
 			if (cienie -> isBound(malpka))
