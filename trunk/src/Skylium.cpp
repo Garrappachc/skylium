@@ -356,45 +356,6 @@ Skylium::__catchEvents() {
 		switch (xev.type) {
 			case  KeyPress:
 				doYourJob(XLookupKeysym(&xev.xkey, 0), __pendingKeys);
-				
-				/*switch(XLookupKeysym(&xev.xkey, 0)) {
-					case XK_Escape:
-						__pendingKeys = KEY_ESC;
-						break;
-					case XK_w:
-						__pendingKeys = KEY_UP;
-						break;
-					case XK_s:
-						__pendingKeys = KEY_DOWN;
-						break;
-					case XK_a:
-						__pendingKeys = KEY_LEFT;
-						break;
-					case XK_d:
-						__pendingKeys = KEY_RIGHT;
-						break;
-					case XK_Tab:
-						__pendingKeys = KEY_TAB;
-						break;
-					case XK_x:
-						__pendingKeys = KEY_X;
-						break;
-					case XK_z:
-						__pendingKeys = KEY_Z;
-						break;
-					case XK_F1:
-						__pendingKeys = KEY_F1;
-						break;
-					case XK_F2:
-						__pendingKeys = KEY_F2;
-						break;
-					case XK_quoteleft:
-						__pendingKeys = KEY_BACKQUOTE;
-						break;
-					default:
-						break;
-				}
-				*/
 				break;
 			case MotionNotify:
 				if (__isMouseMotionEnabled) {
