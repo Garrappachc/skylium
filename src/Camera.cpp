@@ -45,7 +45,8 @@ Camera::Camera(const cType &_type) :
 		__zFar(200.0),
 		__eye(0, 0, 0),
 		__center(0, 0, 0),
-		__up(0, 1, 0) {
+		__up(0, 1, 0),
+		__range(20) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Konstruktor: Camera()";
 }
@@ -57,7 +58,8 @@ Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
 		__zFar(200.0),
 		__eye(_x, _y, _z),
 		__center(0, 0, 0),
-		__up(0, 1, 0) {
+		__up(0, 1, 0),
+		__range(20) {
 	if (__type == SPHERICAL) {
 		__eye.normalize();
 		__eye *= 20;
@@ -106,7 +108,7 @@ Camera::setView() {
 			);
 	} else if (__type == SPHERICAL) {
 		gluLookAt(
-				(__eye.x + __center.x), (__eye.y + __center.y), (__eye.z + __center.z),
+				((__eye.x * __range) + __center.x), ((__eye.y * __range) + __center.y), ((__eye.z * __range) + __center.z),
 				__center.x, __center.y, __center.z,
 				__up.x, __up.y, __up.z
 			);
@@ -163,7 +165,6 @@ Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
 		__eye.z = cos(__angle.y) * cos(__angle.x - 90);
 		
 		__eye.normalize();
-		__eye *= 20;
 	}
 }
 

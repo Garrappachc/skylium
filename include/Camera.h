@@ -112,6 +112,12 @@ public:
 	void lookAt(GLdouble, GLdouble, GLdouble);
 	
 	/**
+	 * Ustawia promień sfery, po której porusa się kamera w trybie SPHERICAL.
+	 * @param range Promień.
+	 */
+	void setRange(GLdouble _range) { __range = _range; }
+	
+	/**
 	 * Zwraca punkt __eye, odpowiednio przeliczony (na gluLookAt).
 	 * @return Współrzędne eye.
 	 */
@@ -122,6 +128,12 @@ public:
 	 * @return Współrzędne center.
 	 */
 	sVector getCenter();
+	
+	/**
+	 * Zwraca promień sfery, po której porusza się kamera w trybie SPHERICAL.
+	 * @return Promień.
+	 */
+	GLdouble getRange() { return __range; }
 	
 	/**
 	 * @return Macierz ModelView.
@@ -157,6 +169,9 @@ private:
 	
 	/* Kąt, pod którym kamera znajduje się w stosunku do osi -z i osi y */
 	sVector __angle;
+	
+	/* Promień sfery, po której porusza się kamera w trybie SPHERICAL. */
+	GLdouble __range;
 	
 	/* Macierz ModelView */
 	sMat16 __modelViewMatrix;
