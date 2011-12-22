@@ -29,19 +29,19 @@
 #include "Vectors.h"
 #include "Matrices.h"
 
-/* Typy kamer */
+/* Cameras types */
 typedef enum {
-	FPP		= 1,	// z widoku pierwszej osoby, myszką ruszamy punkt "lookAt"
-	TPP,			// z góry
-	SPHERICAL		// z widoku pierwszej osoby, myszką ruszamy punkt "eye"
+	FPP		= 1,	// First Person Perspective, moves the "lookAt" point
+	TPP,			// up
+	SPHERICAL		// First Person Perspective, moves the "eye" point
 } cType;
 
+
 /**
- * UWAGA.
- * Co do obrotu i ruchu kamery.
- * W trybie FPP __center jest _wektorem_, nie punktem na który ma patrzeć kamera.
- * Jest to wektor znormalizowany, który określa punkt lookAt w stosunku do punktu (0, 0, 0).
- * Dlatego przy wywoływaniu gluLookAt(...), jako center określamy __center + __eye.
+ * WARNING
+ * In the FPP camera __center is a vector, not the "lookAt" point.
+ * It is normalized vector, which specifies the "lookAt" for the (0,0,0) observer.
+ * That is why gluLookAt(..) is being called with center as __center + __eye.
  */
 
 class Camera {
@@ -49,28 +49,28 @@ class Camera {
 public:
 	
 	/**
-	 * Konstruktor domyślny. Kamera FPP w pozycji (0, 0, 0).
+	 * Default ctor, camera in (0,0,0) position.
 	 */
 	Camera(const cType& = FPP);
 	
 	/**
-	 * Konstruktor, który jako parametry przyjmuje współrzędne położenia kamery.
-	 * @param x Współrzędna x.
-	 * @param y Współrzędna y.
-	 * @param z Współrzędna z.
-	 * @param type Typ kamery. FPP | SPHERICAL | TPP
+	 * Ctor that gets camera's location coords.
+	 * @param x X coord.
+	 * @param y Y coord.
+	 * @param z Z coord.
+	 * @param type Camera type. FPP, TPP, SPHERICAL
 	 */
 	Camera(GLdouble, GLdouble, GLdouble, const cType& = FPP);
 	
 	/**
-	 * Destruktor wywala tylko log na ekran.
+	 * Destructor just sends some output.
 	 */
 	virtual ~Camera();
 	
 	/**
 	 * GL_PROJECTION;
 	 * gluPerspective.
-	 * Tylko w razie zmiany parametrów.
+	 * Called only when parameters change.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml
 	 * http://www.felixgers.de/teaching/jogl/gluPerspective.gif
 	 */
@@ -79,76 +79,71 @@ public:
 	/**
 	 * GL_MODELVIEW;
 	 * gluLookAt.
-	 * Tylko w razie zmiany parametrów.
+	 * Called only when parameters change.
 	 * http://pyopengl.sourceforge.net/documentation/manual/gluLookAt.3G.html
 	 * http://www.toldo.info/roberto/LaboratorioGrafica/Slides/images/glulookat.gif
 	 */
 	void setView();
 
 	/**
-	 * Przesuwa kamerę o podane wartości, w trybie 2D.
-	 * @param movX oś X;
-	 * @param movY oś Y;
-	 * @param movZ oś Z.
+	 * Moves camera, 2-dimensional movement.
+	 * @param movX X axis.
+	 * @param movY Y axis.
+	 * @param movZ Z axis.
 	 */
 	void moveCamera(GLdouble, GLdouble, GLdouble);
 
 	/**
-	 * Obraca kamerę w jednym miejscu - obsługa myszy.
-	 * @param x;
-	 * @param y;
-	 * @param z.
+	 * Rotates the camera - mouse support.
+	 * @param x X rotation.
+	 * @param y Y rotation.
+	 * @param z Z rotation.
 	 */
 	void rotateCamera(GLdouble, GLdouble, GLdouble);
 
 	/**
-	 * Ustawia punkt, na który patrzy się kamera.
-	 * Jako argument przyjmuje albo trzy GLdouble, które definiują punkt (x, y, z),
-	 * albo tablicę GLdouble (p[0], p[1], p[2]).
-	 * @param x Pozycja X.
-	 * @param y Pozycja Y.
-	 * @param z Pozycja Z.
+	 * Sets the "lookAt" point.
+	 * @param x X coord.
+	 * @param y Y coord.
+	 * @param z Z coord.
 	 */
 	void lookAt(GLdouble, GLdouble, GLdouble);
 	
 	/**
-	 * Ustawia promień sfery, po której porusa się kamera w trybie SPHERICAL.
-	 * @param range Promień.
+	 * Sets camera range in SPHERICAL mode.
+	 * @param range Range.
 	 */
 	void setRange(GLdouble _range) { __range = _range; }
 	
 	/**
-	 * Zwraca punkt __eye, odpowiednio przeliczony (na gluLookAt).
-	 * @return Współrzędne eye.
+	 * @return The __eye's coords.
 	 */
 	sVector getEye();
 	
 	/**
-	 * Zwraca punkt __center, odpowiednio przeliczony (na gluLookAt).
-	 * @return Współrzędne center.
+	 * @return The __center's coords.
 	 */
 	sVector getCenter();
 	
 	/**
-	 * Zwraca promień sfery, po której porusza się kamera w trybie SPHERICAL.
-	 * @return Promień.
+	 * @return Range.
 	 */
 	GLdouble getRange() { return __range; }
 	
 	/**
-	 * @return Macierz ModelView.
+	 * @return ModelView Matrix.
 	 */
 	sMat16 getModelViewMatrix() { return __modelViewMatrix; }
 	
 	/**
-	 * @return Macierz projekcji.
+	 * @return Projection Matrix.
 	 */
 	sMat16 getProjectionMatrix() { return __projectionMatrix; }
 
 
 private:
 	
-	/* Typ kamery */
+	/* Camera type */
 	cType __type;
 	
 	/*** setProjection ***/
@@ -158,28 +153,28 @@ private:
 
 	/*** setView ***/
 	
-	/* Punkt, w którym znajduje się kamera */
+	/* Camera's position */
 	sVector __eye;
 
-	/* Punkt, na który patrzy się kamera */
+	/* LookAt position/vector */
 	sVector __center;
 
-	/* Wektor zmiany kierunku patrzenia kamery */
+	/* Up vector, (0, 1, 0) by  default */
 	sVector __up;
 	
-	/* Kąt, pod którym kamera znajduje się w stosunku do osi -z i osi y */
+	/* Angle of the camera */
 	sVector __angle;
 	
-	/* Promień sfery, po której porusza się kamera w trybie SPHERICAL. */
+	/* Range of the SPHERICAL camera type */
 	GLdouble __range;
 	
-	/* Macierz ModelView */
+	/* ModelView Matrix */
 	sMat16 __modelViewMatrix;
 	
-	/* Macierz Projection */
+	/* Projection Matrix */
 	sMat16 __projectionMatrix;
 	
-	/* Przyda się przy setOrtho() */
+	/* Window dimensions */
 	int __windowHeight;
 	int __windowWidth;
 };
