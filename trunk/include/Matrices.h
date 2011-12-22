@@ -53,20 +53,6 @@ public:
 		return __data;
 	}
 	
-	operator T**() {
-		T** ptr = new T*[N];
-			for (int i = 0; i < N; i++)
-				ptr[i] = &__data[N * i];
-		return ptr;
-	}
-	
-	operator const T**() const {
-		const T** ptr = new const T*[N];
-			for (int i = 0; i < N; i++)
-				ptr[i] = &__data[N * i];
-		return ptr;
-	}
-	
 	T& operator [](int _pos) {
 		assert(_pos < N*N);
 		return __data[_pos];
@@ -77,13 +63,17 @@ public:
 		return __data[_pos];
 	}
 	
+	T& at(int _a, int _b) {
+		return __data[_a * N + _b];
+	}
+	
 	void loadIdentity() {
 		memset(__data, 0, N * N * sizeof(T));
 		for (int i = 0; i < N; ++i)
 			__data[i * N + i] = 1;
 	}
 	
-	friend std::ostream& operator <<(std::ostream &_result, sMatrix< T, N > &_orig) {
+	friend std::ostream& operator <<(std::ostream& _result, sMatrix< T, N >& _orig) {
 		int k = 0;
 		for (int i = 0; i < N * N; ++i, ++k) {
 			_result << _orig[i] << "\t";
@@ -93,6 +83,17 @@ public:
 			}
 		}
 		return _result;
+	}
+	
+	friend sMatrix< T, N > operator *(const sMatrix< T, N >& _a, const sMatrix< T, N >& _b) {
+		sMatrix< T, N > result;
+		for (int i = 0; i < N; ++i)
+			for (int j = 0; j < N; ++j) 
+				for (int idx = 0; idx < N; ++idx)
+					result.at(i, j) += _a.at(i, idx) * _b.at(idx, j);
+		
+		
+		return result;	
 	}
 	
 	

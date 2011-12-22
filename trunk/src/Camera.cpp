@@ -89,7 +89,7 @@ Camera::setProjection() {
 	gluPerspective(__fovy, aspect, __zNear, __zFar);
 	checkGLErrors(AT);
 	
-	// pobieramy macierz ModelView
+	// get the ModelView matrix
 	glGetFloatv(GL_MODELVIEW_MATRIX, __modelViewMatrix);
 	checkGLErrors(AT);
 }
@@ -115,7 +115,7 @@ Camera::setView() {
 	}
 	checkGLErrors(AT);
 	
-	// uaktualniamy macierz projekcji
+	// update the Projection matrix
 	glGetFloatv(GL_PROJECTION_MATRIX, __projectionMatrix);
 	checkGLErrors(AT);
 }
@@ -140,18 +140,17 @@ Camera::moveCamera(GLdouble movX, GLdouble movY, GLdouble movZ) {
 void
 Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
 	if (__type == FPP) {
-		/* Apdejtujemy nasz kąt */
+		/* Update the angle */
 		__angle.x -= (GLdouble)(_x / 100);
 		__angle.y += (GLdouble)(_y / 200);
 	
-		// nie chcemy wyjść poza zakres
 		if (__angle.y > 90 * PIdiv180) __angle.y = 90 * PIdiv180;
 		else if (__angle.y < -90 * PIdiv180) __angle.y = -90 * PIdiv180;
 	
-		// podnosimy nasz wektor do góry
+		// vector up
 		__center.y = sin(__angle.y);
 	
-		/* Obliczamy nową pozycję na płaszczyźnie x-z */
+		// count new position on x-z
 		__center.x = cos(__angle.x - 90);
 		__center.z = sin(__angle.x - 90);
 	
