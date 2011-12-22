@@ -33,14 +33,27 @@ fullscreen false
 hud_exists true
 }}}
 </li>
-<li> *enable_key_repeat* - if true, keeping key pressed will be interpreted as many single presses. Default:
-{{{
-enable_key_repeat true
-}}}
-</li>
 <li> *mouse_visible* - if true, the mouse pointer will be showed - useful in debugging. Default:
 {{{
 mouse_visible true
+}}}
+</li>
+<li> *gl_size* - minimum size of each buffer for the Skylium to be started. If the graphics card does not support that many bytes, Skylium won't start. Otherwise, OpenGL will use as many bytes as the graphics card supports.
+{{{
+gl_red_size 8
+gl_green_size 8
+gl_blue_size 8
+gl_depth_size 24
+}}}
+</li>
+<li> *opengl_version* - defines the OpenGL version to be initialized. Note, that versions >2.1 are not supported really well yet - Skylium will work, but using some deprecated functions.
+{{{
+opengl_version 2 1
+}}}
+</li>
+<li> *create_mipmaps* - if true, Skylium will generate mipmaps.
+{{{
+create_mipmaps true
 }}}
 </li>
 </ul>
