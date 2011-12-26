@@ -21,8 +21,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __NO_LIGHTING_MANAGEMENT__
-
 #ifndef LIGHT_H
 #define LIGHT_H
 
@@ -32,54 +30,68 @@ class Scene;
 
 class Light {
 	
-	friend class Scene; // coby prościej było
+	friend class Scene;
 	
 public:
+	/**
+	 * Default ctor, (0, 0, 0).
+	 */
 	Light();
 
 	/**
-	 * Konstruktor, który przyjmuje położenie źródła światła w postaci sVec3D.
-	 * @param pos Położenie źródła światła.
+	 * Ctor that gets the light's source in sVector format.
+	 * @param pos Position of the light's source.
 	 */
 	Light(const sPosition&);
 
 	/**
-	 * Konstruktor, który przyjmuje położenie źródła światła w postaci x, y, z.
-	 * @param x Współrzędna x źródła światła.
-	 * @param y Współrzędna y źródła światła.
-	 * @param z Współrzędna z źródła światła.
+	 * Ctor that gets light source in (x, y, z) format.
+	 * @param x Light source's X coord.
+	 * @param y Y coord.
+	 * @param z Z coord.
 	 */
 	Light(GLfloat, GLfloat, GLfloat);
 	
+	/**
+	 * Just some output.
+	 */
 	virtual ~Light();
 	
+	/**
+	 * Sets lights colours.
+	 * @param col Colour.
+	 */
 	void setAmbient(const sColor&);
-	
 	void setDiffuse(const sColor&);
-	
 	void setSpecular(const sColor&);
 	
+	/**
+	 * Sets light source's position.
+	 * @param pos Position in (x, y, z).
+	 */
 	void setSrcPos(const sPosition&);
 	
+	/**
+	 * Light on/off
+	 */
 	void toggle();
 	
 private:
 	
-	/* Czy światło jest aktualnie włączone? */
+	/* Is light on? */
 	bool __working;
 
-	/* Światło otoczenia */
+	/* Ambient light */
 	sColor __ambientLight;
 
-	/* Swiatło rozproszone */
+	/* Diffuse light */
 	sColor __diffuseLight;
 
-	/* Swiatło odbite */
+	/* Specular light */
 	sColor __specularLight;
 
-	/* Definujemy położenie żródła światła */
+	/* Light source's position */
 	sVec3D < GLfloat > __lightSrc;
 
 };
 #endif // LIGHT_H
-#endif // __NO_LIGHTING_MANAGEMENT__

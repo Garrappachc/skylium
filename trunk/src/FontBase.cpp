@@ -37,9 +37,9 @@ FontBase::FontBase(const string &_fontName, int _characters) :
 		__base(0),
 		__characters(_characters) {
 	Display *dpy = Skylium::GetSingletonPtr() -> getContextPtr() -> display;
-	XFontStruct *fontInfo; // info o nowej czcionce
+	XFontStruct *fontInfo;
 	
-	/* Miejsce na 96 znaków */
+	/* Room for 96 signs */
 	__base = glGenLists(__characters);
 	checkGLErrors(AT);
 	
@@ -47,15 +47,15 @@ FontBase::FontBase(const string &_fontName, int _characters) :
 	
 	if (fontInfo == NULL) { // nie udało się
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Nie znaleziono czcionki: " << _fontName << ".";
+			cout << LOG_WARN << "Font could not be found: " << _fontName << ".";
 		fontInfo = XLoadQueryFont(dpy, "fixed"); // coś musimy mieć
 		if (fontInfo != NULL) {
 			if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-				cout << LOG_WARN << "Załadowano: \"fixed\".";
+				cout << LOG_WARN << "Loaded: \"fixed\".";
 		} else throw;
 	} else {
 		if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-			cout << LOG_INFO << "Załadowano czcionkę: " << _fontName << ".";
+			cout << LOG_INFO << "Font " << _fontName << " loaded.";
 		cout.flush();
 	}
 	
@@ -64,7 +64,7 @@ FontBase::FontBase(const string &_fontName, int _characters) :
 	
 	checkGLErrors(AT);
 	
-	XFreeFont(dpy, fontInfo); // zwalniamy niepotrzebną pamięć
+	XFreeFont(dpy, fontInfo); // release unneeded memory
 }
 
 FontBase::FontBase(const FontBase &_orig) :
@@ -74,7 +74,7 @@ FontBase::FontBase(const FontBase &_orig) :
 
 FontBase::~FontBase() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~FontBase()";
+		cout << LOG_INFO << "Font destructed";
 	glDeleteLists(__base, __characters);
 }
 

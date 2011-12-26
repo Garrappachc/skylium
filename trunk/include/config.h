@@ -38,51 +38,41 @@ enum {
 	D_EVERYTHING		= 512
 };
 
+/* For more info, see ConfigFile wiki page. */
 struct sGlobalConfig {
 	
-	/* Definiuje (za pomocą enuma) elementy do wyświetlania na standardowym
-	 * wyjściu. */
+	/* Configures the output verbosity. */
 	static unsigned	DEBUGGING;
 	
-	/* Jeżeli true, Skylium będzie używało VBO. Jeżeli false, wszystkie
-	 * dane do renderowania będą przechowywane w pamięci RAM. Jeżeli karta
-	 * graficzna obsługuje VBO, zaleza się ustawienie tej wartość na
-	 * true. */
+	/* If true and graphics card supports VBO, Skylium will use it. */
 	static bool		USING_VBO;
 	
-	/* Maksymalny rozmiar tablicy wierzchołków, aby znaleźć się w buforze
-	 * karty graficznej. Tablice powyżej tej wartości będą renderowane
-	 * z pamięci RAM. Domyślna wartość to 256 MB. */
+	/* Maximum size for meshes to be located in the VBO. */
 	static unsigned	MAX_VBO_SIZE;
 	
-	/* Minimalny rozmiar tablicy wierzchołków, aby znaleźć się w buforze
-	 * karty graficznej. Nie zaleza się tworzenia zbyt małych buforów,
-	 * dlatego domyślna wartość to 256 bajtów. */
+	/* Minimum size for meshes to be located in the VBO. */
 	static unsigned	MIN_VBO_SIZE;
 	
-	/* Jeżeli true, Skylium będzie renderował na fullscreenie. */
+	/* If true, Skylium renders on the fullscreen. */
 	static bool		FULLSCREEN_RENDERING;
 	
-	/* Jeżeli true, hud będzie wyświetlany. */
+	/* If, false, hud is not shown */
 	static bool		HUD_EXISTS;
 	
-	/* Jeżeli true, myszka jest widoczna w kontekście renderowania. */
+	/* Mouse visibility, true or false. */
 	static bool		MOUSE_VISIBLE;
 	
-	/* Rozmiar poszczególnych buforów.
-	 * Jest to minimalna wartość potrzebna do uruchomienia naszej aplikacji,
-	 * więc jeżeli karta graficzna obsługuje więcej bitów, OpenGL
-	 * automatycznie wykorzysta wszystkie. */
+	/* Minimum bytes for the Skylium to be started. */
 	static short		GL_RED_SIZE;
 	static short		GL_GREEN_SIZE;
 	static short		GL_BLUE_SIZE;
 	static short		GL_DEPTH_SIZE;
 	
-	/* Wersja OpenGL'a do inicjalizacji */
+	/* OpenGL's version to initialize. */
 	static unsigned	OPENGL_VERSION_MAJOR;
 	static unsigned	OPENGL_VERSION_MINOR;
 	
-	/* Jeżeli true, skylium będzie generował mipmapy dla każdej tekstury. */
+	/* If true, Skylium will generate mipmaps. */
 	static bool		CREATE_MIPMAPS;
 	
 	

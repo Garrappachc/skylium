@@ -41,27 +41,30 @@ class Mesh {
 public:
 	
 	/**
-	 * Konstruktor domyślny, który jako argument przyjmuje tylko nazwę.
-	 * @param name Nazwa mesh'u.
+	 * Default ctor, gets only name.
+	 * @param name Mesh's name.
 	 */
 	Mesh(const std::string& = "");
 	
 	/**
-	 * Konstruktor kopiujący.
+	 * Copy ctor.
 	 */
 	Mesh(const Mesh&);
 	
+	/**
+	 * Empties the VBO (if used), some output.
+	 */
 	virtual ~Mesh();
 	
 	/**
-	 * Renderuje mesh'a.
+	 * Renders the mesh.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glShadeModel.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
 	 */
 	void show();
 	
 	/**
-	 * Wrzuca całą tablicę wierzchołków i indeksów do bufora karty graficznej.
+	 * Sends all of the vertices to GPU's buffer.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glGenBuffers.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glBindBuffer.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml
@@ -73,37 +76,39 @@ public:
 	void loadIntoVbo();
 	
 	/**
-	 * Ustawia wskaźnik na materiał na ten podany w argumencie.
+	 * Sets active material to this given.
 	 */
 	void useMtl(Material*);
 	
-	/*
-	 * Zwraca wskaźnik na aktywny dla siebie materiał.
+	/**
+	 * Returns pointer to the active material.
 	 */
 	Material * getMaterialPtr() { return __material; }
 	
 	/**
-	 * Jeżeli true, włącza smooth shading.
+	 * If true, the smooth shading is set on.
 	 */
 	void smooth(bool = true);
 	
 	/**
-	 * Wrzuca do wektora nowy wierzchołek i zwraca jego indeks.
+	 * Puts into the vector the next Vertex and returns its index.
+	 * @param v Vertex to be put.
+	 * @return The new vertex's index.
 	 */
 	unsigned push_back(const Vertex&);
 	
 	/**
-	 * Wrzuca do wektora nowy indeks.
+	 * Puts the new index to the vector.
 	 */
 	void addNewIdx(int);
 	
 	/**
-	 * Ustawia __hasNormals na true.
+	 * Sets __hasNormals to true.
 	 */
 	void enableNormals() { __hasNormals = true; }
 	
 	/**
-	 * Zwraca rozmiar tablicy wierzchołków.
+	 * Returns size of vertices' vector in bytes.
 	 */
 	size_t getSizeOfVertices() { return sizeof(Vertex) * __vertices.size(); }
 	
@@ -113,25 +118,25 @@ private:
 	
 	void __initGLExtensionsPointers();
 	
-	/* Wektor wierzchołków */
+	/* Vertices' vector */
 	std::vector< Vertex > __vertices;
 	
-	/* Miejsce w buforze dla wierzchołków */
+	/* Vertices' room in VBO */
 	GLuint __vboID;
 	
-	/* Indeks wierzchołków */
+	/* Vertices' index */
 	std::vector< GLushort > __index;
 	
-	/* Miejsce w buforze dla indeksów */
+	/* Indexes' room in VBO */
 	GLuint __vboIndexID;
 	
-	/* Mamy normalne? */
+	/* Do we have normals? */
 	bool __hasNormals;
 	
-	/* Którego materiału używamy? */
+	/* Material that has to be used */
 	Material * __material;
 	
-	/* Jeżeli true, to glShadeModel(GL_SMOOTH) */
+	/* If true, then glShadeModel(GL_SMOOTH) */
 	bool __smooth;
 	
 	/* http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml */
@@ -140,7 +145,7 @@ private:
 	/* http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml */
 	GLenum __mode;
 	
-	/* Wskaźniki na rozszerzenia OpenGL'a */
+	/* GL's extensions' pointers */
 	void	(*glBindBuffer) (GLenum, GLuint);
 	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
 	void	(*glGenBuffers) (GLsizei, GLuint*);

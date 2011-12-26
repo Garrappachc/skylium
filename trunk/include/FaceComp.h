@@ -25,7 +25,7 @@
 #ifndef FACECOMP_H
 #define FACECOMP_H
 
-/* Potrzebne do mapy */
+/* For std::map */
 struct Face {
 	long v;
 	long t;

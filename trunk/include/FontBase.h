@@ -33,16 +33,32 @@ class FontBase {
 	
 public:
 	
+	/**
+	 * Default ctor, creates a bitmap font and sets the GL's list size.
+	 */
 	FontBase(const std::string& = "-*-courier-bold-r-normal--14-*-*-*-*-*-*-*", int = 96);
 	
+	/**
+	 * Copy ctor.
+	 */
 	FontBase(const FontBase&);
 	
+	/**
+	 * Destructor. Deletes GL's list and sends some shitty output.
+	 */
 	virtual ~FontBase();
 	
+	/**
+	 * Displays the text. The camera should be Ortho2D (see Hud::__hudMode), flat.
+	 * @param x The X coord of the text position.
+	 * @param y The Y coord.
+	 * @param text Text to be written.
+	 */
 	void print(GLfloat, GLfloat, const std::string&) const;
 	
 private:
 	
+	/* X font */
 	Font __font;
 	
 	GLuint __base;

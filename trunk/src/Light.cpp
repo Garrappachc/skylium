@@ -37,7 +37,7 @@ Light::Light() :
 		__specularLight(1.0, 1.0, 1.0, 0.0),
 		__lightSrc(0.0, 0.0, 0.0) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Light(0, 0, 0)";
+		cout << LOG_INFO << "Light (0, 0, 0) constructed.";
 }
 
 Light::Light(const sPosition &_position) :
@@ -47,7 +47,7 @@ Light::Light(const sPosition &_position) :
 		__specularLight(1.0, 1.0, 1.0, 0.0),
 		__lightSrc(&_position[0]) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Light( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ")";
+		cout << LOG_INFO << "Light ( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ") constructed.";
 }
 
 Light::Light(GLfloat _x, GLfloat _y, GLfloat _z) :
@@ -57,13 +57,13 @@ Light::Light(GLfloat _x, GLfloat _y, GLfloat _z) :
 		__specularLight(1.0, 1.0, 1.0, 0.0),
 		__lightSrc(_x, _y, _z) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Light( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ")";
+		cout << LOG_INFO << "Light( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ") constructed.";
 
 }
 
 Light::~Light() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~Light()";
+		cout << LOG_INFO << "Light destroyed.";
 	
 }
 
@@ -71,7 +71,11 @@ void
 Light::setAmbient(const sColor &_col) {
 	__ambientLight = _col;
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Ambient color: " << __ambientLight[0] << ", " << __ambientLight[1] << ", " << __ambientLight[2] << ", " << __ambientLight[3];
+		cout << LOG_INFO << "Ambient colour set ("
+				<< __ambientLight[0] << ", "
+				<< __ambientLight[1] << ", "
+				<< __ambientLight[2] << ", "
+				<< __ambientLight[3] << ").";
 
 }
 
@@ -79,21 +83,32 @@ void
 Light::setDiffuse(const sColor &_col) {
 	__diffuseLight = _col;
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Diffuse color: " << __diffuseLight[0] << ", " << __diffuseLight[1] << ", " << __diffuseLight[2] << ", " << __diffuseLight[3];
+		cout << LOG_INFO << "Diffuse colour set ("
+				<< __diffuseLight[0] << ", "
+				<< __diffuseLight[1] << ", "
+				<< __diffuseLight[2] << ", "
+				<< __diffuseLight[3] << ").";
 }
 
 void
 Light::setSpecular(const sColor &_col) {
 	__specularLight = _col;
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Specular color: " << __specularLight[0] << ", " << __specularLight[1] << ", " << __specularLight[2] << ", " << __specularLight[3];
+		cout << LOG_INFO << "Specular colour set ("
+				<< __specularLight[0] << ", "
+				<< __specularLight[1] << ", "
+				<< __specularLight[2] << ", "
+				<< __specularLight[3] << ").";
 }
 
 void
 Light::setSrcPos(const sPosition &_pos) {
 	__lightSrc = _pos;
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Nowa pozycja światła: " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2];
+		cout << LOG_INFO << "Light source set ("
+				<< __lightSrc[0] << ", "
+				<< __lightSrc[1] << ", "
+				<< __lightSrc[2] << ").";
 }
 
 void
