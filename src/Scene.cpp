@@ -52,12 +52,12 @@ Scene::Scene(const string &_name) :
 		__lightIterator(),
 		__isLightOn(false) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Scene(\"" << _name << "\")";
+		cout << LOG_INFO << "Scene (\"" << _name << "\") constructed.";
 }
 
 Scene::~Scene() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~Scene(\"" << name << "\")";
+		cout << LOG_INFO << "Scene (\"" << name << "\") destructed.";
 	while (!__objectList.empty())
 		delete __objectList.back(), __objectList.pop_back();
 	while (!__cameraList.empty())
@@ -88,7 +88,7 @@ Scene::show() {
 Object *
 Scene::createObject(const string &_name, const Object *_orig, Object *_parent) {
 	Object *newObject;
-	if (_orig == NULL) // wartość domyślna
+	if (_orig == NULL) // default value
 		newObject = new Object(_name);
 	else {
 		newObject = new Object(*_orig, _name);
@@ -117,7 +117,7 @@ Scene::createCamera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_cType) 
 	Camera *newCamera = new Camera(_x, _y, _z, _cType);
 	if (!__activeCamera) {
 		__activeCamera = newCamera;
-		__activeCamera -> setProjection(); // ustawiamy parametry "widzenia"
+		__activeCamera -> setProjection(); // sets "seeing" parameters
 	}
 	__cameraList.push_back(newCamera);
 	return newCamera;
@@ -158,12 +158,12 @@ bool
 Scene::setAmbientLight(int _id, GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym ID! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
+			cout << LOG_WARN << "Colour not supported! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 		return false;
 	}
 	__lightList[_id] -> setAmbient(sColor(_R, _G, _B, _A));
@@ -174,12 +174,12 @@ bool
 Scene::setDiffuseLight(int _id, GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
+			cout << LOG_WARN << "Colour not supported! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 		return false;
 	}
 	__lightList[_id] -> setDiffuse(sColor(_R, _G, _B, _A));
@@ -190,12 +190,12 @@ bool
 Scene::setSpecularLight(int _id, GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Zły kolor! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
+			cout << LOG_WARN << "Colour not supported! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
 		return false;
 	}
 	__lightList[_id] -> setSpecular(sColor(_R, _G, _B, _A));
@@ -206,7 +206,7 @@ bool
 Scene::setLightPosition(int _id, GLfloat _x, GLfloat _y, GLfloat _z) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	
@@ -218,7 +218,7 @@ bool
 Scene::moveLight(int _id, GLfloat _x, GLfloat _y, GLfloat _z) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	__lightList[_id] -> __lightSrc += sVec3D< GLfloat >(_x, _y, _z);
@@ -231,9 +231,9 @@ Scene::toggleLight() {
 
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
 		if (__isLightOn)
-			cout << LOG_INFO << "Światła włączone.";
+			cout << LOG_INFO << "Lights on scene \"" << name << "\" switched ON.";
 		else
-			cout << LOG_INFO << "Światła wyłączone.";
+			cout << LOG_INFO << "Lights on scene \"" << name << "\" switched OFF.";
 	}
 }
 
@@ -241,7 +241,7 @@ bool
 Scene::toggleLight(int _id) {
 	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	__lightList[_id] -> toggle();
@@ -252,7 +252,7 @@ bool
 Scene::removeLight(int _id) {
 	if (_id >= static_cast< int >(__lightList.size()) || __lightList[_id] == 0) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znaleziono światła o podanym id! (" << _id << ")";
+			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
 		return false;
 	}
 	if (_id == -1) {

@@ -42,85 +42,81 @@ class Material {
 public:
 	
 	/**
-	 * Konstruktor, który przyjmuje jako argument swoją nazwę.
-	 * Reszta pusta.
-	 * @param name Nazwa materiału.
+	 * Ctor gets the material's name. The rest is empty.
+	 * @param name Material's name.
 	 */
 	Material(const std::string& = "");
 	
 	/**
-	 * Konstruktor kopiujący.
+	 * Copy ctor.
 	 */
 	Material(const Material&);
 	
 	/**
-	 * Destruktor usuwa wszystkie przypisane do niego tekstury.
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glDeleteTextures.xml
+	 * Destructor sends some output.
 	 */
 	virtual ~Material();
 	
 	/**
-	 * Ustawia podany parametr materiału.
-	 * @param param Wartość parametru.
-	 * @param type Typ materiału, którego dotyczy wartość podana w argumencie
-	 * <i>param</i>. I tak:
-	 *		&bump; MATERIAL_AMBIENT - wartość mAmbient;
-	 *		&bump; MATERIAL_DIFFUSE - wartość mDiffuse;
-	 *		&bump; MATERIAL_SPECULAR - wartość mSpecular.
+	 * Sets chosen material's parameter.
+	 * @param param Parameter's value.
+	 * @param type Material's type to be set. Possible values:
+	 *		&bump; MATERIAL_AMBIENT - mAmbient value;
+	 *		&bump; MATERIAL_DIFFUSE - mDiffuse value;
+	 *		&bump; MATERIAL_SPECULAR - mSpecular value.
 	 */
 	void loadMaterial(const sColor&, unsigned);
 	
 	/**
-	 * Ustawia parametr mAlpha_.
-	 * @param alpha Przezroczystość ([0; 1]).
+	 * Sets mAlpha parameter.
+	 * @param alpha Transparency ([0; 1]).
 	 */
 	void loadAlpha(GLfloat);
 	
 	/**
-	 * Ustawia odbicie.
-	 * @param shininess Odbijanie materiału.
+	 * Sets shininess.
+	 * @param shininess Shininess value.
 	 */
 	void loadShininess(GLint);
 	
 	/**
-	 * Sprawdza, czy materiał posiada jakąś teksturę.
-	 * @return True, jeżeli ma jakąkolwiek.
+	 * Checks whether the particular material has any texture or not.
+	 * @return True if has.
 	 */
 	bool hasAnyTexture() { return __textures.size() > 0; }
 	
 	/**
-	 * Ustawia parametry tekstury do renderowania.
+	 * Sets textures' parameters to be rendered.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glTexParameter.xml
 	 */
 	void setTextures();
 	
 	/**
-	 * Ustawia parametry materiału do renderowania.
+	 * Sets materials' parameters to be rendered.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml
 	 */
 	void setMaterial();
 	
 	/**
-	 * Dodaje do wektora __textures wskaźnik na teksturę, który
-	 * został podany jako argument.
-	 * @param _tex Wskaźnik na teksturę.
+	 * Adds to __textures vector pointer to a texture.
+	 * @param _tex Texture's pointer.
 	 */
 	void appendTexture(Texture*);
 	
-	/* Nazwa materiału. */
+	/* Material's name */
 	std::string name;
 	
 private:
 	
-	/* Materiał */
+	/* Material */
 	sColor			__mAmbient;
 	sColor			__mDiffuse;
 	sColor			__mSpecular;
 	GLfloat			__mAlpha;
 	GLint				__mShininess;
 	
-	/* Tekstury */
+	/* Textures */
 	std::vector< Texture* >				__textures;
 	std::vector< Texture* >::const_iterator	__texturesIterator;
 

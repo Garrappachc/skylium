@@ -48,106 +48,106 @@ class Object {
 public:
 	
 	/**
-	 * Konstruktor domyślny.
+	 * Default ctor, gets the name.
 	 */
 	Object(const std::string& = "");
 	
 	/**
-	 * Konstruktor kopiujący.
+	 * Copy ctor.
 	 */
 	Object(const Object&, const std::string& = "");
 	
 	/**
-	 * Niszczy wszystkie dzieci, meshe oraz materiały.
+	 * Destroys children, meshes and materials.
 	 */
 	virtual ~Object();
 	
 	/**
-	 * Obraca układ współrzędnych o zadane wartości, wyświetla obiekt.
+	 * Transforms and renders.
 	 */
 	virtual void show();
 	
 	/**
-	 * Przesuwa obiekt o dany wektor.
-	 * @param x;
-	 * @param y;
-	 * @param z;
+	 * Moves the oject.
+	 * @param x factor;
+	 * @param y factor;
+	 * @param z factor.
 	 */
 	void move(GLdouble, GLdouble, GLdouble);
 	
 	/**
-	 * Skaluje obiekt o podane wartości.
+	 * Scales the object.
 	 * @param x;
 	 * @param y;
-	 * @param z;
+	 * @param z.
 	 */
 	void scale(GLdouble, GLdouble, GLdouble);
 	
 	/**
-	 * Obraca obiekt.
-	 * @param rotX Kąt obrotu wokół osi X.
-	 * @param rotY Kąt obrotu wokół osi Y.
-	 * @param rotZ Kąt obrotu wokół osi Z.
+	 * Rotates the object.
+	 * @param rotX X angle;
+	 * @param rotY Y angle;
+	 * @param rotZ Z angle.
 	 */
 	void rotate(GLdouble, GLdouble, GLdouble);
 	
 	/**
-	 * Ustawia ogólny kolor obiektu.
-	 * @param R Składnik czerwony.
-	 * @param G Składnik zielony.
-	 * @param B Składnik niebieski.
-	 * @param T Przezroczystość obiektu.
-	 * @return false, jeżeli wartość R, G, B lub A jest większa niż 1 i mniejsza niż 0.
+	 * Sets the object general colour.
+	 * @param R Red;
+	 * @param G Green;
+	 * @param B Blue;
+	 * @param A Alpha.
+	 * @return False if one of the values given is not between [0; 1].
 	 */
 	bool setColor(GLfloat, GLfloat, GLfloat, GLfloat = 1.0);
 	
 	/**
-	 * Ustawia ogólny kolor obiektu.
-	 * @param R Składnik czerwony.
-	 * @param G Składnik zielony.
-	 * @param B Składnik niebieski.
-	 * @param T Przezroczystość obiektu.
-	 * @return false, jeżeli wartość R, G lub B jest większa niż 255 i mniejsza niż 0 lub A jest spoza przedziału <0; 1>.
+	 * Sets the object general colour.
+	 * @param R Red;
+	 * @param G Green;
+	 * @param B Blue
+	 * @param A Alpha.
+	 * @return False if one of the values given is not between [0; 255] or alpha is not between [0; 1].
 	 */
 	bool setColor(int, int, int, GLfloat = 1.0);
 	
 	/**
-	 * Wczytuje dane obiektu z pliku .obj i .mtl.
-	 * @param objFile Lokalizacja pliku .obj.
-	 * @param whatToLoad Definiuje, co ma się załadować. I tak:
-	 *		&bull; GET_VERTICES - ładuje tylko współrzędne wierzchołków. Jest to domyślna opcja, jeżeli nie zostanie nadmieniona, to i tak będzie dodana;
-	 *		&bull; GET_TEXTURE  - ładuje koordynaty tekstury oraz samą teksturę;
-	 *		&bull; GET_NORMALS  - ładuje normalne;
-	 *		&bull; GET_MATERIAL - ładuje dane materiału - z pliku .mtl.
-	 * @return false, jeżeli cokolwiek poszło nie tak.
+	 * Loads the object form .obj and .mtl.
+	 * @param objFile .obj file localization.
+	 * @param whatToLoad Defines what to load. Possible values:
+	 *		&bull; GET_VERTICES - loads the vertices' coords. It is always set, even if not set;
+	 *		&bull; GET_TEXTURE  - loads the texture coords and the texture'
+	 *		&bull; GET_NORMALS  - loads normals;
+	 *		&bull; GET_MATERIAL - loads the .mtl file.
+	 * @return False if something went wrong.
 	 */
 	bool loadFromObj(const std::string&, unsigned);
 	
 	/**
-	 * Ładuje cały obiekt do bufora karty graficznej.
+	 * Loads the whole object into the VBO.
 	 */
 	virtual void loadIntoVBO();
 	
 	/**
-	 * Szuka materiału po nazwie i zwraca do niego wskaźnik.
-	 * @param name Nazwa szukanego materiału.
-	 * @return Wskaźnik do instancji reprezentującej szukany materiał, lub 0, jeżeli nie znaleziono.
+	 * Locates the material by the name.
+	 * @param name Material's name to be found.
+	 * @return Pointer to the material or 0, if not found.
 	 */
 	Material * getMaterialByName(const std::string&);
 	
 	/**
-	 * Dodaje wskaźnik na dany obiekt do wektora dzieci.
-	 * @param childPtr Wskaźnik na dziecko.
+	 * Adds the pointer to the children's vector.
+	 * @param childPtr Child's pointer.
 	 */
 	void addChild(Object*);
 	
 	/**
-	 * @return True, jeżeli obiekt został już wyrenderowany.
+	 * @return True, if the object was already rendered.
 	 */
 	bool wasShown() { return __wasShown; }
 	
 	/**
-	 * Ustawia __wasShown na false. Funkcja wywoływana przez Scene pod koniec renderowania każdej ramki.
+	 * Called by the Scene at the end of each frame.
 	 */
 	void endFrame() { __wasShown = false; }
 	
@@ -169,7 +169,7 @@ protected:
 	
 private:
 	
-	/* Wektor wskaźników na dzieci obiektu. */
+	/* Vector of children's pointers. */
 	std::vector< Object* > __children;
 	
 	std::vector< Object* >::const_iterator __childrenIterator;

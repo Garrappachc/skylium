@@ -48,7 +48,7 @@ Camera::Camera(const cType &_type) :
 		__up(0, 1, 0),
 		__range(20) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Camera()";
+		cout << LOG_INFO << "Camera constructed.";
 }
 
 Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
@@ -65,12 +65,12 @@ Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
 		__eye *= 20;
 	}
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Camera(" << __eye.x << ", " << __eye.y << ", " << __eye.z << ")";
+		cout << LOG_INFO << "Camera (" << __eye.x << ", " << __eye.y << ", " << __eye.z << ") constructed.";
 }
 
 Camera::~Camera() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~Camera()";
+		cout << LOG_INFO << "Camera destructed.";
 }
 
 void
@@ -175,7 +175,7 @@ Camera::lookAt(GLdouble x, GLdouble y, GLdouble z) {
 		__center.normalize();
 	}
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "LookAt: " << __center.x << ", " << __center.y << ", " << __center.z;
+		cout << LOG_INFO << "LookAt: (" << __center.x << ", " << __center.y << ", " << __center.z << ")";
 }
 
 sVector

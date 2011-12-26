@@ -38,17 +38,17 @@ Hud::Hud() :
 		__toDisplay(0),
 		__background(1.0f, 0.0f, 0.0f, 0.6f) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Hud()";
+		cout << LOG_INFO << "Hud constructed.";
 }
 
 Hud::~Hud() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~Hud()";
+		cout << LOG_INFO << "Hud destructed.";
 }
 
 void
 Hud::draw() {
-	// włączamy Hud Mode
+	//  Hud Mode on
 	__hudMode(true);
 	
 	glColor4f(__background.r, __background.g, __background.b, __background.a);
@@ -97,7 +97,7 @@ void
 Hud::attachData(HudData *_newdata) {
 	__toDisplay.push_back(_newdata);
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Hud: dołączono (\"" << _newdata -> text << "\")";
+		cout << LOG_INFO << "Hud: attached (\"" << _newdata -> text << "\")";
 }
 
 void

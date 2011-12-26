@@ -40,46 +40,51 @@ class Hud : public Singleton< Hud > {
 public:
 	
 	/**
-	 * Konstruktor, który pobiera wskaźnik na instancję Skyliuma
-	 * oraz inicjalizuje fonta.
+	 * Ctor. Sends some output.
 	 */
 	Hud();
 	
 	/**
-	 * Desktruktor, który w sumie nic nie robi, prócz wywalania loga.
+	 * Sends output.
 	 */
 	virtual ~Hud();
 	
 	/**
-	 * Rysuje Huda.
+	 * Draws the hud.
 	 */
 	void draw();
 	
 	/**
-	 * Jeżeli włączony - wyłącza, jeżeli wyłączony - włącza.
+	 * Toggle hud on/off.
 	 */
 	void toggle();
 	
 	/**
-	 * Zwraca true, jeżeli włączony.
+	 * @return True, if the Hud is on.
 	 */
 	bool visible() { return __visible; }
 	
+	/**
+	 * Send the Hud more data to be displayed.
+	 * @param newData New data to be attached.
+	 */
 	void attachData(HudData*);
 	
+	/**
+	 * Sets the Hud's color.
+	 */
 	void setColor(const sColor& _c) { __background = _c; }
 	
 private:
 	
 	/**
-	 * Ustawia odpowiednią macierz projekcji w zależności o d parametru.
-	 * @param flag Jeżeli true, to przygotowuje projekcję pod wyświetlenie HUDa. Jeżeli false, to
-	 * wraca do standardowej projekcji 3D.
+	 * Prepares the Projection Matrix for the Hud to be displayed.
 	 */
 	void __hudMode(bool);
 	
 	bool __visible;
 	
+	/* Contains data */
 	std::vector< HudData* > __toDisplay;
 	
 	std::vector< HudData* >::const_iterator __displayList;

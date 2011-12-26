@@ -36,8 +36,8 @@ class HudData {
 	
 public:
 	
-	sXY			position;
-	sColor		color;
+	sXY				position;
+	sColor			color;
 	std::string		text;
 	const FontBase *	font;
 	

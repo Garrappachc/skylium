@@ -54,7 +54,7 @@ Object::Object(const string &_name) :
 		 __meshesIterator(),
 		 __materials(0) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Object(\"" << _name << "\")";
+		cout << LOG_INFO << "Object (\"" << _name << "\") constructed.";
 }
 
 Object::Object(const Object &_orig, const string &_name) :
@@ -77,21 +77,20 @@ Object::Object(const Object &_orig, const string &_name) :
 	}
 	
 	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor kopiujący: Object(\"" << name << "\")";
+		cout << LOG_INFO << "Object (\"" << name << "\") constructed as a copy.";
 	
 }
 
 
 Object::~Object() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~Object(\"" << name << "\")";
-
 	//while (!__children.empty())
 	//	delete __children.back(), __children.pop_back();
 	while (!__meshes.empty())
 		delete __meshes.back(), __meshes.pop_back();
 	while (!__materials.empty())
 		delete __materials.back(), __materials.pop_back();
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Object (\"" << name << "\") destructed.";
 }
 
 void
@@ -177,11 +176,11 @@ Object::setColor(int _R, int _G, int _B, GLfloat _A) {
 bool
 Object::loadFromObj(const string &_objFile, unsigned _whatToLoad) {
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Object::loadFromObj: wczytywanie obiektu: " << name << "... ";
+		cout << LOG_INFO << "Loading object (" << name << ")... ";
 	
 	if (!__fileExists(_objFile)) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": nie znalazłem pliku: " << _objFile;
+			cout << LOG_WARN << name << ": error; file not found: " << _objFile;
 		return false;
 	}
 	
@@ -222,10 +221,10 @@ Object::addChild(Object* _childPtr) {
 
 void
 Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
-	unsigned int lastSlash = _fileName.rfind('/'); // potrzebujemy lokalizacji na dysku
+	unsigned int lastSlash = _fileName.rfind('/'); // we need the localization
 	string loc = (lastSlash == string::npos) ? "" : _fileName.substr(0, lastSlash+1);
 	
-	// kilka tymczasowych zmiennych
+	// some temporary variables
 	typedef map< Face, long, FaceComp > faceMap;
 	faceMap faces;
 	vector< Position > tempPos;
@@ -243,7 +242,7 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 		getline (objFile, buffer);
 		
 		if (buffer[0] == '#')
-			continue;	// komenatrz, jedziemy dalej
+			continue;	// comment, pass this
 			
 		istringstream line(buffer);
 		
@@ -310,27 +309,27 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 			if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) == (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) {
 				
 				char d; // delim
-				Face idx; // tymczasowy face - trzy longi mamy
+				Face idx; // temporary face - we have three longs
 				line >> temp;
 				for (int s = 0; s < 3; s++) {
-					line >> idx.v >> d >> idx.t >> d >> idx.n; // wczytujemy dane face'a
-					faceMap::iterator it = faces.find(idx); // znajdujemy index
+					line >> idx.v >> d >> idx.t >> d >> idx.n; // load face's data
+					faceMap::iterator it = faces.find(idx); // find the index
 				
 					if (it == faces.end()) { // lub nie
-						unsigned newVertIdx = current -> push_back( // do aktualnego mesha dorzucamy nowego face'a
+						unsigned newVertIdx = current -> push_back( // add new face to the actual mesh
 								Vertex(
-										Position(tempPos[idx.v - 1]), // położenie
-										TexCoords(tempTex[idx.t - 1]), // koordynaty tekstury
-										Normal(tempNor[idx.n - 1]) // normalna
+										Position(tempPos[idx.v - 1]), // location
+										TexCoords(tempTex[idx.t - 1]), // texture coords
+										Normal(tempNor[idx.n - 1]) // normal vector
 									)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx)); // wrzucamy do mapy naszego face'a
-																	// i przypisujemy do niego nowo nabyty indeks
-						current -> addNewIdx(newVertIdx); // wczucamy do tablicy indeksów naszego mesha nowy indeks
+						faces.insert(pair< Face, int >(idx, newVertIdx)); // add this to out face's map
+																// and give him out new index
+						current -> addNewIdx(newVertIdx);
 					} else {
-						current -> addNewIdx(it -> second); // to samo, cop wyżej
+						current -> addNewIdx(it -> second);
 					}
-					p++; // zliczamy face'y
+					p++; // count faces
 				}
 			} else if ((_whatToLoad & (GET_VERTICES | GET_NORMALS)) == (GET_VERTICES | GET_NORMALS)) {
 				char d;
@@ -370,7 +369,7 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 	}
 
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Wczytano " << p << " wierzchołków.";
+		cout << LOG_INFO << p << " vertices loaded.";
 }
 
 void
@@ -419,7 +418,7 @@ Object::__parseMtl(const string &_fileName) {
 			line >> temp >>texfile;
 			if (!__fileExists("texture/" + texfile)) {
 				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-					cout << LOG_WARN << "Nie znalazłem tekstury: " << "texture/" << texfile;
+					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
 			}
 			Texture *newTex = new Texture("texture/" + texfile);
 			current -> appendTexture(newTex);
