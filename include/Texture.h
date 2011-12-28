@@ -35,68 +35,67 @@ class Texture {
 public:
 	
 	/**
-	 * Konstruktor domyślny, który jako argument przyjmuje lokalizację
-	 * pliku z teksturą. Konstruktor ten od razu generuje teksturę i wrzuca
-	 * swoją instancję do TextureManagera. Jako name ustawiana jest nazwa
-	 * plik  z teksturą, ale bez rozszerzenia.
-	 * @param fileName Nazwa pliku, w którym znajduje się tekstura.
+	 * Default ctor that gets the texture file's location.
+	 * Ctor generates the texture and puts itself into TextureManager's
+	 * vector. The name is the file name without an extension.
+	 * @param fileName Location of file with the texture.
 	 */
 	Texture(const std::string&);
 	
 	/**
-	 * Destruktor niszczy teksturę i usuwa ją z bufora karty graficznej.
+	 * Destructor destroys the texture and removes it from the GPU's buffer.
 	 */
 	virtual ~Texture();
 	
 	/**
-	 * Binduje teksturę do OpenGLa i ustawia parametry w potoku renderowania.
+	 * Binds the texture and sets the pipeline parameters.
 	 */
 	void setTexture();
 
-	/* Nazwa tekstury - ta bez rozszerzenia */
+	/* Name of the texture */
 	std::string name;
 	
 private:
 	
 	/**
-	 * Sprawdza, czy plik istnieje.
+	 * Checks if file exists.
 	 */
 	bool __fileExists(const std::string&);
 	
 	/**
-	 * Ładuje teksturę.
-	 * @param fileName Nazwa pliku z teksturą.
-	 * @return Tekstura.
+	 * Loads the texture.
+	 * @param fileName Name of the file.
+	 * @return Texture.
 	 */
 	GLuint __loadImage(const std::string&);
 	
-	/* Wskaźnik na teksturę OpenGLa */
+	/* Pointer to GL's texture */
 	GLuint __texture;
 	
-	/* Typ tekstury - 
+	/* Texture type - 
 		GL_TEXTURE_1D,
 		GL_TEXTURE_2D,
 		GL_TEXTURE_3D,
 		GL_TEXTURE_CUBE_MAP.
-	Domyślnie GL_TEXTURE_2D. */
+ 		GL_TEXTURE_2D by default */
 	GLenum __type;
 	
-	/* Wrapping tekstury - GL_CLAMP,
+	/* Texture wrapping - GL_CLAMP,
 		GL_CLAMP_TO_BORDER,
 		GL_CLAMP_TO_EDGE,
 		GL_MIRRORED_REPEAT,
 		GL_REPEAT,
 		GL_CLAMP.
-	Domyślnie GL_CLAMP_TO_BORDER. */
+		GL_CLAMP_TO_BORDER by default */
 	GLenum __wrapping;
 	
-	/* Lokalizacja pliku z teksturą - być może się przyda */
+	/* Location of the texture file - may be useful */
 	std::string __file;
 	
 	/* Channels, default 4 (RGBA) */
 	GLint __channels;
 	
-	/* Instancja TextureManagera */
+	/* TM's instance */
 	TextureManager * __boss;
 };
 

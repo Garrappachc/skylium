@@ -46,6 +46,7 @@ Skylium::Skylium() :
 		Scenes(__sceneManagement),
 		Textures(__textureManagement),
 		TheHud(__hud),
+		GlobalTimer(__timer),
 		__sceneManagement(new SceneManager()),
 		__textureManagement(new TextureManager()),
 		__pendingKeys(KEY_NOKEY),
@@ -55,18 +56,15 @@ Skylium::Skylium() :
 		__windowWidth(__GLXContext.winWidth),
 		__windowHeight(__GLXContext.winHeight),
 		__shaderList(0),
-		__hud(new Hud()) {
+		__hud(new Hud()),
+		__timer(new Timer()) {
 	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Konstruktor: Skylium()";
+		cout << LOG_INFO << "Skylium constructed.";
 	cout.flush();
 }
 
 Skylium::~Skylium() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Destruktor: ~Skylium()";
-	
-	// Niszczymy SceneMangagera i TextureManagera
 	delete __textureManagement;
 	delete __sceneManagement;
 	delete __hud;
@@ -86,6 +84,9 @@ Skylium::~Skylium() {
 	
 	while (!__extensions.empty())
 		delete __extensions.back(), __extensions.pop_back();
+	
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Skylium destructed.";
 }
 
 bool
@@ -102,29 +103,29 @@ Skylium::init(const string &_windowName) {
 	
 	XVisualInfo *visualInfo;
 	
-	/* Otwieramy połączenie z serwerem X */
+	/* Open connection with the X server */
 	rcx->display = XOpenDisplay(NULL);
 	if (rcx->display == NULL) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Nie udało się połączyć z serwerem X!";
+			cout << LOG_ERROR << "Connection with X server failed! Exiting.";
 		return false;
 	}
 	checkGLErrors(AT);
 	
-	/* Sprawdzamy wersję GLX */
+	/* Get the GLX version */
 	glXQueryVersion(rcx->display, &rcx->GLXVersionMajor, &rcx->GLXVersionMinor);
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Rozpoznano wersję GLX: " << rcx->GLXVersionMajor << "." << rcx->GLXVersionMinor << ".";
+		cout << LOG_INFO << "GLX version: " << rcx->GLXVersionMajor << "." << rcx->GLXVersionMinor << ".";
 	checkGLErrors(AT);
 	
 	if (rcx->GLXVersionMajor <= 1 && rcx->GLXVersionMinor < 3) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Wersja GLX zainstalowana w tym systemie jest zbyt stara!";
+			cout << LOG_ERROR << "GLX version too old. Exiting.";
 		return false;
 	}
 	checkGLErrors(AT);
 	
-	/* Szukamy odpowiedniej konfiguracji */
+	/* Look for the best configuration */
 	GLXFBConfig *fbConfigs;
 	int numConfigs = 0;
 	static int fbAttribs[] = {
@@ -140,16 +141,16 @@ Skylium::init(const string &_windowName) {
 		GLX_STENCIL_SIZE,	8,
 		GLX_ALPHA_SIZE,	8,
 		0 };
-	/* Pobieramy nową konfigurację */
+	/* Gets new configuration */
 	fbConfigs = glXChooseFBConfig(rcx->display, DefaultScreen(rcx->display), fbAttribs, &numConfigs);
 	if (!fbConfigs) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Nie udało się pobrać konfiguracji bufora ramki!";
+			cout << LOG_ERROR << "Frame buffer configuration failed to be fetched! Exiting.";
 		return false;
 	}
 	checkGLErrors(AT);
 	
-	/* Wybieramy najlepszą konfigurację */
+	/* Choose the best configuration */
 	int bestFbConfigNum = -1, worstFbConfigNum = -1, bestNumSamp = -1, worstNumSamp = 999;
 	for (int i = 0; i < numConfigs; i++) {
 		XVisualInfo *vi = glXGetVisualFromFBConfig(rcx->display, fbConfigs[i]);
@@ -200,7 +201,7 @@ Skylium::init(const string &_windowName) {
 	}
 	checkGLErrors(AT);
 	
-	/* Tworzymy nowe okno */
+	/* Create the new window */
 	rcx->window = XCreateWindow(rcx->display,
 						   DefaultRootWindow(rcx->display),
 						   20, 20,
@@ -220,10 +221,10 @@ Skylium::init(const string &_windowName) {
 	XMapWindow(rcx->display, rcx->window);
 	checkGLErrors(AT);
 	
-	/* Tworzymy nowy kontekst OpenGL'a do renderowania */
+	/* Create the new OpenGL context */
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Inicjalizacja OpenGL " << sGlobalConfig::OPENGL_VERSION_MAJOR
-			<< "." << sGlobalConfig::OPENGL_VERSION_MINOR;
+		cout << LOG_INFO << "Initializing OpenGL version " << sGlobalConfig::OPENGL_VERSION_MAJOR
+			<< "." << sGlobalConfig::OPENGL_VERSION_MINOR << "...";
 	
 	if (glXCreateContextAttribsARB) {
 		GLint attribs[] = {
@@ -238,7 +239,7 @@ Skylium::init(const string &_windowName) {
 		checkGLErrors(AT);
 	} else {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Nie znaleziono glXCreateContextAttribsARB(). W użyciu starsza funkcja.";
+			cout << LOG_WARN << "glXCreateContextAttribsARB() not found. Older function in use.";
 		rcx->context = glXCreateNewContext(rcx->display, bestFbConfig, GLX_RGBA_TYPE, 0, True);
 	}
 	
@@ -247,7 +248,7 @@ Skylium::init(const string &_windowName) {
 	
 	__getExtensionList();
 	
-	// chowany kursor
+	// hides the mouse pointer
 	if (!sGlobalConfig::MOUSE_VISIBLE) {
 		Cursor invisibleCursor;
 		Pixmap bitmapEmpty;
@@ -330,6 +331,7 @@ Skylium::createShader(const unsigned &_type, const string &_vertFile, const stri
 
 bool
 Skylium::isSupported(const string &_ext) {
+	// lambda expression
 	auto comparator = [](const string *a, const string *b) -> bool {
 		return (*a) < (*b);
 	};
@@ -385,7 +387,7 @@ Skylium::__loadConfig(const string &_fileName) {
 	
 	if (!__fileExists(_fileName)) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Nie znaleziono pliku konfiguracyjnego! W użyciu wartości domyślne.";
+			cout << LOG_WARN << "No config file found! Default values in use.";
 		return;
 	}
 	
@@ -414,56 +416,56 @@ Skylium::__loadConfig(const string &_fileName) {
 			else if (value == "true" || value == "1")
 				sGlobalConfig::FULLSCREEN_RENDERING = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value <<
-					". Dostępne wartości dla parametru \"fullscreen\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Value " << value <<
+					" invalid. Possible values for \"fullscreen\" are 0, 1, false or true.";
 		} else if (param == "using_vbo") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::USING_VBO = false;
 			else if (value == "true" || value == "1")
 				sGlobalConfig::USING_VBO = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value <<
-					". Dostępne wartości dla parametru \"using_vbo\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Value " << value <<
+					" invalid. Possible values for \"using_vbo\" are 0, 1, false or true.";
 		} else if (param == "hud_exists") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::HUD_EXISTS = false;
 			else if (value == "true" || value == "1")
 				sGlobalConfig::HUD_EXISTS = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value <<
-					". Dostępne wartości dla parametru \"hud_exists\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Value " << value <<
+					" invalid. Possible valuse for \"hud_exists\" are 0, 1, false or true.";
 		} else if (param == "mouse_visible") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::MOUSE_VISIBLE = false;
 			else if (value == "true" || value == "1")
 				sGlobalConfig::MOUSE_VISIBLE = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value <<
-					". Dostępne wartości dla parametru \"" << param << "\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Value " << value <<
+					" invalid. Possible values for \"" << param << "\" are 0, 1, false or true.";
 		} else if (param == "gl_red_size") {
 			sGlobalConfig::GL_RED_SIZE = string2T< short >(value);
 			if (sGlobalConfig::GL_RED_SIZE < 0)
-				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+				cout << LOG_WARN << "Buffer size is less than 0! It is not going to work as expected.";
 		} else if (param == "gl_blue_size") {
 			sGlobalConfig::GL_BLUE_SIZE = string2T< short >(value);
 			if (sGlobalConfig::GL_BLUE_SIZE < 0)
-				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+				cout << LOG_WARN << "Buffer size is less than 0! It is not going to work as expected.";
 		} else if (param == "gl_green_size") {
 			sGlobalConfig::GL_GREEN_SIZE = string2T< short >(value);
 			if (sGlobalConfig::GL_GREEN_SIZE < 0)
-				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+				cout << LOG_WARN << "Buffer size is less than 0! It is not going to work as expected.";
 		} else if (param == "gl_depth_size") {
 			sGlobalConfig::GL_DEPTH_SIZE = string2T< short >(value);
 			if (sGlobalConfig::GL_DEPTH_SIZE < 0)
-				cout << LOG_WARN << "Rozmiar bufora ustawiony na wartość ujemną! To nie wróży niczego dobrego.";
+				cout << LOG_WARN << "Buffer size is less than 0! It is not going to work as expected.";
 		} else if (param == "create_mipmaps") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::CREATE_MIPMAPS = false;
 			else if (value == "true" || value == "1")
 				sGlobalConfig::CREATE_MIPMAPS = true;
 			else
-				cout << LOG_ERROR << "Nieznana wartość " << value <<
-					". Dostępne wartość dla parametru \"" << param << "\" to 0, 1, false lub true.";
+				cout << LOG_ERROR << "Value " << value <<
+					" invalid. Possible values for \"" << param << "\" are 0, 1, false or true.";
 		} else if (param == "opengl_version") {
 			sGlobalConfig::OPENGL_VERSION_MAJOR = string2T< unsigned >(value);
 			if (line.eof())
@@ -513,11 +515,11 @@ Skylium::__loadConfig(const string &_fileName) {
 								|	D_ERRORS;
 					break;
 				} else {
-					cout << LOG_WARN << "ConfigParser: nierozpoznana opcja: " << *it;
+					cout << LOG_WARN << "ConfigParser: unrecognized option: " << *it;
 				}
 			}
 		} else if (param != "") {
-			cout << LOG_WARN << "ConfigParser: nierozpoznana opcja: \"" << param << "\"";
+			cout << LOG_WARN << "ConfigParser: unrecognized option: \"" << param << "\"";
 		}
 	}
 	configFile.close();
@@ -539,12 +541,12 @@ Skylium::__getExtensionList() {
 		glGetIntegerv(GL_NUM_EXTENSIONS, &n);
 		checkGLErrors(AT);
 		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-			cout << LOG_INFO << "Liczba dostępnych rozszerzeń: " << n;
+			cout << LOG_INFO << "List of available extensions: " << n;
 		for (int i = 0; i < n; i++) {
 			const char *temp = (const char*)glGetStringi(GL_EXTENSIONS, i);
 			__extensions.push_back(new string(temp));
 			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-				cout << LOG_INFO << "Znaleziono rozszerzenie: " << temp;
+				cout << LOG_INFO << "Found an extension: " << temp;
 		}
 	} else {
 		const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
@@ -555,7 +557,7 @@ Skylium::__getExtensionList() {
 			if (tempExt[i] == ' ') {
 				__extensions.push_back(new string(temp));
 				if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-					cout << LOG_INFO << "Znaleziono rozszerznie: " << temp;
+					cout << LOG_INFO << "Found an extension: " << temp;
 				cout.flush();
 				temp = "";
 			} else {
@@ -566,7 +568,7 @@ Skylium::__getExtensionList() {
 		if (temp != "") {
 			__extensions.push_back(new string(temp));
 			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-					cout << LOG_INFO << "Znaleziono rozszerznie: " << temp;
+					cout << LOG_INFO << "Found an extension: " << temp;
 		}
 	}
 	

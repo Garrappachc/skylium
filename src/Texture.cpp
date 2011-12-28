@@ -27,7 +27,9 @@
 #include <sys/stat.h>
 
 #include "../include/Texture.h"
+
 #include "../include/TextureManager.h"
+#include "../include/Skylium.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -44,31 +46,33 @@ Texture::Texture(const string &_fileName) :
 		__channels(4),
 		__boss(TextureManager::GetSingletonPtr()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Ładowanie tekstury: " << _fileName << "... ";
+		cout << LOG_INFO << "Loading texture: " << _fileName << "... ";
 	
 	if (!__fileExists(_fileName))
-		throw "File " + _fileName + " was not found!";
+		throw "File " + _fileName + " not found!";
 	
 	unsigned lastDot = 0;
 	lastDot = _fileName.rfind('.');
-		name = (lastDot != string::npos) ? _fileName.substr(0, lastDot + 1) : _fileName;
+		name = (lastDot != string::npos) ? _fileName.substr(0, lastDot) : _fileName;
 
 	__texture = __loadImage(_fileName);
 	
 	if (!__texture) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Nie udało się załadować tekstury!";
-		throw "Nie udało się załadować tekstury!";
+			cout << LOG_WARN << "Texture loading failed!";
+		throw "Texture loading failed!";
 	}
 	
 	__boss -> pushBack(this);
 	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << "Załadowano.";
+		cout << "Done.";
 }
 
 Texture::~Texture() {
 	glDeleteTextures(1, &__texture);
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Texture (\"" << name << "\") destructed.";
 }
 
 void

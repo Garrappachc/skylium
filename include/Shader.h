@@ -35,54 +35,55 @@
 #define GL_LINK_STATUS 0x8B82
 
 /**
- * Program shadera wysokopoziomowego.
+ * High-level shader program.
  */
 class Shader {
 
 public:
 	/**
-	 * Konstruktor, przyjmuje dwa argumenty.
-	 * @param vertFileName Nazwa pliku z kodem vertex shadera.
-	 * @param fragFileName Nazwa pliku z kodem fragment shadera.
+	 * Ctor that gets two arguments.
+	 * @param vertFileName Vertex shader source file;
+	 * @param fragFileName Flagment shader source file.
 	 */
 	Shader(const std::string&, const std::string&);
 	
+	/**
+	 * Detaches and destroys the shader.
+	 */
 	virtual ~Shader();
 
 	/**
-	 * Kompiluje i linkuje program.
-	 * @return False, jeżeli coś poszło nie tak.
+	 * Compiles and links the shader program.
+	 * @return False if something went wrong.
 	 */
 	bool make();
 
 	/**
-	 * Włącza program, jeżeli jest wyłączony i wyłącza, jeżeli jest włączony.
-	 * @return Zawsze true.
+	 * Toggles on/off.
 	 */
 	void toggle();
 	
 	/**
-	 * Przypina shadera do danego obiektu.
-	 * @param dest Wskaźnik obiektu, do którego ma być przypięty shader.
-	 * @return false, jeżeli coś poszło nie tak.
+	 * Bind shader to an object.
+	 * @param dest Pointer to the object that the shader has to be bound to.
 	 */
 	void bind(Object*);
 	
 	/**
-	 * Odpina shadera od obiektu.
+	 * Unbinds shader from the object.
 	 */
 	void unbind(Object*);
 	
 	/**
-	 * Zwraca true, jeżeli shader jest przypięty do danego obiektu.
+	 * @return True, if the shader is bound to an object.
 	 */
 	bool isBound(Object*);
 	
 	/**
-	 * Wysyła jakieś zmienne do shadera.
-	 * @param name Nazwa zmiennej w shaderze.
-	 * @param params Wektor 4 floatów do wysłania.
-	 * @return False, jeżeli coś poszło nie tak. Patrz log.
+	 * Sends some data to shader.
+	 * @param name Name of variable in the shader.
+	 * @param params Vector of 4 float to be sent.
+	 * @return False if something went wrong - see log.
 	 */
 	bool setUniform4f(const std::string&, const sVec4D< GLfloat >&);
 
@@ -99,14 +100,9 @@ private:
 	
 	void __initGLExtensionsPointers();
 
-	/**
-	 * Funkcja pomocnicza - sprawdza, czy istnieje podany plik.
-	 * @param Nazwa pliku.
-	 * @return True, jeżeli istnieje, w przeciwnym przypadku false.
-	 */
 	bool __fileExists(const std::string&);
 	
-	/* Wskaźniki na rozszerzenia GL-a */
+	/* Pointer to GL's extensions. */
 	GLuint	(*glCreateShader) (GLenum);
 	void		(*glDetachShader) (GLuint, GLuint);
 	void		(*glDeleteProgram) (GLuint);

@@ -24,7 +24,7 @@
 #ifndef KEYSDEF_H
 #define KEYSDEF_H
 
-/* Obsługa klawiszy */
+/* Keys support */
 typedef enum {
 	KEY_NOKEY = 0,
 	

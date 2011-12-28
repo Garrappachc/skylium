@@ -33,10 +33,11 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Hud.h"
+#include "Timer.h"
 
 #include "keysdef.h"
 
-/* Róże typy shaderów */
+/* Shaders' types */
 enum {
 	IDENTITY = 1,
 	PHONG_SHADING,
@@ -50,67 +51,82 @@ class Skylium : public Singleton < Skylium > {
 public:
 	
 	/**
-	 * Konstruktor tworzy nowego SceneManagera - singletona
+	 * Creates new SceneManager (singleton).
 	 */
 	Skylium();
 	
 	virtual ~Skylium();
 	
 	/**
-	 * Metoda init ustawia kontekst renderowania i robi kilka standardowych rzeczy.
-	 * @param windowName Nazwa okna.
-	 * @param fullScreen Jeżeli true, będzie fullscreen.
-	 * @return False, jeżeli coś poszło nie tak.
+	 * Sets rendering context and does some standard jobs.
+	 * @param windowName Window name;
+	 * @return False if something went wrong.
 	 */
 	bool init(const std::string&);
 	
 	/**
-	 * Przechwytuje zdarzenia z kolejki, a następnie renderuje scenę.
+	 * Catches events from the queue and renders activeScene.
 	 */
 	void execute();
 	
 	/**
-	 * Przestawia bufory.
+	 * Swaps buffers.
 	 */
 	void swapBuffers();
 	
+	/**
+	 * Returns pressed keys.
+	 */
 	sKey sEvent() { return __pendingKeys; }
 	
+	/**
+	 * If mouse camera is active, it enables the possibility of controling the camera with mouse.
+	 */
 	void toggleMouseCamera() { __isMouseMotionEnabled = !__isMouseMotionEnabled; }
 	
+	/**
+	 * Creates the new scene.
+	 * @param name Name of the new scene - must be unique!
+	 * @return Pointer to the newly created scene.
+	 */
 	Scene * createScene(const std::string&);
 	
-	/*
-	 * Tworzy nowego shadera i zwraca wskaźnik do niego.
+	/**
+	 * Creates the new shader.
+	 * @param type Type of the new shader. Possible values are: IDENTITY, PHONG_SHADING, TOON, CUSTOM.
+	 * @param vertFile Source file of the vertex shader, if type == CUSTOM.
+	 * @param fragFile Source file of the fragment shader, if type == CUSTOM.
 	 */
 	Shader * createShader(const unsigned&, const std::string& = "", const std::string& = "");
 	
+	/**
+	 * Returns the current window's dimensions.
+	 */
 	void getWindowSize(int &_a, int &_b) { _a = __windowWidth; _b = __windowHeight; }
 	
 	/**
-	 * Sprawdza, czy dane rozszerzenie jest dostępne.
+	 * Checks if particular GL's extension is available.
 	 */
 	bool isSupported(const std::string&);
 	
-	/* Sktruktura przechowująca informacje o kontekście renderowania X.
-	 * Aktualny kontekst jest dostępny poprzez funkcje getContext()
-	 * oraz getContextPtr(). */
+	/* Struct that keeps info about the rendering context.
+	 * Context can be get by getContext() and getContextPtr() methods. */
 	typedef struct sContextStruct {
 		
-		/* Wskaźnik na aktywny ekran serwera X */
+		/* Pointer to an active X server display */
 		Display *	display;
 		
-		/* Wersja GLX */
+		/* GLX version */
 		int	GLXVersionMajor;
 		int	GLXVersionMinor;
 		
-		/* Atrybuty okna */
+		/* Window attribs */
 		XSetWindowAttributes	winAttribs;
 		
-		/* Wskaźnik do okna */
+		/* Pointer to the window */
 		Window	window;
 		
-		/* Rozmiary okna */
+		/* Window dimensions */
 		int	winHeight;
 		int	winWidth;
 		
@@ -125,78 +141,82 @@ public:
 	const sContextStruct * getContextPtr() { return &__GLXContext; }
 	
 	
-	/* Dostęp do manadżerów z zewnątrze */
+	/* Access to managers from outside the class */
 	SceneManager*& Scenes;
 	TextureManager*& Textures;
 	Hud*& TheHud;
+	Timer*& GlobalTimer;
 	
 	
 private:
 	
 	/**
-	 * Renderuje scenę.
+	 * Renders the scene.
 	 */
 	void __render();
 	
 	/**
-	 * Łapie eventy z kolejki, obsługuje je odpowiednio, a naciśnięte klawisze
-	 * wrzuca do __pendingKeys.
+	 * Catches events from the queue.
 	 */
 	void __catchEvents();
 	
 	/**
-	 * Ładuje plik konfiguracyjny.
-	 * @param fileName Lokalizacji pliku.
-	 * @param 
+	 * Loads the config file.
+	 * @param fileName File location.
 	 */
 	void __loadConfig(const std::string&);
 	
 	/**
-	 * Ustawia wskaźniki na potrzebne funkcje.
+	 * Sets GL's extensions pointer.
 	 */
 	void __earlyInitGLXFnPointers();
 	
 	/**
-	 * Pobiera listę dostępnych rozszerzeń */
+	 * Gets list of available extensions.
+	 */
 	void __getExtensionList();
 	
 	/**
-	 * Zwraca false, jeżeli plik nie istnieje.
+	 * @param fileName Name of the file.
+	 * @return False if file could not be found, otherwise true.
 	 */
 	bool __fileExists(const std::string&);
 	
-	/* Instancja SceneManagera */
+	/* SceneManager instance */
 	SceneManager * __sceneManagement;
 	
-	/* Instancja TextureManagera */
+	/* TextureManager instance */
 	TextureManager * __textureManagement;
 	
-	/* Przechowuje kontekst renderowania */
+	/* Keeps the rendering context */
 	sContextStruct __GLXContext;
 	
-	/* Przechowuje wciśnięte klawisze. Patrz metoda sEvent(). */
+	/* Keeps pressed keys */
 	sKey __pendingKeys;
 	
-	/* Do kamerki z myszką. */
+	/* For mouse-controlled camera */
 	bool __isMouseMotionEnabled;
 	
-	/* Przechowuje pozycję x i y myszy. */
+	/* Keeps mouse position */
 	int __lastMousePositionX;
 	int __lastMousePositionY;
 	
-	/* Przechowuje rozmiary okna. */
+	/* Keeps window dimensions */
 	int & __windowWidth;
 	int & __windowHeight;
 	
 	std::vector< Shader* > __shaderList;
 	
-	/* Jedyna instancja huda */
+	/* The Hud's only instance */
 	Hud * __hud;
 	
-	/* Wektor z dostępnymi rozszerzeniami */
+	/* Global Timer */
+	Timer * __timer;
+	
+	/* Vector with available extensions */
 	std::vector< std::string* > __extensions;
 	
-	/* Wskaźniki na kilka potrzebnych funkcji */
+	/* Pointers to some GL's extensions */
 	GLXContext	(*glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 	GLXFBConfig *	(*glXChooseFBConfig)(Display*, int, const int*, int*);
 	XVisualInfo *	(*glXGetVisualFromFBConfig)(Display*, GLXFBConfig);

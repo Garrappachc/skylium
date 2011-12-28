@@ -332,7 +332,6 @@ public:
 	T	&b;
 	T	&a;
 	
-	/* Konstruktory */
 	sVec4D() :
 			r(__data[0]),
 			g(__data[1]),
@@ -363,7 +362,6 @@ public:
 			b(__data[2]),
 			a(__data[3]) {}
 	
-	/* Operatory */
 	operator T*() {
 		return __data;
 	}

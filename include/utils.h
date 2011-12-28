@@ -40,9 +40,9 @@
 #define TOSTRING(x) STRINGIFY(x)
 #define AT __FILE__ " : " TOSTRING(__LINE__)
 
-/**
- * Funkcje pomocnicze.
- */
+/* Some helpful functions */
+
+
 template < typename T >
 inline T string2T(const std::string &_s) {
 	T temp;
@@ -65,8 +65,8 @@ T getProcAddr(const std::string &_procName) {
 	T temp = (T)glXGetProcAddress((GLubyte*)_procName.c_str());
 	if (temp == (T)NULL) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			std::cout << LOG_WARN << "Błąd przy pobieraniu wskaźnika na funkcję \"" << _procName << "\"!" <<
-				LOG_WARN << "Bardzo prawdopodobne jest, iż nastąpi naruszenie ochrony pamięci.";
+			std::cout << LOG_WARN << "Error getting the \"" << _procName << "\" function pointer." <<
+				LOG_WARN << "Segfault is expected.";
 	}
 	return temp;		
 }

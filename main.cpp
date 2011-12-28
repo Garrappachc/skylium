@@ -21,10 +21,10 @@ main() {
 	
 	
 	Shader *cienie = s_main -> createShader(PHONG_SHADING);
-	if (!cienie -> make()) // kompilacja + linkowanie
+	if (!cienie -> make()) // compilation + linking
 		exit(1);
 	
-	Scene *scenka = s_main -> createScene("Scenka"); // tworzymy scenę
+	Scene *scenka = s_main -> createScene("SampleScene"); // we create the scene
 
 	Object *surface = scenka -> createObject("surface_0");
 	if (!surface -> loadFromObj("objects/surface.obj", GET_VERTICES | GET_NORMALS | GET_TEXTURE | GET_MATERIAL))
@@ -46,14 +46,14 @@ main() {
 	
 	
 	Object *table = scenka -> createObject("table");
-	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE); // akurat stolik jest źle wymodelowany - nie przejmować się nim
+	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE);
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
 	table -> setColor(0.7f, 0.7f, 0.7f);
 	
-	Object *malpka = scenka -> createObject("malpka"); // małpka
-	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL)) // znowu .obj
-		exit(1); // nie chcemy brzydali na ekranie
+	Object *malpka = scenka -> createObject("monkey"); // monkey
+	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL))
+		exit(1);
 	malpka -> move(0, 7, 0);
 	malpka -> scale(3, 3, 3);
 	malpka -> rotate(0, -45, 40);
@@ -186,6 +186,9 @@ main() {
 	
 	// całą resztę wywali za nas Skylium.
 	delete s_main;
+	
+	
+	cout << endl;
 
 	return 0;
 	
