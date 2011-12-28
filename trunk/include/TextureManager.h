@@ -37,31 +37,31 @@ class TextureManager : public Singleton< TextureManager > {
 public:
 	
 	/**
-	 * Konstruktor domyślny.
+	 * Default ctor.
 	 */
 	TextureManager();
 	
 	/**
-	 * Desktruktor niszczy wszystkie załadowane tekstury.
+	 * Destructor destroys all textures.
 	 */
 	virtual ~TextureManager();
 
 	/**
-	 * Pozwala dobrać się do tekstury za pomocą jej nazwy.
-	 * @param name Nazwa tekstury, która będzie szukana.
-	 * @return Wskaźnik do tej tekstury.
+	 * Lets get the texture by its name.
+	 * @param name Name of the texture to be found.
+	 * @return Pointer to this texture.
 	 */
 	Texture * getTextureByName(const std::string&);
 	
 	/**
-	 * Wrzuca teksturę do swojego wektora.
-	 * @param texture Wskaźnik na teksturę, która zostanie wrzucona do wektora.
+	 * Puts the texture into the vector.
+	 * @param texture Pointer to the texture that will be put into the vector.
 	 */
 	void pushBack(Texture*);
 
 private:
 	
-	/* Wektor tekstur */
+	/* Textures vector */
 	std::vector< Texture* > __textureList;
 };
 

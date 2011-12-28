@@ -26,16 +26,25 @@
 #include "../include/TextureManager.h"
 #include "../include/Texture.h"
 
+#include "../include/Skylium.h"
+
+#include "../include/defines.h"
+#include "../include/config.h"
+#include "../include/utils.h"
+
 using namespace std;
 
 TextureManager::TextureManager() :
 		__textureList(0) {
-
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "TextureManager constructed.";
 }
 
 TextureManager::~TextureManager() {
 	while (!__textureList.empty())
 		delete __textureList.back(), __textureList.pop_back();
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "TextureManager destructed.";
 }
 
 Texture *

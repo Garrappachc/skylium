@@ -25,6 +25,8 @@
 
 #include "../include/Scene.h"
 
+#include "../include/Skylium.h"
+
 #include "../include/defines.h"
 #include "../include/config.h"
 #include "../include/utils.h"

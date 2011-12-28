@@ -50,9 +50,9 @@ void checkGLErrors(const string &_at) {
 	GLenum err = glGetError(); // pobieramy błędy
 	while (err != GL_NO_ERROR) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS) {
-			cout << "\n\e[33m(WW)\e[0m " << "Błąd OpenGL!" 
-				<< "\nGdzie: " << _at << "\nKod błędu: " << err
-				<< "\nRozwinięcie błędu: " << gluErrorString(err) << endl;
+			cout << "\n\e[33m(WW)\e[0m " << "OpenGL error!" 
+				<< "\nAt: " << _at << "\nError code: " << err
+				<< "\nError message: " << gluErrorString(err) << endl;
 			cout.flush();
 		}
 		err = glGetError();

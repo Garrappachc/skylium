@@ -24,7 +24,9 @@
 #include <iostream>
 
 #include "../include/Material.h"
+
 #include "../include/Texture.h"
+#include "../include/Skylium.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"

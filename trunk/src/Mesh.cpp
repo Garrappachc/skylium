@@ -27,6 +27,8 @@
 
 #include "../include/Mesh.h"
 
+#include "../include/Skylium.h"
+
 #include "../include/defines.h"
 #include "../include/config.h"
 #include "../include/utils.h"
@@ -70,12 +72,12 @@ Mesh::Mesh(const Mesh &_orig) :
 }
 
 Mesh::~Mesh() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
 	if (__vboID != 0)
 		glDeleteBuffers(1, &__vboID);
 	if (__vboIndexID != 0)
 		glDeleteBuffers(1, &__vboIndexID);
+	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
+		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
 }
 
 void

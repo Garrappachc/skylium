@@ -31,28 +31,28 @@ enum {
 	MICROSECONDS
 };
 
-/* Niskopoziomowy timer, liczący z dokładnością do ~10 mikrosekund. */
+/* Low-level timer, ~10 microseconds */
 class Timer {
 	
 public:
 	/**
-	 * Domyślny konstruktor - wszystko 0.
-     */
+	 * Default ctor.
+      */
 	Timer();
 	
 	/**
-	 * Pyta się system o aktualny czas, zwraca go w postaci long long int.
-	 * @param clock Dokładność mierzenia rzasu - SECONDS lub MICROSECONDS.
-	 * @return Czas.
+	 * Asks the system for the actual time, returns it as long long int.
+	 * @param clock Precision of the time returned - SECONDS or MICROSECONDS.
+	 * @return The time.
 	 */
 	long long int update(unsigned);
 	
 	/**
-	 * Sprawdza, czy od ostatniego wywołania funkcji minęła określona długość
-	 * czasu.
-	 * @param howMuch Ile czasu ma minąć?
-	 * @param clock Dokładność mierzenia czasu - SECONDS lub MICROSECONDS.
-	 * @return True, jeżeli minęło już tyle czasu, w przeciwnym wypadku - false.
+	 * Checks if from the last time the function was called, the time specified
+	 * in the argument has gone or not.
+	 * @param howMuch How much time?
+	 * @param clock Precision - SECONDS or MICROSECONDS.
+	 * @return True if the time is up, otherwise false.
 	 */
 	bool passed(const long int&, unsigned);
 	

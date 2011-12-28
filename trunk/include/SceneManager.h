@@ -35,45 +35,46 @@ class SceneManager : public Singleton< SceneManager > {
 public:
 	
 	/**
-	 * Konstruktor - nie ma scen, aktywna scena nie istnieje.
+	 * Default ctor - no scenes, no active scene.
 	 */
 	SceneManager();
 	
 	/**
-	 * Usuwa cały wektor __sceneList.
+	 * Deletes the __sceneList vector.
 	 */
 	virtual ~SceneManager();
 	
 	/**
-	 * Tworzy nową scenę o podanej nazwie i zwraca wskaźnik do niej.
-	 * Jeżeli nie ma aktywnej sceny, ta scena staję się automatycznie aktywną.
-	 * @param name Nazwa nowej sceny.
-	 * @return Wskaźnik do nowo utworzonej sceny.
+	 * Creates new scene with the name given and return the pointer.
+	 * If there's no active scene, this scene will be activated.
+	 * @param name Name of the new scene.
+	 * @return Pointer to the newly creates scene.
 	 */
 	Scene * createScene(const std::string&);
 	
 	/**
-	 * Renderuje aktywną scenę.
+	 * Renders active scene.
 	 */
 	void displayActiveScene();
 	
 	/**
-	 * Ustawia aktywną scenę na tą, której wskaźnik poadny został jako argument.
-	 * @param toSet Wskaźnik na scenę, która ustawiona zostanie jako aktywna.
-	 * @return False, jeżeli nie udało się ustawić aktywnej sceny. Patrz -> log.
+	 * Sets activeScene pointer to this given in argument.
+	 * @param toSet Pointer to scene that has to be set as an active.
+	 * @return False if something went wrong; see log.
 	 */
 	bool setActive(const Scene*);
 	
 	/**
-	 * Zwraca wskaźnik na aktywną scenę.
-	 * @return Wskaźnik na aktywną scenę.
+	 * @return Pointer to an active scene.
 	 */
 	Scene * getActiveScene() { return __activeScene; }
 	
 private:
 	
+	/* All scenes */
 	std::vector< Scene* > __sceneList;
 	
+	/* Pointer to the active scene */
 	Scene * __activeScene;
 	
 };
