@@ -103,6 +103,12 @@ public:
 	void addNewIdx(int);
 	
 	/**
+	 * This is used to add these faces, which have 4 indices - it adds
+	 * the first, third and the last indices.
+	 */
+	void addThreeIdxs(int);
+	
+	/**
 	 * Sets __hasNormals to true.
 	 */
 	void enableNormals() { __hasNormals = true; }

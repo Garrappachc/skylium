@@ -260,7 +260,6 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 					current = new Mesh();
 				else {
 					__meshes.push_back(current);
-					current = NULL;
 					current = new Mesh();
 				}
 			} else {
@@ -269,10 +268,6 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 					__meshes.push_back(current);
 				current = new Mesh(name);
 			}
-			tempPos.clear();
-			tempNor.clear();
-			tempTex.clear();
-			faces.clear();
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!(_whatToLoad & GET_MATERIAL))
 				continue;
@@ -311,11 +306,17 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				char d; // delim
 				Face idx; // temporary face - we have three longs
 				line >> temp;
-				for (int s = 0; s < 3; s++) {
-					line >> idx.v >> d >> idx.t >> d >> idx.n; // load face's data
+				for (int s = 0; s < 3; ++s) {
+					line >> idx.v >> d >> idx.t >> d >> idx.n; // load face's idices
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					if (idx.t < 0)
+						idx.t = tempTex.size() + idx.t;
+					if (idx.n < 0)
+						idx.n = tempNor.size() + idx.n;
 					faceMap::iterator it = faces.find(idx); // find the index
 				
-					if (it == faces.end()) { // lub nie
+					if (it == faces.end()) { // face not found
 						unsigned newVertIdx = current -> push_back( // add new face to the actual mesh
 								Vertex(
 										Position(tempPos[idx.v - 1]), // location
@@ -323,20 +324,50 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 										Normal(tempNor[idx.n - 1]) // normal vector
 									)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx)); // add this to out face's map
-																// and give him out new index
+						faces.insert(pair< Face, int >(idx, newVertIdx)); // add this to our face's map
+																// and give him our new index
 						current -> addNewIdx(newVertIdx);
 					} else {
 						current -> addNewIdx(it -> second);
 					}
-					p++; // count faces
+					++p; // count faces
+				}
+				if (!line.eof()) { // we have 4 indices
+					line >> idx.v >> d >> idx.t >> d >> idx.n;
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					if (idx.t < 0)
+						idx.t = tempTex.size() + idx.t;
+					if (idx.n < 0)
+						idx.n = tempNor.size() + idx.n;
+					faceMap::iterator it = faces.find(idx);
+					
+					if (it == faces.end()) {
+						unsigned newVertIdx = current -> push_back(
+								Vertex(
+										Position(tempPos[idx.v - 1]),
+										TexCoords(tempTex[idx.t - 1]),
+										Normal(tempNor[idx.n - 1])
+									)
+							);
+						faces.insert(pair< Face, int >(idx, newVertIdx));
+						current -> addThreeIdxs(newVertIdx);
+					} else {
+						current -> addThreeIdxs(it -> second);
+					}
+					++p;
 				}
 			} else if ((_whatToLoad & (GET_VERTICES | GET_NORMALS)) == (GET_VERTICES | GET_NORMALS)) {
 				char d;
 				Face idx;
 				line >> temp;
-				for (int s = 0; s < 3; s++) {
+				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> d >> idx.n;
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					if (idx.n < 0)
+						idx.n = tempNor.size() + idx.n;
+					idx.t = 0;
 					faceMap::iterator it = faces.find(idx);
 					
 					if (it == faces.end()) {
@@ -350,11 +381,85 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 						faces.insert(pair< Face, int >(idx, newVertIdx));
 						
 						current -> addNewIdx(newVertIdx);
-						p++;
 					} else {
 						current -> addNewIdx(it -> second);
-						p++;
 					}
+					++p;
+				}
+				if (!line.eof()) { // we have 4 indices
+					line >> idx.v >> d >> d >> idx.n;
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					if (idx.n < 0)
+						idx.n = tempNor.size() + idx.n;
+					faceMap::iterator it = faces.find(idx);
+					
+					if (it == faces.end()) {
+						unsigned newVertIdx = current -> push_back(
+								Vertex(
+										Position(tempPos[idx.v - 1]),
+										TexCoords(0, 0),
+										Normal(tempNor[idx.n - 1])
+									)
+							);
+						faces.insert(pair< Face, int >(idx, newVertIdx));
+						current -> addThreeIdxs(newVertIdx);
+					} else {
+						current -> addThreeIdxs(it -> second);
+					}
+					++p;
+				}
+			} else if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE)) == (GET_VERTICES | GET_TEXTURE)) {
+				char d;
+				Face idx;
+				line >> temp;
+				for (int s = 0; s < 3; ++s) {
+					line >> idx.v >> d >> idx.t;
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					if (idx.t < 0)
+						idx.t = tempTex.size() + idx.t;
+					idx.n = 0;
+					auto it = faces.find(idx);
+					
+					if (it == faces.end()) {
+						unsigned newVertIdx = current -> push_back(
+								Vertex(
+										Position(tempPos[idx.v - 1]),
+									  	TexCoords(tempTex[idx.t - 1]),
+									  	Normal(0, 0, 0)
+								)
+							);
+						faces.insert(pair< Face, int >(idx, newVertIdx));
+					
+						current -> addNewIdx(newVertIdx);
+					} else {
+						current -> addNewIdx(it -> second);
+					}
+					++p;
+				}
+				if (!line.eof()) { // we have 4 indices
+					line >> idx.v >> d >> idx.n;
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					if (idx.t < 0)
+						idx.t = tempTex.size() + idx.t;
+					faceMap::iterator it = faces.find(idx);
+					
+					if (it == faces.end()) {
+						unsigned newVertIdx = current -> push_back(
+								Vertex(
+										Position(tempPos[idx.v - 1]),
+										TexCoords(tempTex[idx.t - 1]),
+										Normal(0, 0, 0)
+									)
+							);
+						faces.insert(pair< Face, int >(idx, newVertIdx));
+						current -> addThreeIdxs(newVertIdx);
+					} else {
+						current -> addThreeIdxs(it -> second);
+					}
+					++p;
 				}
 			}
 		}

@@ -235,6 +235,13 @@ Mesh::addNewIdx(int _idx) {
 }
 
 void
+Mesh::addThreeIdxs(int _idx) {
+	__index.push_back(__index[__index.size() - 1]);
+	__index.push_back(_idx);
+	__index.push_back(__index[__index.size() - 5]);
+}
+
+void
 Mesh::__initGLExtensionsPointers() {
 	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
 	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");

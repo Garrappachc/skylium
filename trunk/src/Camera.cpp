@@ -23,7 +23,6 @@
 
 #include <iostream>
 #include <cmath>
-#include <SDL/SDL.h>
 
 #include "../include/Camera.h"
 #include "../include/Skylium.h"
@@ -42,7 +41,7 @@ Camera::Camera(const cType &_type) :
 		__type(_type),
 		__fovy(45.0),
 		__zNear(1.0),
-		__zFar(200.0),
+		__zFar(1000.0),
 		__eye(0, 0, 0),
 		__center(0, 0, 0),
 		__up(0, 1, 0),
@@ -55,7 +54,7 @@ Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
 		__type(_type),
 		__fovy(45.0),
 		__zNear(1.0),
-		__zFar(200.0),
+		__zFar(1000.0),
 		__eye(_x, _y, _z),
 		__center(0, 0, 0),
 		__up(0, 1, 0),

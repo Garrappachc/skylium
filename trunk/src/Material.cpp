@@ -44,6 +44,7 @@ Material::Material(const string &_name) :
 		__textures(0) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Material (\"" << name << "\") constructed.";
+	cout.flush();
 }
 
 Material::Material(const Material &_orig) :
@@ -57,11 +58,13 @@ Material::Material(const Material &_orig) :
 	__textures = _orig.__textures;
 	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
 		cout << LOG_INFO << "Material (\"" << name << "\") constructed as a copy.";
+	cout.flush();
 }
 
 Material::~Material() {
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Material (\"" << name << "\") destructed.";
+	cout.flush();
 }
 
 void
