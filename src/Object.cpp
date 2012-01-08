@@ -308,20 +308,30 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				line >> temp;
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> idx.t >> d >> idx.n; // load face's idices
+					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
 					if (idx.t < 0)
 						idx.t = tempTex.size() + idx.t;
+					else
+						--idx.t;
+					
 					if (idx.n < 0)
 						idx.n = tempNor.size() + idx.n;
+					else
+						--idx.n;
+					
 					faceMap::iterator it = faces.find(idx); // find the index
 				
 					if (it == faces.end()) { // face not found
 						unsigned newVertIdx = current -> push_back( // add new face to the actual mesh
 								Vertex(
-										Position(tempPos[idx.v - 1]), // location
-										TexCoords(tempTex[idx.t - 1]), // texture coords
-										Normal(tempNor[idx.n - 1]) // normal vector
+										Position(tempPos[idx.v]), // location
+										TexCoords(tempTex[idx.t]), // texture coords
+										Normal(tempNor[idx.n]) // normal vector
 									)
 							);
 						faces.insert(pair< Face, int >(idx, newVertIdx)); // add this to our face's map
@@ -334,20 +344,30 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				}
 				if (!line.eof()) { // we have 4 indices
 					line >> idx.v >> d >> idx.t >> d >> idx.n;
+					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
 					if (idx.t < 0)
 						idx.t = tempTex.size() + idx.t;
+					else
+						--idx.t;
+					
 					if (idx.n < 0)
 						idx.n = tempNor.size() + idx.n;
+					else
+						--idx.n;
+					
 					faceMap::iterator it = faces.find(idx);
 					
 					if (it == faces.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
-										Position(tempPos[idx.v - 1]),
-										TexCoords(tempTex[idx.t - 1]),
-										Normal(tempNor[idx.n - 1])
+										Position(tempPos[idx.v]),
+										TexCoords(tempTex[idx.t]),
+										Normal(tempNor[idx.n])
 									)
 							);
 						faces.insert(pair< Face, int >(idx, newVertIdx));
@@ -363,19 +383,26 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				line >> temp;
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> d >> idx.n;
+					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
 					if (idx.n < 0)
 						idx.n = tempNor.size() + idx.n;
+					else
+						--idx.n;
+					
 					idx.t = 0;
 					faceMap::iterator it = faces.find(idx);
 					
 					if (it == faces.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
-										Position(tempPos[idx.v - 1]),
+										Position(tempPos[idx.v]),
 										TexCoords(0, 0),
-										Normal(tempNor[idx.n - 1])
+										Normal(tempNor[idx.n])
 								)
 							);
 						faces.insert(pair< Face, int >(idx, newVertIdx));
@@ -388,18 +415,25 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				}
 				if (!line.eof()) { // we have 4 indices
 					line >> idx.v >> d >> d >> idx.n;
+					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
 					if (idx.n < 0)
 						idx.n = tempNor.size() + idx.n;
+					else
+						--idx.n;
+					
 					faceMap::iterator it = faces.find(idx);
 					
 					if (it == faces.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
-										Position(tempPos[idx.v - 1]),
+										Position(tempPos[idx.v]),
 										TexCoords(0, 0),
-										Normal(tempNor[idx.n - 1])
+										Normal(tempNor[idx.n])
 									)
 							);
 						faces.insert(pair< Face, int >(idx, newVertIdx));
@@ -415,18 +449,25 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				line >> temp;
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> idx.t;
+					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
 					if (idx.t < 0)
 						idx.t = tempTex.size() + idx.t;
+					else
+						--idx.t;
+					
 					idx.n = 0;
 					auto it = faces.find(idx);
 					
 					if (it == faces.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
-										Position(tempPos[idx.v - 1]),
-									  	TexCoords(tempTex[idx.t - 1]),
+										Position(tempPos[idx.v]),
+									  	TexCoords(tempTex[idx.t]),
 									  	Normal(0, 0, 0)
 								)
 							);
@@ -440,17 +481,24 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 				}
 				if (!line.eof()) { // we have 4 indices
 					line >> idx.v >> d >> idx.n;
+					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
 					if (idx.t < 0)
 						idx.t = tempTex.size() + idx.t;
+					else
+						--idx.t;
+					
 					faceMap::iterator it = faces.find(idx);
 					
 					if (it == faces.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
-										Position(tempPos[idx.v - 1]),
-										TexCoords(tempTex[idx.t - 1]),
+										Position(tempPos[idx.v]),
+										TexCoords(tempTex[idx.t]),
 										Normal(0, 0, 0)
 									)
 							);
