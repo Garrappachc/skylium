@@ -133,12 +133,12 @@ public:
 	/**
 	 * @return ModelView Matrix.
 	 */
-	sMat16 getModelViewMatrix() { return __modelViewMatrix; }
+	sMat16 & getModelViewMatrix() { return __modelViewMatrix; }
 	
 	/**
 	 * @return Projection Matrix.
 	 */
-	sMat16 getProjectionMatrix() { return __projectionMatrix; }
+	sMat16 & getProjectionMatrix() { return __projectionMatrix; }
 
 
 private:
