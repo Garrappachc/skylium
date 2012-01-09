@@ -27,7 +27,7 @@ main() {
 	Scene *scenka = s_main -> createScene("SampleScene"); // we create the scene
 
 	Object *surface = scenka -> createObject("surface_0");
-	if (!surface -> loadFromObj("objects/surface.obj", GET_VERTICES | GET_NORMALS | GET_TEXTURE | GET_MATERIAL))
+	if (!surface -> loadFromObj("objects/surface.obj"))
 		exit(1);
 	
 	surface -> move(-6, -2.65, -10);
@@ -46,13 +46,13 @@ main() {
 	
 	
 	Object *table = scenka -> createObject("table");
-	table -> loadFromObj("objects/table.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL | GET_TEXTURE);
+	table -> loadFromObj("objects/table.obj");
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
 	table -> setColor(0.7f, 0.7f, 0.7f);
 	
 	Object *malpka = scenka -> createObject("monkey"); // monkey
-	if (!malpka -> loadFromObj("objects/monkey.obj", GET_VERTICES | GET_NORMALS | GET_MATERIAL))
+	if (!malpka -> loadFromObj("objects/monkey.obj"))
 		exit(1);
 	malpka -> move(0, 7, 0);
 	malpka -> scale(3, 3, 3);

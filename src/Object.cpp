@@ -30,7 +30,6 @@
 
 #include "../include/Object.h"
 #include "../include/Vertex.h"
-#include "../include/FaceComp.h"
 #include "../include/Shader.h"
 #include "../include/Skylium.h"
 #include "../include/Texture.h"
@@ -40,6 +39,37 @@
 #include "../include/utils.h"
 
 using namespace std;
+
+
+enum {
+	GET_TEXTURE	= 1,
+	GET_NORMALS	= 2
+};
+
+/* For std::map in obj parsing */
+struct Index {
+	long v;
+	long t;
+	long n;
+	
+	Index() : v(0), t(0), n(0) {}
+	Index(const long& _v, const long& _t, const long& _n) :
+			v(_v), t(_t), n(_n) {}
+};
+
+struct IndexComp {
+	bool operator ()(const Index &_a, const Index &_b) const {
+		if (_a.v < _b.v) return true;
+		else if (_a.v == _b.v ) {
+			if (_a.t < _b.t) return true;
+			else if (_a.t == _b.t)
+				return _a.n < _b.n;
+			return false;
+		}
+		return false;
+	}
+};
+
 
 Object::Object(const string &_name) :
 		 name(_name),
@@ -83,8 +113,8 @@ Object::Object(const Object &_orig, const string &_name) :
 
 
 Object::~Object() {
-	//while (!__children.empty())
-	//	delete __children.back(), __children.pop_back();
+	while (!__children.empty())
+		delete __children.back(), __children.pop_back();
 	while (!__meshes.empty())
 		delete __meshes.back(), __meshes.pop_back();
 	while (!__materials.empty())
@@ -174,7 +204,7 @@ Object::setColor(int _R, int _G, int _B, GLfloat _A) {
 }
 
 bool
-Object::loadFromObj(const string &_objFile, unsigned _whatToLoad) {
+Object::loadFromObj(const string &_objFile) {
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << "Loading object (" << name << ")... ";
 	
@@ -184,7 +214,7 @@ Object::loadFromObj(const string &_objFile, unsigned _whatToLoad) {
 		return false;
 	}
 	
-	__parseObj(_objFile, _whatToLoad);
+	__parseObj(_objFile);
 	
 	if (sGlobalConfig::USING_VBO)
 		loadIntoVBO();
@@ -220,19 +250,21 @@ Object::addChild(Object* _childPtr) {
 }
 
 void
-Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
+Object::__parseObj(const string &_fileName) {
 	unsigned int lastSlash = _fileName.rfind('/'); // we need the localization
 	string loc = (lastSlash == string::npos) ? "" : _fileName.substr(0, lastSlash+1);
 	
 	// some temporary variables
-	typedef map< Face, long, FaceComp > faceMap;
-	faceMap faces;
+	typedef map< Index, long, IndexComp > indicesMap;
+	indicesMap indices;
 	vector< Position > tempPos;
 	vector< TexCoords > tempTex;
 	vector< Normal > tempNor;
+	unsigned gLastPosSize = 0, gLastTexSize = 0, gLastNorSize = 0;
 	string buffer, temp;
 	long p = 0;
 	GLfloat x, y, z;
+	bool hasNormals = false;
 	
 	Mesh *current = NULL;
 	
@@ -247,30 +279,22 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 		istringstream line(buffer);
 		
 		if (buffer.substr(0, 6) == "mtllib") {
-			if (!(_whatToLoad & GET_MATERIAL))
-				continue;
 			string mtlFileName;
 			line >> temp >> mtlFileName;
 			__parseMtl(loc + mtlFileName);
 			continue;
 		} else if (buffer[0] == 'g') {
-			string gName;
-			if (buffer.length() <= 2) {
-				if (!current)
-					current = new Mesh();
-				else {
-					__meshes.push_back(current);
-					current = new Mesh();
-				}
-			} else {
-				name = buffer.substr(2);
-				if (current)
-					__meshes.push_back(current);
-				current = new Mesh(name);
-			}
+			string gName = "";
+			if (buffer.length() > 2)
+				gName = buffer.substr(2);
+			if (current)
+				__meshes.push_back(current);
+			current = new Mesh(gName);
+			
+			gLastPosSize = tempPos.size();
+			gLastTexSize = tempTex.size();
+			gLastNorSize = tempNor.size();
 		} else if (buffer.substr(0, 6) == "usemtl") {
-			if (!(_whatToLoad & GET_MATERIAL))
-				continue;
 			if (!current)
 				current = new Mesh();
 			string mtlName;
@@ -301,13 +325,12 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 			line >> temp >> x >> y >> z;
 			tempNor.push_back(Normal(x, y, z));
 		} else if (buffer[0] == 'f') {
-			if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) == (GET_VERTICES | GET_TEXTURE | GET_NORMALS)) {
-				
-				char d; // delim
-				Face idx; // temporary face - we have three longs
-				line >> temp;
+			char d; // delim
+			Index idx; // temporary index
+			line >> temp; // loads 'f'
+			if (!tempTex.empty() && !tempNor.empty()) {
 				for (int s = 0; s < 3; ++s) {
-					line >> idx.v >> d >> idx.t >> d >> idx.n; // load face's idices
+					line >> idx.v >> d >> idx.t >> d >> idx.n; // load index's indices (sounds strange)
 					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
@@ -324,9 +347,9 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 					else
 						--idx.n;
 					
-					faceMap::iterator it = faces.find(idx); // find the index
+					indicesMap::iterator it = indices.find(idx); // find the index
 				
-					if (it == faces.end()) { // face not found
+					if (it == indices.end()) { // face not found
 						unsigned newVertIdx = current -> push_back( // add new face to the actual mesh
 								Vertex(
 										Position(tempPos[idx.v]), // location
@@ -334,13 +357,25 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 										Normal(tempNor[idx.n]) // normal vector
 									)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx)); // add this to our face's map
+						
+						indices.insert(pair< Index, int >(idx, newVertIdx)); // add this to our face's map
 																// and give him our new index
+						
 						current -> addNewIdx(newVertIdx);
 					} else {
+						if (idx.v < gLastPosSize || idx.t < gLastTexSize || idx.n < gLastNorSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(tempTex[idx.t]),
+											Normal(tempNor[idx.n])
+										)
+								);
+							it -> second = newVertIdx;
+						}
 						current -> addNewIdx(it -> second);
 					}
-					++p; // count faces
+					++p; // count indices
 				}
 				if (!line.eof()) { // we have 4 indices
 					line >> idx.v >> d >> idx.t >> d >> idx.n;
@@ -360,9 +395,9 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 					else
 						--idx.n;
 					
-					faceMap::iterator it = faces.find(idx);
+					indicesMap::iterator it = indices.find(idx);
 					
-					if (it == faces.end()) {
+					if (it == indices.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
 										Position(tempPos[idx.v]),
@@ -370,17 +405,25 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 										Normal(tempNor[idx.n])
 									)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx));
+						indices.insert(pair< Index, int >(idx, newVertIdx));
+						
 						current -> addThreeIdxs(newVertIdx);
 					} else {
+						if (idx.v < gLastPosSize || idx.t < gLastTexSize || idx.n < gLastNorSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(tempTex[idx.t]),
+											Normal(tempNor[idx.n])
+										)
+								);
+							it -> second = newVertIdx;
+						}
 						current -> addThreeIdxs(it -> second);
 					}
 					++p;
 				}
-			} else if ((_whatToLoad & (GET_VERTICES | GET_NORMALS)) == (GET_VERTICES | GET_NORMALS)) {
-				char d;
-				Face idx;
-				line >> temp;
+			} else if (!tempNor.empty() && tempTex.empty()) {
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> d >> idx.n;
 					
@@ -395,9 +438,9 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 						--idx.n;
 					
 					idx.t = 0;
-					faceMap::iterator it = faces.find(idx);
+					indicesMap::iterator it = indices.find(idx);
 					
-					if (it == faces.end()) {
+					if (it == indices.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
 										Position(tempPos[idx.v]),
@@ -405,10 +448,20 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 										Normal(tempNor[idx.n])
 								)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx));
+						indices.insert(pair< Index, int >(idx, newVertIdx));
 						
 						current -> addNewIdx(newVertIdx);
 					} else {
+						if (idx.v < gLastPosSize || idx.n < gLastNorSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(0, 0),
+											Normal(tempNor[idx.n])
+										)
+								);
+							it -> second = newVertIdx;
+						}
 						current -> addNewIdx(it -> second);
 					}
 					++p;
@@ -426,9 +479,10 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 					else
 						--idx.n;
 					
-					faceMap::iterator it = faces.find(idx);
+					idx.n = 0;
+					indicesMap::iterator it = indices.find(idx);
 					
-					if (it == faces.end()) {
+					if (it == indices.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
 										Position(tempPos[idx.v]),
@@ -436,17 +490,24 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 										Normal(tempNor[idx.n])
 									)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx));
+						indices.insert(pair< Index, int >(idx, newVertIdx));
 						current -> addThreeIdxs(newVertIdx);
 					} else {
+						if (idx.v < gLastPosSize || idx.n < gLastNorSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(0, 0),
+											Normal(tempNor[idx.n])
+										)
+								);
+							it -> second = newVertIdx;
+						}
 						current -> addThreeIdxs(it -> second);
 					}
 					++p;
 				}
-			} else if ((_whatToLoad & (GET_VERTICES | GET_TEXTURE)) == (GET_VERTICES | GET_TEXTURE)) {
-				char d;
-				Face idx;
-				line >> temp;
+			} else if (tempNor.empty() && !tempTex.empty()) {
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> idx.t;
 					
@@ -461,9 +522,9 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 						--idx.t;
 					
 					idx.n = 0;
-					auto it = faces.find(idx);
+					indicesMap::iterator it = indices.find(idx);
 					
-					if (it == faces.end()) {
+					if (it == indices.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
 										Position(tempPos[idx.v]),
@@ -471,16 +532,26 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 									  	Normal(0, 0, 0)
 								)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx));
+						indices.insert(pair< Index, int >(idx, newVertIdx));
 					
 						current -> addNewIdx(newVertIdx);
 					} else {
+						if (idx.v < gLastPosSize || idx.t < gLastTexSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(tempTex[idx.t]),
+											Normal(0, 0, 0)
+										)
+								);
+							it -> second = newVertIdx;
+						}
 						current -> addNewIdx(it -> second);
 					}
 					++p;
 				}
 				if (!line.eof()) { // we have 4 indices
-					line >> idx.v >> d >> idx.n;
+					line >> idx.v >> d >> idx.t;
 					
 					if (idx.v < 0)
 						idx.v = tempPos.size() + idx.v;
@@ -492,9 +563,10 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 					else
 						--idx.t;
 					
-					faceMap::iterator it = faces.find(idx);
+					idx.n = 0;
+					indicesMap::iterator it = indices.find(idx);
 					
-					if (it == faces.end()) {
+					if (it == indices.end()) {
 						unsigned newVertIdx = current -> push_back(
 								Vertex(
 										Position(tempPos[idx.v]),
@@ -502,9 +574,95 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 										Normal(0, 0, 0)
 									)
 							);
-						faces.insert(pair< Face, int >(idx, newVertIdx));
+						indices.insert(pair< Index, int >(idx, newVertIdx));
 						current -> addThreeIdxs(newVertIdx);
 					} else {
+						if (idx.v < gLastPosSize || idx.t < gLastTexSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(tempTex[idx.t]),
+											Normal(0, 0, 0)
+										)
+								);
+							it -> second = newVertIdx;
+						}
+						current -> addThreeIdxs(it -> second);
+					}
+					++p;
+				}
+			} else {
+				for (int s = 0; s < 3; ++s) {
+					line >> idx.v;
+					
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
+					idx.n = 0;
+					idx.t = 0;
+					auto it = indices.find(idx);
+					
+					if (it == indices.end()) {
+						unsigned newVertIdx = current -> push_back(
+								Vertex(
+										Position(tempPos[idx.v]),
+									  	TexCoords(0, 0),
+									  	Normal(0, 0, 0)
+								)
+							);
+						indices.insert(pair< Index, int >(idx, newVertIdx));
+					
+						current -> addNewIdx(newVertIdx);
+					} else {
+						if (idx.v < gLastPosSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(0, 0),
+											Normal(0, 0, 0)
+										)
+								);
+							it -> second = newVertIdx;
+						}
+						current -> addNewIdx(it -> second);
+					}
+					++p;
+				}
+				if (!line.eof()) { // we have 4 indices
+					line >> idx.v;
+					
+					if (idx.v < 0)
+						idx.v = tempPos.size() + idx.v;
+					else
+						--idx.v;
+					
+					idx.n = 0;
+					idx.t = 0;
+					indicesMap::iterator it = indices.find(idx);
+					
+					if (it == indices.end()) {
+						unsigned newVertIdx = current -> push_back(
+								Vertex(
+										Position(tempPos[idx.v]),
+										TexCoords(0, 0),
+										Normal(0, 0, 0)
+									)
+							);
+						indices.insert(pair< Index, int >(idx, newVertIdx));
+						current -> addThreeIdxs(newVertIdx);
+					} else {
+						if (idx.v < gLastPosSize) {
+							unsigned newVertIdx = current -> push_back(
+									Vertex(
+											Position(tempPos[idx.v]),
+											TexCoords(0, 0),
+											Normal(0, 0, 0)
+										)
+								);
+							it -> second = newVertIdx;
+						}
 						current -> addThreeIdxs(it -> second);
 					}
 					++p;
@@ -515,10 +673,10 @@ Object::__parseObj(const string &_fileName, unsigned _whatToLoad) {
 	objFile.close();
 	__meshes.push_back(current);
 	
-	if ((_whatToLoad & GET_NORMALS) == GET_NORMALS) {
+	if (hasNormals) {
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end())
-			(*__meshesIterator) -> enableNormals(), __meshesIterator++;
+			(*__meshesIterator) -> enableNormals(), ++__meshesIterator;
 	}
 
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
