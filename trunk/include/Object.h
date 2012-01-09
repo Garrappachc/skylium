@@ -34,13 +34,6 @@
 class Shader;
 class SkyliumConfig;
 
-enum {
-	GET_VERTICES	= 1,
-	GET_TEXTURE	= 2,
-	GET_NORMALS	= 4,
-	GET_MATERIAL	= 8
-};
-
 class Object {
 	
 	friend class Shader;
@@ -114,14 +107,9 @@ public:
 	/**
 	 * Loads the object form .obj and .mtl.
 	 * @param objFile .obj file localization.
-	 * @param whatToLoad Defines what to load. Possible values:
-	 *		&bull; GET_VERTICES - loads the vertices' coords. It is always set, even if not set;
-	 *		&bull; GET_TEXTURE  - loads the texture coords and the texture'
-	 *		&bull; GET_NORMALS  - loads normals;
-	 *		&bull; GET_MATERIAL - loads the .mtl file.
 	 * @return False if something went wrong.
 	 */
-	bool loadFromObj(const std::string&, unsigned);
+	bool loadFromObj(const std::string&);
 	
 	/**
 	 * Loads the whole object into the VBO.
@@ -182,7 +170,7 @@ private:
 	
 	bool __fileExists(const std::string&);
 	
-	void __parseObj(const std::string&, unsigned);
+	void __parseObj(const std::string&);
 	
 	void __parseMtl(const std::string&);
 	

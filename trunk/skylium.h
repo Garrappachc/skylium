@@ -26,7 +26,6 @@
 
 /* Classes includes */
 #include <skylium/Camera.h>
-#include <skylium/FaceComp.h>
 #include <skylium/FontBase.h>
 #include <skylium/Hud.h>
 #include <skylium/HudData.h>

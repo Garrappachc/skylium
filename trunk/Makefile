@@ -27,13 +27,13 @@ INSTALL_DIR = install -p -o $(LIBOWN) -g $(LIBGRP) -d
 DESTDIR = $(prefix)/lib
 INCDIR = $(prefix)/include
 
-OBJS = Camera.o FaceComp.o FontBase.o Hud.o HudData.o Light.o Material.o \
+OBJS = Camera.o FontBase.o Hud.o HudData.o Light.o Material.o \
 	Mesh.o Object.o Scene.o SceneManager.o Shader.o Skylium.o Texture.o \
 	TextureManager.o Timer.o Vertex.o config.o keysfunc.o utils.o
 
 D = include
 
-INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h $(D)/FaceComp.h \
+INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h \
 	$(D)/FontBase.h $(D)/Hud.h $(D)/HudData.h $(D)/keysdef.h \
 	$(D)/keysfunc.h $(D)/Light.h $(D)/Material.h $(D)/Matrices.h \
 	$(D)/Mesh.h $(D)/Object.h $(D)/Scene.h $(D)/SceneManager.h \
