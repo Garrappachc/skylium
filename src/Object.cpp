@@ -329,6 +329,7 @@ Object::__parseObj(const string &_fileName) {
 			Index idx; // temporary index
 			line >> temp; // loads 'f'
 			if (!tempTex.empty() && !tempNor.empty()) {
+				hasNormals = true;
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> idx.t >> d >> idx.n; // load index's indices (sounds strange)
 					
@@ -424,6 +425,7 @@ Object::__parseObj(const string &_fileName) {
 					++p;
 				}
 			} else if (!tempNor.empty() && tempTex.empty()) {
+				hasNormals = true;
 				for (int s = 0; s < 3; ++s) {
 					line >> idx.v >> d >> d >> idx.n;
 					
