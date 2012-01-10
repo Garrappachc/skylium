@@ -176,6 +176,16 @@ private:
 	 */
 	void __getExtensionList();
 	
+	/* Init functions */
+	bool __openXServerConnection();
+	bool __getGLXVersion();
+	bool __getBestConfig(XVisualInfo*&, GLXFBConfig&);
+	bool __openXWindow(XVisualInfo*, const std::string&);
+	bool __createGLXContext(GLXFBConfig&);
+	void __hideMousePointer();
+	
+	void __destroyContextAndWindow();
+	
 	/**
 	 * @param fileName Name of the file.
 	 * @return False if file could not be found, otherwise true.
@@ -220,7 +230,7 @@ private:
 	GLXContext	(*glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 	GLXFBConfig *	(*glXChooseFBConfig)(Display*, int, const int*, int*);
 	XVisualInfo *	(*glXGetVisualFromFBConfig)(Display*, GLXFBConfig);
-	int			(*glXGetFBConfigAttrib)(Display*, GLXFBConfig, int, int*);
+	int		(*glXGetFBConfigAttrib)(Display*, GLXFBConfig, int, int*);
 	const GLubyte *	(*glGetStringi)(GLenum, GLuint);
 	
 };

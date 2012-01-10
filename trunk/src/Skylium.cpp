@@ -72,15 +72,7 @@ Skylium::~Skylium() {
 	while (!__shaderList.empty())
 		delete __shaderList.back(), __shaderList.pop_back();
 	
-	glXMakeCurrent(__GLXContext.display, None, NULL);
-	glXDestroyContext(__GLXContext.display, __GLXContext.context);
-	__GLXContext.context = NULL;
-	
-	XDestroyWindow(__GLXContext.display, __GLXContext.window);
-	__GLXContext.window = (Window)NULL;
-	
-	XCloseDisplay(__GLXContext.display);
-	__GLXContext.display = 0;
+	__destroyContextAndWindow();
 	
 	while (!__extensions.empty())
 		delete __extensions.back(), __extensions.pop_back();
@@ -96,177 +88,36 @@ Skylium::init(const string &_windowName) {
 	
 	__earlyInitGLXFnPointers();
 	
-	sContextStruct *rcx = &__GLXContext;
+	__GLXContext.mousePosX = 0;
+	__GLXContext.mousePosY = 0;
 	
-	rcx->mousePosX = 0;
-	rcx->mousePosY = 0;
+	XVisualInfo *visualInfo = nullptr;
+	GLXFBConfig bestFbConfig;
 	
-	XVisualInfo *visualInfo;
-	
-	/* Open connection with the X server */
-	rcx->display = XOpenDisplay(NULL);
-	if (rcx->display == NULL) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Connection with X server failed! Exiting.";
+	if (!__openXServerConnection())
 		return false;
-	}
-	checkGLErrors(AT);
 	
-	/* Get the GLX version */
-	glXQueryVersion(rcx->display, &rcx->GLXVersionMajor, &rcx->GLXVersionMinor);
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "GLX version: " << rcx->GLXVersionMajor << "." << rcx->GLXVersionMinor << ".";
-	checkGLErrors(AT);
-	
-	if (rcx->GLXVersionMajor <= 1 && rcx->GLXVersionMinor < 3) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "GLX version too old. Exiting.";
+	if (!__getGLXVersion())
 		return false;
-	}
-	checkGLErrors(AT);
 	
-	/* Look for the best configuration */
-	GLXFBConfig *fbConfigs;
-	int numConfigs = 0;
-	static int fbAttribs[] = {
-		GLX_RENDER_TYPE,	GLX_RGBA_BIT,
-		GLX_X_RENDERABLE,	True,
-		GLX_DRAWABLE_TYPE,	GLX_WINDOW_BIT,
-		GLX_DOUBLEBUFFER,	True,
-		GLX_X_VISUAL_TYPE,	GLX_TRUE_COLOR,
-		GLX_RED_SIZE,		sGlobalConfig::GL_RED_SIZE,
-		GLX_BLUE_SIZE,		sGlobalConfig::GL_BLUE_SIZE,
-		GLX_GREEN_SIZE,	sGlobalConfig::GL_GREEN_SIZE,
-		GLX_DEPTH_SIZE,	sGlobalConfig::GL_DEPTH_SIZE,
-		GLX_STENCIL_SIZE,	8,
-		GLX_ALPHA_SIZE,	8,
-		0 };
-	/* Gets new configuration */
-	fbConfigs = glXChooseFBConfig(rcx->display, DefaultScreen(rcx->display), fbAttribs, &numConfigs);
-	if (!fbConfigs) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Frame buffer configuration failed to be fetched! Exiting.";
+	if (!__getBestConfig(visualInfo, bestFbConfig))
 		return false;
-	}
-	checkGLErrors(AT);
+	 
+	if (!__openXWindow(visualInfo, _windowName))
+		return false;
 	
-	/* Choose the best configuration */
-	int bestFbConfigNum = -1, worstFbConfigNum = -1, bestNumSamp = -1, worstNumSamp = 999;
-	for (int i = 0; i < numConfigs; i++) {
-		XVisualInfo *vi = glXGetVisualFromFBConfig(rcx->display, fbConfigs[i]);
-		if (vi) {
-			int sampBuf, samples;
-			glXGetFBConfigAttrib(rcx->display, fbConfigs[i], GLX_SAMPLE_BUFFERS, &sampBuf);
-			glXGetFBConfigAttrib(rcx->display, fbConfigs[i], GLX_SAMPLES, &samples);
-			
-			if ((bestFbConfigNum < 0 || sampBuf) && samples > bestNumSamp)
-				bestFbConfigNum = i, bestNumSamp = samples;
-			if (worstFbConfigNum < 0 || !sampBuf || samples < worstNumSamp)
-				worstFbConfigNum = i, worstNumSamp = samples;
-		}
-		XFree(vi);
-	}
-	checkGLErrors(AT);
-	
-	GLXFBConfig bestFbConfig = fbConfigs[bestFbConfigNum];
-	XFree(fbConfigs);
-	
-	visualInfo = glXGetVisualFromFBConfig(rcx->display, bestFbConfig);
-	
-	rcx -> winAttribs.event_mask =	ExposureMask
-							|	VisibilityChangeMask
-							|	KeyPressMask
-							|	PointerMotionMask
-							|	StructureNotifyMask
-							;
-	rcx -> winAttribs.border_pixel = 0;
-	rcx -> winAttribs.background_pixmap = None;
-	rcx -> winAttribs.bit_gravity = StaticGravity;
-	rcx -> winAttribs.colormap = XCreateColormap(rcx->display,
-										RootWindow(rcx->display, visualInfo->screen),
-										visualInfo->visual,
-										AllocNone
-						    );
-	checkGLErrors(AT);
-	
-	GLint winmask = CWBorderPixel | CWBitGravity | CWEventMask | CWColormap;
-		
-	
-	rcx->winWidth = DisplayWidth(rcx->display,  DefaultScreen(rcx->display));
-	rcx->winHeight = DisplayHeight(rcx->display,  DefaultScreen(rcx->display));
-	
-	if (!sGlobalConfig::FULLSCREEN_RENDERING) {
-		rcx->winWidth -= 50;
-		rcx->winHeight -= 100;
-	}
-	checkGLErrors(AT);
-	
-	/* Create the new window */
-	rcx->window = XCreateWindow(rcx->display,
-						   DefaultRootWindow(rcx->display),
-						   20, 20,
-						   rcx->winWidth, rcx->winHeight, 0,
-						   visualInfo->depth, InputOutput,
-						   visualInfo->visual, winmask,
-						   &rcx->winAttribs
-			    );
-	checkGLErrors(AT);
-	
-	if (sGlobalConfig::FULLSCREEN_RENDERING) {
-		XGrabKeyboard(rcx->display, rcx->window, True, GrabModeAsync, GrabModeAsync, CurrentTime);                                     
-		XGrabPointer(rcx->display, rcx->window, True, ButtonPressMask, GrabModeAsync, GrabModeAsync, rcx->window, None, CurrentTime); 
-	}
-	
-	XStoreName(rcx->display, rcx->window, _windowName.c_str());
-	XMapWindow(rcx->display, rcx->window);
-	checkGLErrors(AT);
-	
-	/* Create the new OpenGL context */
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Initializing OpenGL version " << sGlobalConfig::OPENGL_VERSION_MAJOR
-			<< "." << sGlobalConfig::OPENGL_VERSION_MINOR << "...";
-	
-	if (glXCreateContextAttribsARB) {
-		GLint attribs[] = {
-			GLX_CONTEXT_MAJOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MAJOR,
-			GLX_CONTEXT_MINOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MINOR,
-			//GLX_CONTEXT_FLAGS_ARB,			GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-			0 };
-	
-		rcx->context = glXCreateContextAttribsARB(rcx->display, bestFbConfig,
-									  0, True, attribs);	
-		XSync(rcx->display, False);
-		checkGLErrors(AT);
-	} else {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "glXCreateContextAttribsARB() not found. Older function in use.";
-		rcx->context = glXCreateNewContext(rcx->display, bestFbConfig, GLX_RGBA_TYPE, 0, True);
-	}
-	
-	glXMakeCurrent(rcx->display, rcx->window, rcx->context);
-	checkGLErrors(AT);
+	if (!__createGLXContext(bestFbConfig))
+		return false;
 	
 	__getExtensionList();
 	
-	// hides the mouse pointer
-	if (!sGlobalConfig::MOUSE_VISIBLE) {
-		Cursor invisibleCursor;
-		Pixmap bitmapEmpty;
-		XColor black;
-		static char noData[] = { 0,0,0,0,0,0,0,0 };
-		black.red = black.green = black.blue = 0;
-		
-		bitmapEmpty = XCreateBitmapFromData(rcx->display, rcx->window, noData, 8, 8);
-		invisibleCursor = XCreatePixmapCursor(rcx->display, bitmapEmpty, bitmapEmpty, &black, &black, 0, 0);
-		XDefineCursor(rcx->display, rcx->window, invisibleCursor);
-		
-		XFreeCursor(rcx->display, invisibleCursor);
-	}
+	if (!sGlobalConfig::MOUSE_VISIBLE)
+		__hideMousePointer();
 	
 	swapBuffers();
 	checkGLErrors(AT);
 	
-	glViewport(0, 0, rcx->winWidth, rcx->winHeight);
+	glViewport(0, 0, __GLXContext.winWidth, __GLXContext.winHeight);
 	checkGLErrors(AT);
 	
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -341,9 +192,7 @@ Skylium::isSupported(const string &_ext) {
 
 void
 Skylium::__render() {
-	
 	__sceneManagement -> displayActiveScene();
-	
 }
 
 void
@@ -577,6 +426,200 @@ Skylium::__getExtensionList() {
 	};
 	
 	sort(__extensions.begin(), __extensions.end(), comparator);
+}
+
+bool
+Skylium::__openXServerConnection() {
+	/* Open connection with the X server */
+	__GLXContext.display = XOpenDisplay(NULL);
+	if (__GLXContext.display == NULL) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Connection with X server failed! Exiting.";
+		return false;
+	}
+	checkGLErrors(AT);
+	return true;
+}
+
+bool
+Skylium::__getGLXVersion() {
+	/* Get the GLX version */
+	glXQueryVersion(__GLXContext.display, &__GLXContext.GLXVersionMajor, &__GLXContext.GLXVersionMinor);
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+		cout << LOG_INFO << "GLX version: " << __GLXContext.GLXVersionMajor << "." << __GLXContext.GLXVersionMinor << ".";
+	checkGLErrors(AT);
+	
+	if (__GLXContext.GLXVersionMajor <= 1 && __GLXContext.GLXVersionMinor < 3) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "GLX version too old. Exiting.";
+		return false;
+	}
+	checkGLErrors(AT);
+	return true;
+}
+
+bool
+Skylium::__getBestConfig(XVisualInfo*& _visualInfo, GLXFBConfig& _bestFbConfig) {
+	/* Look for the best configuration */
+	GLXFBConfig *fbConfigs;
+	int numConfigs = 0;
+	static int fbAttribs[] = {
+		GLX_RENDER_TYPE,	GLX_RGBA_BIT,
+		GLX_X_RENDERABLE,	True,
+		GLX_DRAWABLE_TYPE,	GLX_WINDOW_BIT,
+		GLX_DOUBLEBUFFER,	True,
+		GLX_X_VISUAL_TYPE,	GLX_TRUE_COLOR,
+		GLX_RED_SIZE,		sGlobalConfig::GL_RED_SIZE,
+		GLX_BLUE_SIZE,		sGlobalConfig::GL_BLUE_SIZE,
+		GLX_GREEN_SIZE,	sGlobalConfig::GL_GREEN_SIZE,
+		GLX_DEPTH_SIZE,	sGlobalConfig::GL_DEPTH_SIZE,
+		GLX_STENCIL_SIZE,	8,
+		GLX_ALPHA_SIZE,	8,
+		0 };
+	/* Gets new configuration */
+	fbConfigs = glXChooseFBConfig(__GLXContext.display, DefaultScreen(__GLXContext.display), fbAttribs, &numConfigs);
+	if (!fbConfigs) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Frame buffer configuration failed to be fetched! Exiting.";
+		return false;
+	}
+	checkGLErrors(AT);
+	
+	/* Choose the best configuration */
+	int bestFbConfigNum = -1, worstFbConfigNum = -1, bestNumSamp = -1, worstNumSamp = 999;
+	for (int i = 0; i < numConfigs; i++) {
+		XVisualInfo *vi = glXGetVisualFromFBConfig(__GLXContext.display, fbConfigs[i]);
+		if (vi) {
+			int sampBuf, samples;
+			glXGetFBConfigAttrib(__GLXContext.display, fbConfigs[i], GLX_SAMPLE_BUFFERS, &sampBuf);
+			glXGetFBConfigAttrib(__GLXContext.display, fbConfigs[i], GLX_SAMPLES, &samples);
+			
+			if ((bestFbConfigNum < 0 || sampBuf) && samples > bestNumSamp)
+				bestFbConfigNum = i, bestNumSamp = samples;
+			if (worstFbConfigNum < 0 || !sampBuf || samples < worstNumSamp)
+				worstFbConfigNum = i, worstNumSamp = samples;
+		}
+		XFree(vi);
+	}
+	checkGLErrors(AT);
+	
+	_bestFbConfig = fbConfigs[bestFbConfigNum];
+	XFree(fbConfigs);
+	
+	_visualInfo = glXGetVisualFromFBConfig(__GLXContext.display, _bestFbConfig);
+	
+	__GLXContext.winAttribs.event_mask =	ExposureMask
+							|	VisibilityChangeMask
+							|	KeyPressMask
+							|	PointerMotionMask
+							|	StructureNotifyMask
+							;
+	__GLXContext.winAttribs.border_pixel = 0;
+	__GLXContext.winAttribs.background_pixmap = None;
+	__GLXContext.winAttribs.bit_gravity = StaticGravity;
+	__GLXContext.winAttribs.colormap = XCreateColormap(__GLXContext.display,
+										RootWindow(__GLXContext.display, _visualInfo->screen),
+										_visualInfo->visual,
+										AllocNone
+						    );
+	checkGLErrors(AT);
+	return true;
+}
+
+bool
+Skylium::__openXWindow(XVisualInfo* _visualInfo, const string& _windowName) {
+	GLint winmask = CWBorderPixel | CWBitGravity | CWEventMask | CWColormap;	
+	
+	__GLXContext.winWidth = DisplayWidth(__GLXContext.display,  DefaultScreen(__GLXContext.display));
+	__GLXContext.winHeight = DisplayHeight(__GLXContext.display,  DefaultScreen(__GLXContext.display));
+	
+	if (!sGlobalConfig::FULLSCREEN_RENDERING) {
+		__GLXContext.winWidth -= 50;
+		__GLXContext.winHeight -= 100;
+	}
+	checkGLErrors(AT);
+	
+	/* Create the new window */
+	__GLXContext.window = XCreateWindow(__GLXContext.display,
+						   DefaultRootWindow(__GLXContext.display),
+						   20, 20,
+						   __GLXContext.winWidth, __GLXContext.winHeight, 0,
+						   _visualInfo -> depth, InputOutput,
+						   _visualInfo -> visual, winmask,
+						   &__GLXContext.winAttribs
+			    );
+	checkGLErrors(AT);
+	
+	if (sGlobalConfig::FULLSCREEN_RENDERING) {
+		XGrabKeyboard(__GLXContext.display, __GLXContext.window, True, GrabModeAsync, GrabModeAsync, CurrentTime);                                     
+		XGrabPointer(__GLXContext.display, __GLXContext.window, True, ButtonPressMask, GrabModeAsync,
+				   GrabModeAsync, __GLXContext.window, None, CurrentTime); 
+	}
+	
+	XStoreName(__GLXContext.display, __GLXContext.window, _windowName.c_str());
+	XMapWindow(__GLXContext.display, __GLXContext.window);
+	checkGLErrors(AT);
+	
+	return true;
+}
+
+bool
+Skylium::__createGLXContext(GLXFBConfig& _bestFbConfig) {
+	/* Create the new OpenGL context */
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
+		cout << LOG_INFO << "Initializing OpenGL version " << sGlobalConfig::OPENGL_VERSION_MAJOR
+			<< "." << sGlobalConfig::OPENGL_VERSION_MINOR << "...";
+	
+	if (glXCreateContextAttribsARB) {
+		GLint attribs[] = {
+			GLX_CONTEXT_MAJOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MAJOR,
+			GLX_CONTEXT_MINOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MINOR,
+			//GLX_CONTEXT_FLAGS_ARB,			GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+			0 };
+	
+		__GLXContext.context = glXCreateContextAttribsARB(__GLXContext.display, _bestFbConfig,
+									  0, True, attribs);	
+		XSync(__GLXContext.display, False);
+		checkGLErrors(AT);
+	} else {
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "glXCreateContextAttribsARB() not found. Older function in use.";
+		__GLXContext.context = glXCreateNewContext(__GLXContext.display, _bestFbConfig, GLX_RGBA_TYPE, 0, True);
+	}
+	
+	glXMakeCurrent(__GLXContext.display, __GLXContext.window, __GLXContext.context);
+	checkGLErrors(AT);
+	
+	return true;
+}
+
+void
+Skylium::__hideMousePointer() {
+	// hides the mouse pointer
+	Cursor invisibleCursor;
+	Pixmap bitmapEmpty;
+	XColor black;
+	static char noData[] = { 0,0,0,0,0,0,0,0 };
+	black.red = black.green = black.blue = 0;
+	
+	bitmapEmpty = XCreateBitmapFromData(__GLXContext.display, __GLXContext.window, noData, 8, 8);
+	invisibleCursor = XCreatePixmapCursor(__GLXContext.display, bitmapEmpty, bitmapEmpty, &black, &black, 0, 0);
+	XDefineCursor(__GLXContext.display, __GLXContext.window, invisibleCursor);
+	
+	XFreeCursor(__GLXContext.display, invisibleCursor);
+}
+
+void
+Skylium::__destroyContextAndWindow() {
+	glXMakeCurrent(__GLXContext.display, None, NULL);
+	glXDestroyContext(__GLXContext.display, __GLXContext.context);
+	__GLXContext.context = NULL;
+	
+	XDestroyWindow(__GLXContext.display, __GLXContext.window);
+	__GLXContext.window = (Window)NULL;
+	
+	XCloseDisplay(__GLXContext.display);
+	__GLXContext.display = 0;
 }
 
 bool
