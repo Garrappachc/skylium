@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "Vectors.h"
 #include "Material.h"
@@ -33,6 +34,13 @@
 
 class Shader;
 class SkyliumConfig;
+struct Position;
+struct TexCoords;
+struct Normal;
+struct Index;
+struct IndexComp;
+
+typedef std::map< Index, long, IndexComp > indicesMap;
 
 class Object {
 	
@@ -171,6 +179,12 @@ private:
 	bool __fileExists(const std::string&);
 	
 	void __parseObj(const std::string&);
+	
+	void __parseFace(std::istringstream&, Mesh*&,
+			std::vector< Position >&, std::vector< TexCoords >&,
+			std::vector< Normal >&, indicesMap&,
+			unsigned, unsigned, unsigned,
+			long&, unsigned);
 	
 	void __parseMtl(const std::string&);
 	
