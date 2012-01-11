@@ -24,7 +24,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <map>
 
 #include <sys/stat.h>
 
@@ -255,12 +254,20 @@ Object::__parseObj(const string &_fileName) {
 	string loc = (lastSlash == string::npos) ? "" : _fileName.substr(0, lastSlash+1);
 	
 	// some temporary variables
-	typedef map< Index, long, IndexComp > indicesMap;
 	indicesMap indices;
+	
 	vector< Position > tempPos;
+	tempPos.push_back(Position(0, 0, 0));
+	
 	vector< TexCoords > tempTex;
+	tempTex.push_back(TexCoords(0, 0));
+	
 	vector< Normal > tempNor;
+	tempNor.push_back(Normal(0, 0, 0));
+	
 	unsigned gLastPosSize = 0, gLastTexSize = 0, gLastNorSize = 0;
+	unsigned howToParse = 0;
+	bool normalsChecked = false, textureChecked = false;
 	string buffer, temp;
 	long p = 0;
 	GLfloat x, y, z;
@@ -285,8 +292,15 @@ Object::__parseObj(const string &_fileName) {
 			continue;
 		} else if (buffer[0] == 'g') {
 			string gName = "";
-			if (buffer.length() > 2)
-				gName = buffer.substr(2);
+			if (buffer.length() > 2) {
+				char g;
+				line >> g >> temp;
+				while (!line.eof()) {
+					gName += temp;
+					line >> temp;
+
+				}
+			}
 			if (current)
 				__meshes.push_back(current);
 			current = new Mesh(gName);
@@ -321,359 +335,41 @@ Object::__parseObj(const string &_fileName) {
 			line >> temp >> x >> y;
 			x = 1-x;
 			tempTex.push_back(TexCoords(x, y));
+			if (!textureChecked) {
+				howToParse |= GET_TEXTURE;
+				textureChecked = true;
+			}
 		} else if (buffer.substr(0, 2) == "vn") {
 			line >> temp >> x >> y >> z;
 			tempNor.push_back(Normal(x, y, z));
-		} else if (buffer[0] == 'f') {
-			char d; // delim
-			Index idx; // temporary index
-			line >> temp; // loads 'f'
-			if (!tempTex.empty() && !tempNor.empty()) {
+			if (!normalsChecked) {
+				howToParse |= GET_NORMALS;
 				hasNormals = true;
-				for (int s = 0; s < 3; ++s) {
-					line >> idx.v >> d >> idx.t >> d >> idx.n; // load index's indices (sounds strange)
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					if (idx.t < 0)
-						idx.t = tempTex.size() + idx.t;
-					else
-						--idx.t;
-					
-					if (idx.n < 0)
-						idx.n = tempNor.size() + idx.n;
-					else
-						--idx.n;
-					
-					indicesMap::iterator it = indices.find(idx); // find the index
-				
-					if (it == indices.end()) { // face not found
-						unsigned newVertIdx = current -> push_back( // add new face to the actual mesh
-								Vertex(
-										Position(tempPos[idx.v]), // location
-										TexCoords(tempTex[idx.t]), // texture coords
-										Normal(tempNor[idx.n]) // normal vector
-									)
-							);
-						
-						indices.insert(pair< Index, int >(idx, newVertIdx)); // add this to our face's map
-																// and give him our new index
-						
-						current -> addNewIdx(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize || idx.t < gLastTexSize || idx.n < gLastNorSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(tempTex[idx.t]),
-											Normal(tempNor[idx.n])
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addNewIdx(it -> second);
-					}
-					++p; // count indices
-				}
-				if (!line.eof()) { // we have 4 indices
-					line >> idx.v >> d >> idx.t >> d >> idx.n;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					if (idx.t < 0)
-						idx.t = tempTex.size() + idx.t;
-					else
-						--idx.t;
-					
-					if (idx.n < 0)
-						idx.n = tempNor.size() + idx.n;
-					else
-						--idx.n;
-					
-					indicesMap::iterator it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-										TexCoords(tempTex[idx.t]),
-										Normal(tempNor[idx.n])
-									)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-						
-						current -> addThreeIdxs(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize || idx.t < gLastTexSize || idx.n < gLastNorSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(tempTex[idx.t]),
-											Normal(tempNor[idx.n])
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addThreeIdxs(it -> second);
-					}
-					++p;
-				}
-			} else if (!tempNor.empty() && tempTex.empty()) {
-				hasNormals = true;
-				for (int s = 0; s < 3; ++s) {
-					line >> idx.v >> d >> d >> idx.n;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					if (idx.n < 0)
-						idx.n = tempNor.size() + idx.n;
-					else
-						--idx.n;
-					
-					idx.t = 0;
-					indicesMap::iterator it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-										TexCoords(0, 0),
-										Normal(tempNor[idx.n])
-								)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-						
-						current -> addNewIdx(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize || idx.n < gLastNorSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(0, 0),
-											Normal(tempNor[idx.n])
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addNewIdx(it -> second);
-					}
-					++p;
-				}
-				if (!line.eof()) { // we have 4 indices
-					line >> idx.v >> d >> d >> idx.n;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					if (idx.n < 0)
-						idx.n = tempNor.size() + idx.n;
-					else
-						--idx.n;
-					
-					idx.n = 0;
-					indicesMap::iterator it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-										TexCoords(0, 0),
-										Normal(tempNor[idx.n])
-									)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-						current -> addThreeIdxs(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize || idx.n < gLastNorSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(0, 0),
-											Normal(tempNor[idx.n])
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addThreeIdxs(it -> second);
-					}
-					++p;
-				}
-			} else if (tempNor.empty() && !tempTex.empty()) {
-				for (int s = 0; s < 3; ++s) {
-					line >> idx.v >> d >> idx.t;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					if (idx.t < 0)
-						idx.t = tempTex.size() + idx.t;
-					else
-						--idx.t;
-					
-					idx.n = 0;
-					indicesMap::iterator it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-									  	TexCoords(tempTex[idx.t]),
-									  	Normal(0, 0, 0)
-								)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-					
-						current -> addNewIdx(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize || idx.t < gLastTexSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(tempTex[idx.t]),
-											Normal(0, 0, 0)
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addNewIdx(it -> second);
-					}
-					++p;
-				}
-				if (!line.eof()) { // we have 4 indices
-					line >> idx.v >> d >> idx.t;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					if (idx.t < 0)
-						idx.t = tempTex.size() + idx.t;
-					else
-						--idx.t;
-					
-					idx.n = 0;
-					indicesMap::iterator it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-										TexCoords(tempTex[idx.t]),
-										Normal(0, 0, 0)
-									)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-						current -> addThreeIdxs(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize || idx.t < gLastTexSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(tempTex[idx.t]),
-											Normal(0, 0, 0)
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addThreeIdxs(it -> second);
-					}
-					++p;
-				}
-			} else {
-				for (int s = 0; s < 3; ++s) {
-					line >> idx.v;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					idx.n = 0;
-					idx.t = 0;
-					auto it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-									  	TexCoords(0, 0),
-									  	Normal(0, 0, 0)
-								)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-					
-						current -> addNewIdx(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(0, 0),
-											Normal(0, 0, 0)
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addNewIdx(it -> second);
-					}
-					++p;
-				}
-				if (!line.eof()) { // we have 4 indices
-					line >> idx.v;
-					
-					if (idx.v < 0)
-						idx.v = tempPos.size() + idx.v;
-					else
-						--idx.v;
-					
-					idx.n = 0;
-					idx.t = 0;
-					indicesMap::iterator it = indices.find(idx);
-					
-					if (it == indices.end()) {
-						unsigned newVertIdx = current -> push_back(
-								Vertex(
-										Position(tempPos[idx.v]),
-										TexCoords(0, 0),
-										Normal(0, 0, 0)
-									)
-							);
-						indices.insert(pair< Index, int >(idx, newVertIdx));
-						current -> addThreeIdxs(newVertIdx);
-					} else {
-						if (idx.v < gLastPosSize) {
-							unsigned newVertIdx = current -> push_back(
-									Vertex(
-											Position(tempPos[idx.v]),
-											TexCoords(0, 0),
-											Normal(0, 0, 0)
-										)
-								);
-							it -> second = newVertIdx;
-						}
-						current -> addThreeIdxs(it -> second);
-					}
-					++p;
-				}
+				normalsChecked = true;
 			}
-		}
+		} else if (buffer[0] == 'f')
+			__parseFace(
+					line, current,
+					tempPos, tempTex, tempNor,
+					indices,
+					gLastPosSize, gLastTexSize, gLastNorSize,
+					p, howToParse
+				);
 	}
 	objFile.close();
 	__meshes.push_back(current);
+	
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
+		cout << LOG_INFO << "Detected: ";
+		if ((howToParse & (GET_TEXTURE | GET_NORMALS)) == (GET_TEXTURE | GET_NORMALS))
+			cout << "texture coordinates and normals.";
+		else if ((howToParse & GET_TEXTURE) == GET_TEXTURE)
+			cout << "texture coordinates.";
+		else if ((howToParse & GET_NORMALS) == GET_NORMALS)
+			cout << "normals.";
+		else
+			cout << "only vertices.";
+	}
 	
 	if (hasNormals) {
 		__meshesIterator = __meshes.begin();
@@ -683,6 +379,114 @@ Object::__parseObj(const string &_fileName) {
 
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << p << " vertices loaded.";
+}
+
+void
+Object::__parseFace(
+		istringstream&			_line,		// current line
+		Mesh*&				_current,		// mesh - where to load indices
+		vector< Position >&		_tPos,		// "v"s vector
+		vector< TexCoords >&	_tTex,		// "vt"s vector
+		vector< Normal >&		_tNor,		// "vn"s vector
+		indicesMap&			_indices,		// already parsed indices
+		unsigned				_tPosSize,	// we store these 3 sizes to indicate whether
+		unsigned				_tTexSize,	// 	the following vertex belongs to the current
+		unsigned				_tNorSize,	//	group or not
+		long&				_iCount,		// count vertices
+		unsigned				_howToParse	// v, v/t, v//n or v/t/n
+	   ) {
+	char d; // delim
+	Index idx; // temporary index
+	_line >> d; // passes 'f'
+	
+	for (int s = 0; s < 3; ++s) {
+		if ((_howToParse & (GET_TEXTURE | GET_NORMALS)) == (GET_TEXTURE | GET_NORMALS))
+			_line >> idx.v >> d >> idx.t >> d >> idx.n;
+		else if ((_howToParse & GET_TEXTURE) == GET_TEXTURE)
+			_line >> idx.v >> d >> idx.t;
+		else if ((_howToParse & GET_NORMALS) == GET_NORMALS)
+			_line >> idx.v >> d >> d >> idx.n;
+		else
+			_line >> idx.v;
+		
+		if (idx.v < 0)
+			idx.v = _tPos.size() + idx.v;
+		if (idx.t < 0)
+			idx.t = _tTex.size() + idx.t;
+		if (idx.n < 0)
+			idx.n = _tNor.size() + idx.n;
+		
+		auto it = _indices.find(idx);
+		if (it == _indices.end()) {
+			unsigned newVertIdx = _current -> push_back(
+					Vertex(
+							_tPos[idx.v],
+		  					_tTex[idx.t],
+		  					_tNor[idx.n]
+						)
+				);
+			_indices.insert(make_pair(idx, newVertIdx));
+			_current -> addNewIdx(newVertIdx);
+		} else {
+			if (idx.v < _tPosSize || idx.t < _tTexSize || idx.n < _tNorSize) {
+				unsigned newVertIdx = _current -> push_back(
+					Vertex(
+							_tPos[idx.v],
+		  					_tTex[idx.t],
+		  					_tNor[idx.n]
+						)
+					);
+				it -> second = newVertIdx;
+			}
+			_current -> addNewIdx(it -> second);
+		}
+		++_iCount;
+		
+	}
+	
+	if (!_line.eof()) { // we have quad here
+		if ((_howToParse & (GET_TEXTURE | GET_NORMALS)) == (GET_TEXTURE | GET_NORMALS))
+			_line >> idx.v >> d >> idx.t >> d >> idx.n;
+		else if ((_howToParse & GET_TEXTURE) == GET_TEXTURE)
+			_line >> idx.v >> d >> idx.t;
+		else if ((_howToParse & GET_NORMALS) == GET_NORMALS)
+			_line >> idx.v >> d >> d >> idx.n;
+		else
+			_line >> idx.v;
+		
+		if (idx.v < 0)
+			idx.v = _tPos.size() + idx.v;
+		if (idx.t < 0)
+			idx.t = _tTex.size() + idx.t;
+		if (idx.n < 0)
+			idx.n = _tNor.size() + idx.n;
+		
+		auto it = _indices.find(idx);
+		if (it == _indices.end()) {
+			unsigned newVertIdx = _current -> push_back(
+					Vertex(
+							_tPos[idx.v],
+		  					_tTex[idx.t],
+		  					_tNor[idx.n]
+						)
+				);
+			_indices.insert(make_pair(idx, newVertIdx));
+			_current -> addThreeIdxs(newVertIdx);
+		} else {
+			if (idx.v < _tPosSize || idx.t < _tTexSize || idx.n < _tNorSize) {
+				unsigned newVertIdx = _current -> push_back(
+					Vertex(
+							_tPos[idx.v],
+		  					_tTex[idx.t],
+		  					_tNor[idx.n]
+						)
+					);
+				it -> second = newVertIdx;
+			}
+			_current -> addThreeIdxs(it -> second);
+		}
+		++_iCount;
+	}
 }
 
 void
@@ -728,7 +532,9 @@ Object::__parseMtl(const string &_fileName) {
 			current -> loadShininess(param);
 		} else if (buffer.substr(0, 6) == "map_Kd") {
 			string texfile;
-			line >> temp >>texfile;
+			line >> temp >> texfile;
+			if (texfile == "")
+				continue;
 			if (!__fileExists("texture/" + texfile)) {
 				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
 					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
