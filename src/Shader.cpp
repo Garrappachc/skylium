@@ -203,11 +203,18 @@ Shader::isBound(Object *_dest) {
 }
 
 bool
-Shader::setUniform4f(const string &_name, const sVec4D< GLfloat > &_params) {
+Shader::setUniformFloat(const string &_name, const sVec< GLfloat > &_params) {
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	
-	glUniform4f(location, _params[0], _params[1], _params[2], _params[3]);
+	switch (_params.size()) {
+		case 2:
+			glUniform2f(location, _params[0], _params[1]);
+		case 3:
+			glUniform3f(location, _params[0], _params[1], _params[2]);
+		case 4:
+			glUniform4f(location, _params[0], _params[1], _params[2], _params[3]);
+	}
 	checkGLErrors(AT);
 	
 	return true;
@@ -230,6 +237,8 @@ Shader::__initGLExtensionsPointers() {
 	glGetProgramInfoLog = getProcAddr< decltype(glGetProgramInfoLog) >("glGetProgramInfoLog");
 	glUseProgram = getProcAddr< decltype(glUseProgram) >("glUseProgram");
 	glGetUniformLocation = getProcAddr< decltype(glGetUniformLocation) >("glGetUniformLocation");
+	glUniform2f = getProcAddr< decltype(glUniform2f) >("glUniform2f");
+	glUniform3f = getProcAddr< decltype(glUniform3f) >("glUniform3f");
 	glUniform4f = getProcAddr< decltype(glUniform4f) >("glUniform4f");
 }
 

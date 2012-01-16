@@ -29,6 +29,10 @@
 
 #include <assert.h>
 
+/*
+ * This matrix is a column-order matrix, as OpenGL prefers.
+ * It is continuous in the memory.
+ */
 template < typename T, int N >
 class sMatrix {
 	
@@ -36,6 +40,7 @@ private:
 	T	__data[N * N];
 	
 public:
+	// default ctor
 	sMatrix() {
 		memset(__data, 0, N * N * sizeof(T));
 	}
@@ -43,8 +48,10 @@ public:
 	// Let the GCC make the copy ctor
 	sMatrix(const sMatrix< T, N >&) = default;
 	
+	// and the operator =
 	sMatrix< T, N> & operator =(const sMatrix< T, N >&) = default;
 	
+	// pointer
 	operator T*() {
 		return __data;
 	}
@@ -54,17 +61,19 @@ public:
 	}
 	
 	T& operator [](int _pos) {
-		assert(_pos < N*N);
+		assert(_pos < N * N);
 		return __data[_pos];
 	}
 	
 	const T& operator [](int _pos) const {
-		assert(_pos < N*N);
+		assert(_pos < N * N);
 		return __data[_pos];
 	}
 	
-	T& at(int _a, int _b) {
-		return __data[_a * N + _b];
+	// not like in minor in maths in general - we count from 0.
+	// i - row, j - column
+	T& at(int _i, int _j) {
+		return __data[_j * N + _i];
 	}
 	
 	void loadIdentity() {
@@ -72,15 +81,15 @@ public:
 		for (int i = 0; i < N; ++i)
 			__data[i * N + i] = 1;
 	}
-
+	
 	T determinant() {
 		if (N == 1)
 			return __data[0];
 		if (N == 2)
-			return (__data[0] * __data[3]) - (__data[1] * __data[2]);
+			return (__data[0] * __data[3]) - (__data[2] * __data[1]);
 		if (N == 3)
-			return ((__data[0] * __data[4] * __data[8]) + (__data[1] * __data[5] * __data[6]) + (__data[2] * __data[3] * __data[7]))
-				- ((__data[2] * __data[4] * __data[6]) + (__data[5] * __data[7] * __data[0]) + (__data[1] * __data[3] * __data[8]));
+			return ((__data[0] * __data[4] * __data[8]) + (__data[3] * __data[7] * __data[2]) + (__data[6] * __data[1] * __data[5]))
+				- ((__data[6] * __data[4] * __data[2]) + (__data[3] * __data[1] * __data[8]) + (__data[0] * __data[7] * __data[5]));
 		
 	}
 	
@@ -103,13 +112,10 @@ public:
 	}
 	
 	friend std::ostream& operator <<(std::ostream& _result, const sMatrix< T, N >& _orig) {
-		int k = 0;
-		for (int i = 0; i < N * N; ++i, ++k) {
-			_result << _orig[i] << "\t";
-			if (k == N - 1) {
-				k = -1;
-				_result << "\n";
-			}
+		for (int i = 0; i < N; ++i) {
+			for (int j = 0; j < N; ++j)
+				_result << _orig.at(i, j) << "\t";
+			_result << "\n";
 		}
 		return _result;
 	}
@@ -162,8 +168,8 @@ public:
 		return __data[_pos];
 	}
 	
-	T& at(int _a, int _b) {
-		return __data[_a * 4 + _b];
+	T& at(int _i, int _j) {
+		return __data[_j * 4 + _i];
 	}
 	
 	void loadIdentity() {
@@ -203,13 +209,10 @@ public:
 	}
 	
 	friend std::ostream& operator <<(std::ostream& _result, const sMatrix< T, 4 >& _orig) {
-		int k = 0;
-		for (int i = 0; i < 16; ++i, ++k) {
-			_result << _orig[i] << "\t";
-			if (k == 3) {
-				k = -1;
-				_result << "\n";
-			}
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j)
+				_result << _orig.at(i, j) << "\t";
+			_result << "\n";
 		}
 		return _result;
 	}

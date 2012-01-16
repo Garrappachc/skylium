@@ -82,10 +82,10 @@ public:
 	/**
 	 * Sends some data to shader.
 	 * @param name Name of variable in the shader.
-	 * @param params Vector of 4 float to be sent.
+	 * @param params Vector of N float to be sent.
 	 * @return False if something went wrong - see log.
 	 */
-	bool setUniform4f(const std::string&, const sVec4D< GLfloat >&);
+	bool setUniformFloat(const std::string&, const sVec< GLfloat >&);
 
 private:
 	std::string __vertFile;
@@ -118,6 +118,8 @@ private:
 	void		(*glGetProgramInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
 	void		(*glUseProgram) (GLuint);
 	GLint	(*glGetUniformLocation) (GLuint, const GLchar*);
+	void		(*glUniform2f) (GLint, GLfloat, GLfloat);
+	void		(*glUniform3f) (GLint, GLfloat, GLfloat, GLfloat);
 	void		(*glUniform4f) (GLint, GLfloat, GLfloat, GLfloat, GLfloat);
 	
 };

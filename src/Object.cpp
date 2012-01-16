@@ -128,7 +128,7 @@ Object::show() {
 		
 		if (__shader) {
 			__shader -> toggle();
-			__shader -> setUniform4f("sDefColor", __defColor);
+			__shader -> setUniformFloat("sDefColor", __defColor);
 		} else
 			glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
 		

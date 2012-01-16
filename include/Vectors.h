@@ -30,7 +30,15 @@
 #include <GL/gl.h>
 
 template < typename T >
-class sVec2D {
+class sVec {
+public:
+	virtual const unsigned size() const = 0;
+	virtual const T & operator [](const int&) const = 0;
+	virtual T& operator [](const int&) = 0;
+};
+
+template < typename T >
+class sVec2D : public sVec< T > {
 	
 private:
 	T	__data[2];
@@ -64,6 +72,8 @@ public:
 			v(__data[1]) {
 		memcpy(__data, _orig, sizeof(T)*2);
 	}
+	
+	const unsigned size() const { return 2; }
 	
 	operator T*() {
 		return __data;
@@ -156,7 +166,7 @@ typedef sVec2D< GLfloat > sXY;
 
 
 template < typename T >
-class sVec3D {
+class sVec3D : public sVec< T > {
 	
 private:
 	T	__data[3];
@@ -192,6 +202,7 @@ public:
 			y(__data[1]),
 			z(__data[2]) {}
 			
+	const unsigned size() const { return 3; }
 	
 	operator T*() {
 		return __data;
@@ -321,7 +332,7 @@ typedef sVec3D< GLfloat > sPosition;
 
 
 template < typename T >
-class sVec4D {
+class sVec4D : public sVec< T > {
 	
 private:
 	T	__data[4];
@@ -361,6 +372,8 @@ public:
 			g(__data[1]),
 			b(__data[2]),
 			a(__data[3]) {}
+	
+	const unsigned size() const { return 4; }
 	
 	operator T*() {
 		return __data;
