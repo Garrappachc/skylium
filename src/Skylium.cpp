@@ -128,6 +128,9 @@ Skylium::init(const string &_windowName) {
 	glDepthFunc(GL_LEQUAL);
 	checkGLErrors(AT);
 	
+	if (sGlobalConfig::HUD_EXISTS)
+		TheHud -> prepare();
+	
 	return true;
 	
 }

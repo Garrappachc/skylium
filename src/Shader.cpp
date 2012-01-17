@@ -48,15 +48,17 @@ Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileNam
 
 	__initGLExtensionsPointers();
 	
-	__vertFile = "shaders/" +
-			T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
-			T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
-			"/" + __vertFile;
+	if (__vertFile.find('/') == string::npos)
+		__vertFile = "shaders/" +
+				T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
+				T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
+				"/" + __vertFile;
 	
-	__fragFile = "shaders/" +
-			T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
-			T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
-			"/" + __fragFile;
+	if (__fragFile.find('/') == string::npos)
+		__fragFile = "shaders/" +
+				T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
+				T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
+				"/" + __fragFile;
 	
 	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

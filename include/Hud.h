@@ -33,6 +33,8 @@
 
 class Skylium;
 class HudData;
+class Shader;
+class MatricesManager;
 
 
 class Hud : public Singleton< Hud > {
@@ -73,7 +75,9 @@ public:
 	/**
 	 * Sets the Hud's color.
 	 */
-	void setColor(const sColor& _c) { __background = _c; }
+	void setColor(const sColor& _bg, const sColor& _br) { __background = _bg; __border = _br; }
+	
+	void prepare();
 	
 private:
 	
@@ -81,6 +85,8 @@ private:
 	 * Prepares the Projection Matrix for the Hud to be displayed.
 	 */
 	void __hudMode(bool);
+	
+	GLfloat __vertices[8];
 	
 	bool __visible;
 	
@@ -90,6 +96,12 @@ private:
 	std::vector< HudData* >::const_iterator __displayList;
 	
 	sColor __background;
+	sColor __border;
+	
+	/* Identity shader for skylium */
+	Shader* __hudShader;
+	
+	MatricesManager& __matrices;
 	
 };
 

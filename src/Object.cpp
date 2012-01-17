@@ -130,7 +130,7 @@ Object::~Object() {
 
 void
 Object::show() {
-	__matrices.store();
+	__matrices.storeModelViewMatrix();
 			__matrices.translate(__mov);
 			__matrices.scale(__scale);
 			__matrices.rotate(__rot.x, X);
@@ -168,7 +168,7 @@ Object::show() {
 		
 		__wasShown = true;
 		
-	__matrices.restore();
+	__matrices.restoreModelViewMatrix();
 }
 
 void

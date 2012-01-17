@@ -89,12 +89,22 @@ public:
 	/**
 	 * Pushes the current ModelView matrix on the stack.
 	 */
-	void store();
+	void storeModelViewMatrix();
 	
 	/**
 	 * Pops the ModelView matrix from the stack.
 	 */
-	void restore();
+	void restoreModelViewMatrix();
+	
+	/**
+	 * Pushes the current Projection matrix on the stack.
+	 */
+	void storeProjectionMatrix();
+	
+	/**
+	 * Pops the Projection Matrix from the stack.
+	 */
+	void restoreProjectionMatrix();
 	
 	
 	
@@ -104,7 +114,9 @@ private:
 	
 	sMat16 __projectionMatrix;
 	
-	std::stack< sMat16 > __matStack;
+	std::stack< sMat16 > __MVStack;
+	
+	std::stack< sMat16 > __PStack;
 	
 	
 	

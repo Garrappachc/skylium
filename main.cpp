@@ -21,19 +21,23 @@ main() {
 	
 	
 	Shader *shadow = s_main -> createShader(PHONG_SHADING);
-	if (!shadow -> make()) // compilation + linking
+	/* compilation + link */
+	if (!shadow -> make())
 		exit(1);
 	
-	Scene *sScene = s_main -> createScene("SampleScene"); // we create the scene
+	/* create the scene */
+	Scene *sScene = s_main -> createScene("SampleScene");
 
+	/* create the object */
 	Object *surface = sScene -> createObject("surface_0");
+	/* read the vertices from the .obj file */
 	if (!surface -> loadFromObj("objects/surface.obj"))
 		exit(1);
-	
+	/* translate */
 	surface -> move(-6, -2.65, -10);
 	surface -> scale(4, 4, 4);
 	
-	// we crate the larger surface
+	/* let's crate the larger surface */
 	for (int k = 0; k < 5; k++ ) {
 		for (int i = -1; i < 4; i++) {
 			ostringstream temp;
@@ -44,50 +48,53 @@ main() {
 		}
 	}
 	
-	
+	/* create second object and load its data from file */
 	Object *table = sScene -> createObject("table");
 	table -> loadFromObj("objects/table.obj");
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
 	table -> setColor(0.7f, 0.7f, 0.7f);
 	
-	Object *malpka = sScene -> createObject("monkey"); // monkey
-	if (!malpka -> loadFromObj("objects/monkey.obj"))
+	Object *monkey = sScene -> createObject("monkey"); // monkey
+	if (!monkey -> loadFromObj("objects/monkey.obj"))
 		exit(1);
-	malpka -> move(0, 7, 0);
-	malpka -> scale(3, 3, 3);
-	malpka -> rotate(0, -45, 40);
-	malpka -> setColor(54, 18, 0);
+	monkey -> move(0, 7, 0);
+	monkey -> scale(3, 3, 3);
+	monkey -> rotate(0, -45, 40);
+	monkey -> setColor(54, 18, 0);
 	
-	Camera* fppCamera = sScene -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
-	fppCamera -> lookAt(0, 7, 0); // kamerka skierowana na punkt (0, 7, 0)
+	/* Camera of (0, 4, -20) position, looking at (0, 7, 20) */
+	Camera* fppCamera = sScene -> createCamera(0, 4.0, -20, FPP);
+	fppCamera -> lookAt(0, 7, 20);
 	
 	Camera *sphereCamera = sScene -> createCamera(0, 4, -20, SPHERICAL);
 	sphereCamera -> lookAt(0, 7, 0);
 	
-	shadow -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
-	shadow -> bind(table); // do stolika
+	/* Let's bind our shading shader to the monkey and the table */
+	shadow -> bind(monkey);
+	shadow -> bind(table);
 	
-	int light = sScene -> createLight(7, 3, 0); // światło na pozycji (6, 6, 0)
-	sScene -> setAmbientLight(light, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
-	sScene -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
+	/* Light on (7, 3, 0) position */
+	int light = sScene -> createLight(7, 3, 0);
+	/* Set ambient light */
+	sScene -> setAmbientLight(light, 0.5, 0.5, 0.5, 1.0);
+	/* Switch the light on. By default, all lights are off */
+	sScene -> toggleLight();
 	
-	Timer *Tanimation = new Timer(); // zegarek dla obracającego się stolika + samolotu
-	Timer *Tfps = new Timer(); // liczymy fps'y
-	Timer *Ttabulator = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
+	/* Timer for animation */
+	Timer *Tanimation = new Timer();
+	/* Timer for fps counting */
+	Timer *Tfps = new Timer();
+	/* We have to count the time when the key is down to avoid "flashing-like" effect */
+	Timer *Ttabulator = new Timer();
 	Timer *Thud = new Timer();
 	
-	//Timer matrixTimer;
+	/* Let's create new bitmap font */
+	FontBase *sFont = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1");
 	
-	FontBase *sFont = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1"); // tworzymy nowego fonta
-	
-	HudData fpsCounter(sXY(-0.75, 0.9), sColor(SCOLORS_WHITE), "", sFont);  // Tworzymy "paczkę" danych dla Huda -
-													// pozycję tekstu, kolor tekstu, tekst (póki co
-													// pusty, w pętli renderującej będzie apdejtowany)
-													// oraz czcionkę.
-	s_main -> TheHud -> attachData(&fpsCounter); // TheHud jest referencją do wskaźnika na instancję Huda, do którego to dołączmy
-								// dopiero co utworzoną paczkę.
-	
+	/* Make the "data package" for Hud. */
+	HudData fpsCounter(sXY(-0.75, 0.9), sColor(SCOLORS_WHITE), "", sFont);
+	s_main -> TheHud -> attachData(&fpsCounter);
 	
 	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_WHITE), "Camera: FPP", sFont);
 	s_main -> TheHud -> attachData(&cameraInfo);
@@ -100,15 +107,17 @@ main() {
 	s_main -> TheHud -> attachData(&cameraCenter);
 	sVector camCenter;
 	
-	s_main -> TheHud -> setColor(sColor(0.0f, 0.0f, 1.0f, 0.5f));
+	s_main -> TheHud -> setColor(sColor(0.0f, 0.0f, 1.0f, 0.5f), sColor(0.0f, 0.0f, 1.0f, 0.8f));
 	
+	/* FPS counting */
+	short fps = 0;
 	
-	short fps = 0; // licznik fps.
+	/* Switch on steering the camera with mouse. */
+	s_main -> toggleMouseCamera();
 	
-	s_main -> toggleMouseCamera(); // Ha! Włączamy obracanie kamerą za pomocą myszy
-	
-	sKey keyPressed; // tutaj przechwytujemy klawisze
-	while ((keyPressed = s_main -> sEvent()) != KEY_Esc) { // żeby się dało czymś wyjść
+	/* Capture keys pressed */
+	sKey keyPressed;
+	while ((keyPressed = s_main -> sEvent()) != KEY_Esc) { // to make exit possible
 		if (keyPressed == KEY_s)
 			sScene -> getActiveCamera() -> moveCamera(0.0, 0.0, -0.1);
 		if (keyPressed == KEY_w)
@@ -137,18 +146,16 @@ main() {
 		}
 		if (keyPressed == KEY_backquote && Thud -> passed(250000, MICROSECONDS))
 			s_main -> TheHud -> toggle();
-		if (keyPressed == KEY_Tab && Ttabulator -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
-																	// przytrzymamy taba tak krótko, żeby się
-																	// po prostu raz włączył lub wyłączył
-			if (shadow -> isBound(malpka))
-				shadow -> unbind(malpka);
+		if (keyPressed == KEY_Tab && Ttabulator -> passed(250000, MICROSECONDS)) {
+			if (shadow -> isBound(monkey))
+				shadow -> unbind(monkey);
 			else
-				shadow -> bind(malpka);
+				shadow -> bind(monkey);
 		}
 		
 		if (Tanimation -> passed(2500, MICROSECONDS)) {
 			table -> rotate(0, 0.1, 0);
-			malpka -> rotate(0, 0.1, 0);
+			monkey -> rotate(0, 0.1, 0);
 		}
 		
 		fps++;
@@ -167,25 +174,21 @@ main() {
 		cameraCenter.text = "Center: (" + T2String(camCenter.x) +
 				", " + T2String(camCenter.y) +
 				", " + T2String(camCenter.z) + ")";
-				
-		//if (matrixTimer.passed(1, SECONDS)) {
-		//	cout << "\n" << scenka -> getActiveCamera() -> getModelViewMatrix() << "\n";
-		//}
 		
-		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
+		s_main -> execute(); // Skylium::execute() captures some events and renders the scene.
 		
-		s_main -> swapBuffers(); // musi być! Zamieniamy bufory.
+		s_main -> swapBuffers(); // Must be. Swaps the buffers.
 		
 	}
 	
-	// musimy wywalić ręcznie wszystko, co utworzyliśmy ręcznie (operatorem new w źródle)
+	/* We have to delete everything that was made on our own. */
 	delete Tanimation;
 	delete Tfps;
 	delete Ttabulator;
 	delete Thud;
 	delete sFont;
 	
-	// całą resztę wywali za nas Skylium.
+	/* Skylium handles the rest. */
 	delete s_main;
 	
 	
