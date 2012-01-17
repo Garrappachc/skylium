@@ -1,5 +1,5 @@
 /*
-      __  __      _       _           __  __                                      
+	 __  __      _       _           __  __                                      
 	|  \/  |__ _| |_ _ _(_)__ ___ __|  \/  |__ _ _ _  __ _ __ _ ___ _ _  __ _ __ _ __ 
 	| |\/| / _` |  _| '_| / _/ -_|_-< |\/| / _` | ' \/ _` / _` / -_) '_|/ _| '_ \ '_ \
 	|_|  |_\__,_|\__|_| |_\__\___/__/_|  |_\__,_|_||_\__,_\__, \___|_|(_)__| .__/ .__/
@@ -150,18 +150,35 @@ MatricesManager::rotate(GLdouble _angle, Axis _axis) {
 }
 
 void
-MatricesManager::store() {
-	__matStack.push(__modelViewMatrix);
+MatricesManager::storeModelViewMatrix() {
+	__MVStack.push(__modelViewMatrix);
 	
 	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: ModelView matrix pushed. Current stack size: " << __matStack.size();
+		cout << LOG_INFO << "MatricesManager: ModelView matrix pushed. Current stack size: " << __MVStack.size();
 }
 
 void
-MatricesManager::restore() {
-	__modelViewMatrix = __matStack.top();
-	__matStack.pop();
+MatricesManager::restoreModelViewMatrix() {
+	__modelViewMatrix = __MVStack.top();
+	__MVStack.pop();
 	
 	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: ModelView matrix popped. Current stack size: " << __matStack.size();
+		cout << LOG_INFO << "MatricesManager: ModelView matrix popped. Current stack size: " << __MVStack.size();
+}
+
+void
+MatricesManager::storeProjectionMatrix() {
+	__PStack.push(__projectionMatrix);
+	
+	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+		cout << LOG_INFO << "MatricesManager: Projection matrix pushed. Current stack size: " << __PStack.size();
+}
+
+void
+MatricesManager::restoreProjectionMatrix() {
+	__projectionMatrix = __PStack.top();
+	__PStack.pop();
+	
+	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+		cout << LOG_INFO << "MatricesManager: Projection matrix popped. Current stack size: " << __PStack.size();
 }

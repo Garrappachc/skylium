@@ -26,6 +26,8 @@
 #include "../include/Skylium.h"
 #include "../include/FontBase.h"
 #include "../include/HudData.h"
+#include "../include/Shader.h"
+#include "../include/MatricesManager.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -34,14 +36,20 @@
 using namespace std;
 
 Hud::Hud() :
+		__vertices({-0.8, 1.0, -0.8, 0.6, 0.8, 0.6, 0.8, 1.0}),
 		__visible(false),
 		__toDisplay(0),
-		__background(1.0f, 0.0f, 0.0f, 0.6f) {
+		__background(1.0f, 0.0f, 0.0f, 0.6f),
+		__border(1.0f, 0.0f, 0.0f, 0.8f),
+		__hudShader(NULL),
+		__matrices(MatricesManager::GetSingleton()) {
+	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Hud constructed.";
 }
 
 Hud::~Hud() {
+	delete __hudShader;
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Hud destructed.";
 }
@@ -50,22 +58,27 @@ void
 Hud::draw() {
 	//  Hud Mode on
 	__hudMode(true);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	checkGLErrors(AT);
 	
-	glColor4f(__background.r, __background.g, __background.b, __background.a);
-	glBegin(GL_QUADS);
-		glVertex2f(-0.8, 1.0);
-		glVertex2f(-0.8, 0.6);
-		glVertex2f(0.8, 0.6);
-		glVertex2f(0.8, 1.0);
-	glEnd();
-	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	__hudShader -> toggle();
+	__hudShader -> setUniformFloat("sDefColor", __background);
+	
+	glVertexPointer(2, GL_FLOAT, 0, __vertices);
+	checkGLErrors(AT);
+	glDrawArrays(GL_QUADS, 0, 4);
+	checkGLErrors(AT);
+	
+	__hudShader -> setUniformFloat("sDefColor", __border);
+	glVertexPointer(2, GL_FLOAT, 0, __vertices);
 	glLineWidth(2.0f);
-	glBegin(GL_LINE_LOOP);
-		glVertex2f(-0.8, 1.0);
-		glVertex2f(-0.8, 0.6);
-		glVertex2f(0.8, 0.6);
-		glVertex2f(0.8, 1.0);
-	glEnd();
+	glDrawArrays(GL_LINE_LOOP, 0, 4);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	checkGLErrors(AT);
+	
+	__hudShader -> toggle();
+	
 	checkGLErrors(AT);
 	
 	__displayList = __toDisplay.begin();
@@ -101,14 +114,28 @@ Hud::attachData(HudData *_newdata) {
 }
 
 void
+Hud::prepare() {
+	__hudShader = new Shader("hud_identity.vert", "hud_identity.frag");
+	if (!__hudShader -> make()) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Hud: shader compilation error occured; exiting.\n";
+		exit(1);
+	}
+}
+
+void
 Hud::__hudMode(bool flag) {
 	if (flag) {
+		/* At this point, we don't manipulate Skylium's matrices,
+		   as in the hud shader we don't get any matrices for transform.
+		   But we use GL's lists. */
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
+
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_COLOR_MATERIAL);
 		glDisable(GL_LIGHTING);
@@ -117,6 +144,7 @@ Hud::__hudMode(bool flag) {
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
+		
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_COLOR_MATERIAL);
 		glEnable(GL_LIGHTING);
