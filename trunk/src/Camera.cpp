@@ -26,6 +26,7 @@
 
 #include "../include/Camera.h"
 #include "../include/Skylium.h"
+#include "../include/MatricesManager.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -45,7 +46,8 @@ Camera::Camera(const cType &_type) :
 		__eye(0, 0, 0),
 		__center(0, 0, 0),
 		__up(0, 1, 0),
-		__range(20) {
+		__range(20),
+		__matrices(MatricesManager::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Camera constructed.";
 }
@@ -58,10 +60,11 @@ Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
 		__eye(_x, _y, _z),
 		__center(0, 0, 0),
 		__up(0, 1, 0),
-		__range(20) {
+		__range(20),
+		__matrices(MatricesManager::GetSingleton()) {
 	if (__type == SPHERICAL) {
 		__eye.normalize();
-		__eye *= 20;
+		__eye *= (double)20;
 	}
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Camera (" << __eye.x << ", " << __eye.y << ", " << __eye.z << ") constructed.";
@@ -76,47 +79,20 @@ void
 Camera::setProjection() {
 	__windowWidth = Skylium::GetSingletonPtr() -> getContextPtr() -> winWidth;
 	__windowHeight = Skylium::GetSingletonPtr() -> getContextPtr() -> winHeight;
-	glMatrixMode(GL_PROJECTION);
-	checkGLErrors(AT);
 	
-	glLoadIdentity();
-	checkGLErrors(AT);
 	GLdouble aspect = (GLdouble) __windowWidth / __windowHeight;
 	glViewport(0, 0, __windowWidth, __windowHeight);
 	checkGLErrors(AT);
 	
-	gluPerspective(__fovy, aspect, __zNear, __zFar);
-	checkGLErrors(AT);
-	
-	// get the ModelView matrix
-	glGetFloatv(GL_MODELVIEW_MATRIX, __modelViewMatrix);
-	checkGLErrors(AT);
+	__matrices.sPerspective(__fovy, aspect, __zNear, __zFar);
 }
 
 void
 Camera::setView() {
-	glMatrixMode(GL_MODELVIEW);
-	checkGLErrors(AT);
-	glLoadIdentity();
-	checkGLErrors(AT);
-	if (__type == FPP) {
-		gluLookAt(
-				__eye.x, __eye.y, __eye.z,
-				(__center.x + __eye.x), (__center.y + __eye.y), (__center.z + __eye.z),
-				__up.x, __up.y, __up.z
-			);
-	} else if (__type == SPHERICAL) {
-		gluLookAt(
-				((__eye.x * __range) + __center.x), ((__eye.y * __range) + __center.y), ((__eye.z * __range) + __center.z),
-				__center.x, __center.y, __center.z,
-				__up.x, __up.y, __up.z
-			);
-	}
-	checkGLErrors(AT);
-	
-	// update the Projection matrix
-	glGetFloatv(GL_PROJECTION_MATRIX, __projectionMatrix);
-	checkGLErrors(AT);
+	if (__type == FPP)
+		__matrices.sLookAt(__eye, __center + __eye, __up);
+	else if (__type == SPHERICAL)
+		__matrices.sLookAt((__eye * __range) + __center, __center, __up);
 }
 
 void
@@ -192,3 +168,5 @@ Camera::getCenter() {
 	else
 		return __center;
 }
+
+

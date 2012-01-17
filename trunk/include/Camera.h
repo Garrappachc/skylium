@@ -23,11 +23,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <stack>
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 
 #include "Vectors.h"
 #include "Matrices.h"
+
+class MatricesManager;
 
 /* Cameras types */
 typedef enum {
@@ -129,16 +133,6 @@ public:
 	 * @return Range.
 	 */
 	GLdouble getRange() { return __range; }
-	
-	/**
-	 * @return ModelView Matrix.
-	 */
-	sMat16 & getModelViewMatrix() { return __modelViewMatrix; }
-	
-	/**
-	 * @return Projection Matrix.
-	 */
-	sMat16 & getProjectionMatrix() { return __projectionMatrix; }
 
 
 private:
@@ -168,15 +162,11 @@ private:
 	/* Range of the SPHERICAL camera type */
 	GLdouble __range;
 	
-	/* ModelView Matrix */
-	sMat16 __modelViewMatrix;
-	
-	/* Projection Matrix */
-	sMat16 __projectionMatrix;
-	
 	/* Window dimensions */
 	int __windowHeight;
 	int __windowWidth;
+	
+	MatricesManager& __matrices;
 };
 
 #endif // CAMERA_H

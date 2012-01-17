@@ -28,6 +28,7 @@
 
 #include "Object.h"
 #include "Vectors.h"
+#include "Matrices.h"
 
 #define GL_FRAGMENT_SHADER 0x8B30
 #define GL_VERTEX_SHADER	0x8B31
@@ -80,12 +81,18 @@ public:
 	bool isBound(Object*);
 	
 	/**
-	 * Sends some data to shader.
+	 * Sends some data to the shader.
 	 * @param name Name of variable in the shader.
 	 * @param params Vector of N float to be sent.
-	 * @return False if something went wrong - see log.
 	 */
-	bool setUniformFloat(const std::string&, const sVec< GLfloat >&);
+	void setUniformFloat(const std::string&, const sVec< GLfloat >&);
+	
+	/**
+	 * Sends a matrix to the shader.
+	 * @param name Name of variable in the shader.
+	 * @param matrix Matrix of 16 floats to be sent.
+	 */
+	void setMatrixFloat(const std::string&, const sMat16&);
 
 private:
 	std::string __vertFile;
@@ -121,6 +128,7 @@ private:
 	void		(*glUniform2f) (GLint, GLfloat, GLfloat);
 	void		(*glUniform3f) (GLint, GLfloat, GLfloat, GLfloat);
 	void		(*glUniform4f) (GLint, GLfloat, GLfloat, GLfloat, GLfloat);
+	void		(*glUniformMatrix4fv) (GLint, GLsizei, GLboolean, const GLfloat*);
 	
 };
 

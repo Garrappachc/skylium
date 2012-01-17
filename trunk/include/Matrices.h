@@ -29,6 +29,8 @@
 
 #include <assert.h>
 
+#include <skylium/Vectors.h>
+
 /*
  * This matrix is a column-order matrix, as OpenGL prefers.
  * It is continuous in the memory.
@@ -73,6 +75,10 @@ public:
 	// not like in minor in maths in general - we count from 0.
 	// i - row, j - column
 	T& at(int _i, int _j) {
+		return __data[_j * N + _i];
+	}
+	
+	const T& at(int _i, int _j) const {
 		return __data[_j * N + _i];
 	}
 	
@@ -127,8 +133,40 @@ public:
 				for (int idx = 0; idx < N; ++idx)
 					result.at(i, j) += _a.at(i, idx) * _b.at(idx, j);
 		
-		
 		return result;	
+	}
+	
+	sMatrix< T, N >& operator *=(const sMatrix< T, N >& _b) {
+		*this = *this * _b;
+		return *this;
+	}
+	
+	/**
+	 * Sets the whole column in the matrix.
+	 * @param c Column to be replaced, counting from 0.
+	 * @param vector Vector with data.
+	 * @param offset Which row to start from. Default 0.
+	 */
+	template < typename D >
+	void setColumn(int _c, const sVec< D >& _vector, unsigned _offset = 0) {
+		assert(_c < N);
+		int v = 0;
+		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
+			at(i, _c) = _vector[v];
+	}
+	
+	/**
+	 * Sets the while row in the matrix.
+	 * @param r Row to be replaced, counting from 0.
+	 * @param vector Vector with data.
+	 * @param offset Which column to start from. Default 0.
+	 */
+	template < typename D >
+	void setRow(int _r, const sVec< D >& _vector, unsigned _offset = 0) {
+		assert(_r < N);
+		int v = 0;
+		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
+			at(_r, i) = _vector[v];
 	}
 	
 	
@@ -146,7 +184,7 @@ public:
 	}
 	
 	// Let the GCC make the copy ctor
-	sMatrix(const sMatrix< T, 4 >&) = default;
+	sMatrix(const sMatrix< T, 4 >& _orig) = default;
 	
 	sMatrix< T, 4 > & operator =(const sMatrix< T, 4 >&) = default;
 	
@@ -169,6 +207,10 @@ public:
 	}
 	
 	T& at(int _i, int _j) {
+		return __data[_j * 4 + _i];
+	}
+	
+	const T& at(int _i, int _j) const {
 		return __data[_j * 4 + _i];
 	}
 	
@@ -228,7 +270,38 @@ public:
 		return result;	
 	}
 	
+	sMatrix< T, 4 >& operator *=(const sMatrix< T, 4 >& _b) {
+		*this = *this * _b;
+		return *this;
+	}
 	
+	/**
+	 * Sets the whole column in the matrix.
+	 * @param c Column to be replaced, counting from 0.
+	 * @param vector Vector with data.
+	 * @param offset Which row to start from. Default 0.
+	 */
+	template < typename D >
+	void setColumn(int _c, const sVec< D >& _vector, unsigned _offset = 0) {
+		assert(_c < 4);
+		int v = 0;
+		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
+			at(i, _c) = _vector[v];
+	}
+	
+	/**
+	 * Sets the while row in the matrix.
+	 * @param r Row to be replaced, counting from 0.
+	 * @param vector Vector with data.
+	 * @param offset Which column to start from. Default 0.
+	 */
+	template < typename D >
+	void setRow(int _r, const sVec< D >& _vector, unsigned _offset = 0) {
+		assert(_r < 4);
+		int v = 0;
+		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
+			at(_r, i) = _vector[v];
+	}
 };
 	
 

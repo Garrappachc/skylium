@@ -20,13 +20,13 @@ main() {
 	}
 	
 	
-	Shader *cienie = s_main -> createShader(PHONG_SHADING);
-	if (!cienie -> make()) // compilation + linking
+	Shader *shadow = s_main -> createShader(PHONG_SHADING);
+	if (!shadow -> make()) // compilation + linking
 		exit(1);
 	
-	Scene *scenka = s_main -> createScene("SampleScene"); // we create the scene
+	Scene *sScene = s_main -> createScene("SampleScene"); // we create the scene
 
-	Object *surface = scenka -> createObject("surface_0");
+	Object *surface = sScene -> createObject("surface_0");
 	if (!surface -> loadFromObj("objects/surface.obj"))
 		exit(1);
 	
@@ -39,19 +39,19 @@ main() {
 			ostringstream temp;
 			temp << (int)((i+2) + k * 5);
 			string str = "surface_" + temp.str();
-			Object *surface_new = scenka -> createObject(str, surface);
+			Object *surface_new = sScene -> createObject(str, surface);
 			surface_new -> move(10*i, 0, 10*k);
 		}
 	}
 	
 	
-	Object *table = scenka -> createObject("table");
+	Object *table = sScene -> createObject("table");
 	table -> loadFromObj("objects/table.obj");
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
 	table -> setColor(0.7f, 0.7f, 0.7f);
 	
-	Object *malpka = scenka -> createObject("monkey"); // monkey
+	Object *malpka = sScene -> createObject("monkey"); // monkey
 	if (!malpka -> loadFromObj("objects/monkey.obj"))
 		exit(1);
 	malpka -> move(0, 7, 0);
@@ -59,27 +59,29 @@ main() {
 	malpka -> rotate(0, -45, 40);
 	malpka -> setColor(54, 18, 0);
 	
-	Camera* kamerka_fpp = scenka -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
-	kamerka_fpp -> lookAt(0, 7, 0); // kamerka skierowana na punkt (0, 7, 0)
+	Camera* fppCamera = sScene -> createCamera(0, 4.0, -20, FPP); // kamerka na pozycji (5, 6, 0)
+	fppCamera -> lookAt(0, 7, 0); // kamerka skierowana na punkt (0, 7, 0)
 	
-	Camera *kamerka_kula = scenka -> createCamera(0, 4, -20, SPHERICAL);
-	kamerka_kula -> lookAt(0, 7, 0);
+	Camera *sphereCamera = sScene -> createCamera(0, 4, -20, SPHERICAL);
+	sphereCamera -> lookAt(0, 7, 0);
 	
-	cienie -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
-	cienie -> bind(table); // do stolika
+	shadow -> bind(malpka); // przyłączmy shadera z cieniowanem do małpki
+	shadow -> bind(table); // do stolika
 	
-	int swiatelko = scenka -> createLight(7, 3, 0); // światło na pozycji (6, 6, 0)
-	scenka -> setAmbientLight(swiatelko, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
-	scenka -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
+	int light = sScene -> createLight(7, 3, 0); // światło na pozycji (6, 6, 0)
+	sScene -> setAmbientLight(light, 0.5, 0.5, 0.5, 1.0); // ustawiamy ambient Light.
+	sScene -> toggleLight(); // włączamy światło. Domyślnie każde światło jest wyłączone!
 	
-	Timer *zegarek_dla_animacji = new Timer(); // zegarek dla obracającego się stolika + samolotu
-	Timer *zegarek_dla_fps = new Timer(); // liczymy fps'y
-	Timer *zegarek_dla_taba = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
-	Timer *zegarek_dla_huda = new Timer();
+	Timer *Tanimation = new Timer(); // zegarek dla obracającego się stolika + samolotu
+	Timer *Tfps = new Timer(); // liczymy fps'y
+	Timer *Ttabulator = new Timer(); // nie chcemy efektu "jarzeniówki" przy przęłączaniu shaderów :)
+	Timer *Thud = new Timer();
 	
-	FontBase *foncik = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1"); // tworzymy nowego fonta
+	//Timer matrixTimer;
 	
-	HudData fpsCounter(sXY(-0.75, 0.9), sColor(SCOLORS_WHITE), "", foncik);  // Tworzymy "paczkę" danych dla Huda -
+	FontBase *sFont = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1"); // tworzymy nowego fonta
+	
+	HudData fpsCounter(sXY(-0.75, 0.9), sColor(SCOLORS_WHITE), "", sFont);  // Tworzymy "paczkę" danych dla Huda -
 													// pozycję tekstu, kolor tekstu, tekst (póki co
 													// pusty, w pętli renderującej będzie apdejtowany)
 													// oraz czcionkę.
@@ -87,14 +89,14 @@ main() {
 								// dopiero co utworzoną paczkę.
 	
 	
-	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_WHITE), "Camera: FPP", foncik);
+	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_WHITE), "Camera: FPP", sFont);
 	s_main -> TheHud -> attachData(&cameraInfo);
 	
-	HudData cameraLookAt(sXY(0.0, 0.9), sColor(SCOLORS_WHITE), "LookAt: ", foncik);
+	HudData cameraLookAt(sXY(0.0, 0.9), sColor(SCOLORS_WHITE), "LookAt: ", sFont);
 	s_main -> TheHud -> attachData(&cameraLookAt);
 	sVector camLookAt;
 	
-	HudData cameraCenter(sXY(0.0, 0.8), sColor(SCOLORS_WHITE), "Center: ", foncik);
+	HudData cameraCenter(sXY(0.0, 0.8), sColor(SCOLORS_WHITE), "Center: ", sFont);
 	s_main -> TheHud -> attachData(&cameraCenter);
 	sVector camCenter;
 	
@@ -105,71 +107,70 @@ main() {
 	
 	s_main -> toggleMouseCamera(); // Ha! Włączamy obracanie kamerą za pomocą myszy
 	
-	sKey klawisz; // tutaj przechwytujemy klawisze
-	while ((klawisz = s_main -> sEvent()) != KEY_Esc) { // żeby się dało czymś wyjść
-		if (klawisz == KEY_s)
-			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, -0.1);
-		if (klawisz == KEY_w)
-			scenka -> getActiveCamera() -> moveCamera(0.0, 0.0, 0.1);
-		if (klawisz == KEY_d)
-			scenka -> getActiveCamera() -> moveCamera(0.1, 0.0, 0.0);
-		if (klawisz == KEY_a)
-			scenka -> getActiveCamera() -> moveCamera(-0.1, 0.0, 0.0);
-		if (klawisz == KEY_z)
- 			scenka -> getActiveCamera() -> moveCamera(0.0, -0.7, 0.0);
-		if (klawisz == KEY_x)
-			scenka -> getActiveCamera() -> moveCamera(0.0, 0.7, 0.0);
+	sKey keyPressed; // tutaj przechwytujemy klawisze
+	while ((keyPressed = s_main -> sEvent()) != KEY_Esc) { // żeby się dało czymś wyjść
+		if (keyPressed == KEY_s)
+			sScene -> getActiveCamera() -> moveCamera(0.0, 0.0, -0.1);
+		if (keyPressed == KEY_w)
+			sScene -> getActiveCamera() -> moveCamera(0.0, 0.0, 0.1);
+		if (keyPressed == KEY_d)
+			sScene -> getActiveCamera() -> moveCamera(0.1, 0.0, 0.0);
+		if (keyPressed == KEY_a)
+			sScene -> getActiveCamera() -> moveCamera(-0.1, 0.0, 0.0);
+		if (keyPressed == KEY_z)
+ 			sScene -> getActiveCamera() -> moveCamera(0.0, -0.7, 0.0);
+		if (keyPressed == KEY_x)
+			sScene -> getActiveCamera() -> moveCamera(0.0, 0.7, 0.0);
 		
-		if (klawisz == KEY_q)
-			scenka -> getActiveCamera() -> setRange((scenka -> getActiveCamera() -> getRange()) + 0.5);
-		if (klawisz == KEY_e)
-			scenka -> getActiveCamera() -> setRange((scenka -> getActiveCamera() -> getRange()) - 0.5);
+		if (keyPressed == KEY_q)
+			sScene -> getActiveCamera() -> setRange((sScene -> getActiveCamera() -> getRange()) + 0.5);
+		if (keyPressed == KEY_e)
+			sScene -> getActiveCamera() -> setRange((sScene -> getActiveCamera() -> getRange()) - 0.5);
 		
-		if (klawisz == KEY_F1) {
-			scenka -> setActiveCamera(kamerka_fpp);
+		if (keyPressed == KEY_F1) {
+			sScene -> setActiveCamera(fppCamera);
 			cameraInfo.text = "Camera: FPP";
 		}
-		if (klawisz == KEY_F2) {
-			scenka -> setActiveCamera(kamerka_kula);
+		if (keyPressed == KEY_F2) {
+			sScene -> setActiveCamera(sphereCamera);
 			cameraInfo.text = "Camera: SPHERICAL";
 		}
-		if (klawisz == KEY_backquote && zegarek_dla_huda -> passed(250000, MICROSECONDS))
+		if (keyPressed == KEY_backquote && Thud -> passed(250000, MICROSECONDS))
 			s_main -> TheHud -> toggle();
-		if (klawisz == KEY_Tab && zegarek_dla_taba -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
+		if (keyPressed == KEY_Tab && Ttabulator -> passed(250000, MICROSECONDS)) { // używamy dodatkowego zegarka, bo nigdy nie 
 																	// przytrzymamy taba tak krótko, żeby się
 																	// po prostu raz włączył lub wyłączył
-			if (cienie -> isBound(malpka))
-				cienie -> unbind(malpka);
+			if (shadow -> isBound(malpka))
+				shadow -> unbind(malpka);
 			else
-				cienie -> bind(malpka);
-			
-			if (cienie -> isBound(table))
-				cienie -> unbind(table);
-			else
-				cienie -> bind(table);
+				shadow -> bind(malpka);
 		}
 		
-		if (zegarek_dla_animacji -> passed(2500, MICROSECONDS)) {
+		if (Tanimation -> passed(2500, MICROSECONDS)) {
 			table -> rotate(0, 0.1, 0);
 			malpka -> rotate(0, 0.1, 0);
 		}
 		
 		fps++;
 		
-		if (zegarek_dla_fps -> passed(1, SECONDS)) {
-			fpsCounter.text = "FPS: " + T2String< short >(fps) + " (approximately)";
+		if (Tfps -> passed(1, SECONDS)) {
+			fpsCounter.text = "FPS: " + T2String(fps) + " (approximately)";
 			fps = 0;
 		}
 		
-		camLookAt = scenka -> getActiveCamera() -> getCenter();
-		cameraLookAt.text = "LookAt: (" + T2String< float >(camLookAt.x) +
-				", " + T2String< float >(camLookAt.y) +
-				", " + T2String< float >(camLookAt.z) + ")";
+		camLookAt = sScene -> getActiveCamera() -> getCenter();
+		cameraLookAt.text = "LookAt: (" + T2String(camLookAt.x) +
+				", " + T2String(camLookAt.y) +
+				", " + T2String(camLookAt.z) + ")";
 		
-		camCenter = scenka -> getActiveCamera() -> getEye();
-		cameraCenter.text = "Center: (" + T2String< float >(camCenter.x) +
-				", " + T2String< float >(camCenter.y) +
-				", " + T2String< float >(camCenter.z) + ")";
+		camCenter = sScene -> getActiveCamera() -> getEye();
+		cameraCenter.text = "Center: (" + T2String(camCenter.x) +
+				", " + T2String(camCenter.y) +
+				", " + T2String(camCenter.z) + ")";
+				
+		//if (matrixTimer.passed(1, SECONDS)) {
+		//	cout << "\n" << scenka -> getActiveCamera() -> getModelViewMatrix() << "\n";
+		//}
 		
 		s_main -> execute(); // Skylium::execute() przechwytuje i obsługuje stosowne eventy i renderuje scenę.
 		
@@ -178,11 +179,11 @@ main() {
 	}
 	
 	// musimy wywalić ręcznie wszystko, co utworzyliśmy ręcznie (operatorem new w źródle)
-	delete zegarek_dla_animacji;
-	delete zegarek_dla_fps;
-	delete zegarek_dla_taba;
-	delete zegarek_dla_huda;
-	delete foncik;
+	delete Tanimation;
+	delete Tfps;
+	delete Ttabulator;
+	delete Thud;
+	delete sFont;
 	
 	// całą resztę wywali za nas Skylium.
 	delete s_main;

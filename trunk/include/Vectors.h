@@ -29,6 +29,7 @@
 
 #include <GL/gl.h>
 
+// interface for vectors
 template < typename T >
 class sVec {
 public:
@@ -99,58 +100,40 @@ public:
 		return (__data[0] != _orig[0] || __data[1] != _orig[1]);
 	}
 	
-	T& operator =(const sVec2D &_orig) {
+	sVec2D< T >& operator =(const sVec2D< T >& _orig) {
 		__data[0] = _orig[0];
 		__data[1] = _orig[1];
-		return *__data;
+		return *this;
 	}
 	
-	friend sVec2D operator +(const sVec2D &_a, const sVec2D &_b) {
-		sVec2D< T > x = _a;
-		x += _b;
-		return x;
-	}
-	
-	friend sVec2D operator -(const sVec2D &_a, const sVec2D &_b) {
-		sVec2D< T > x = _a;
-		x -= _b;
-		return x;
-	}
-	
-	friend sVec2D operator *(const sVec2D &_a, const sVec2D &_b) {
-		sVec2D< T > x = _a;
-		x *= _b;
-		return x;
-	}
-	
-	friend sVec2D operator /(const sVec2D &_a, const sVec2D &_b) {
-		sVec2D< T >x = _a;
-		x /= _b;
-		return x;
-	}
-	
-	T& operator +=(const sVec2D &_orig) {
+	sVec2D< T >& operator +=(const sVec2D< T >& _orig) {
 		__data[0] += _orig[0];
 		__data[1] += _orig[1];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator -=(const sVec2D &_orig) {
+	sVec2D< T >& operator -=(const sVec2D< T >& _orig) {
 		__data[0] -= _orig[0];
 		__data[1] -= _orig[1];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator *=(const sVec2D &_orig) {
+	sVec2D< T >& operator *=(const sVec2D< T >& _orig) {
 		__data[0] *= _orig[0];
 		__data[1] *= _orig[1];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator /=(const sVec2D &_orig) {
+	sVec2D< T >& operator /=(const sVec2D< T >& _orig) {
 		__data[0] /= _orig[0];
 		__data[1] /= _orig[1];
-		return *__data;
+		return *this;
+	}
+	
+	sVec2D< T >& operator *=(const T& _orig) {
+		__data[0] *= _orig;
+		__data[1] *= _orig;
+		return *this;
 	}
 	
 	void normalize() {
@@ -159,6 +142,26 @@ public:
 			return;
 		__data[0] /= len;
 		__data[1] /= len;
+	}
+	
+	friend sVec2D< T > operator +(const sVec2D< T >& _a, const sVec2D< T >& _b) {
+		return sVec2D< T >(_a[0] + _b[0], _a[1] + _b[1]);
+	}
+	
+	friend sVec2D< T > operator -(const sVec2D< T >& _a, const sVec2D< T >& _b) {
+		return sVec2D< T >(_a[0] - _b[0], _a[1] - _b[1]);
+	}
+	
+	friend sVec2D< T > operator *(const sVec2D< T >& _a, const sVec2D< T >& _b) {
+		return sVec2D< T >(_a[0] * _b[0], _a[1] * _b[1]);
+	}
+	
+	friend sVec2D< T > operator /(const sVec2D< T >& _a, const sVec2D< T >& _b) {
+		return sVec2D< T >(_a[0] / _b[0], _a[1] / _b[1]);
+	}
+	
+	friend sVec2D< T > operator *(const sVec2D< T >& _a, const T& _b) {
+		return sVec2D< T >(_a[0] * _b, _a[1] * _b);
 	}
 };
 
@@ -228,93 +231,51 @@ public:
 		return (__data[0] != _orig[0] || __data[1] != _orig[1] || __data[2] != _orig[2]);
 	}
 	
-	T& operator =(const sVec3D &_orig) {
+	sVec3D< T > operator -() {
+		return sVec3D< T >(-__data[0], -__data[1], -__data[2]);
+	}
+	
+	sVec3D< T >& operator =(const sVec3D< T >& _orig) {
 		__data[0] = _orig[0];
 		__data[1] = _orig[1];
 		__data[2] = _orig[2];
-		return *__data;
+		return *this;
 	}
 	
-	friend sVec3D operator +(const sVec3D &_a, const sVec3D &_b) {
-		sVec3D< T > x = _a;
-		x += _b;
-		return x;
-	}
-	
-	friend sVec3D operator -(const sVec3D &_a, const sVec3D &_b) {
-		sVec3D< T > x = _a;
-		x -= _b;
-		return x;
-	}
-	
-	friend sVec3D operator *(const sVec3D &_a, const sVec3D &_b) {
-		sVec3D< T > x = _a;
-		x *= _b;
-		return x;
-	}
-	
-	friend sVec3D operator /(const sVec3D &_a, const sVec3D &_b) {
-		sVec3D< T >x = _a;
-		x /= _b;
-		return x;
-	}
-	
-	T& operator +=(const sVec3D &_orig) {
+	sVec3D< T >& operator +=(const sVec3D< T >& _orig) {
 		__data[0] += _orig[0];
 		__data[1] += _orig[1];
 		__data[2] += _orig[2];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator +=(const T &_orig) {
-		__data[0] += _orig[0];
-		__data[1] += _orig[1];
-		__data[2] += _orig[2];
-		return *__data;
-	}
-	
-	T& operator -=(const sVec3D &_orig) {
+	sVec3D< T >& operator -=(const sVec3D< T >& _orig) {
 		__data[0] -= _orig[0];
 		__data[1] -= _orig[1];
 		__data[2] -= _orig[2];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator -=(const T &_orig) {
-		__data[0] -= _orig[0];
-		__data[1] -= _orig[1];
-		__data[2] -= _orig[2];
-		return *__data;
-	}
-	
-	T& operator *=(const sVec3D &_orig) {
+	sVec3D< T >& operator *=(const sVec3D< T >& _orig) {
 		__data[0] *= _orig[0];
 		__data[1] *= _orig[1];
 		__data[2] *= _orig[2];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator *=(const T &_orig) {
-		__data[0] *= _orig;
-		__data[1] *= _orig;
-		__data[2] *= _orig;
-		return *__data;
-	}
-	
-	T& operator /=(const sVec3D &_orig) {
+	sVec3D< T >& operator /=(const sVec3D< T >& _orig) {
 		__data[0] /= _orig[0];
 		__data[1] /= _orig[1];
 		__data[2] /= _orig[2];
-		return *__data;
+		return *this;
 	}
 	
-	T& operator /=(const T &_orig) {
-		__data[0] /= _orig;
-		__data[1] /= _orig;
-		__data[2] /= _orig;
-		return *__data;
+	sVec3D< T >& operator *=(const T& _orig) {
+		__data[0] *= _orig;
+		__data[1] *= _orig;
+		__data[2] *= _orig;
+		return *this;
 	}
-	
 	
 	void normalize() {
 		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]));
@@ -324,7 +285,35 @@ public:
 		__data[1] /= len;
 		__data[2] /= len;
 	}
+	
+	friend sVec3D< T > operator +(const sVec3D< T >& _a, const sVec3D< T >& _b) {
+		return sVec3D< T >(_a[0] + _b[0], _a[1] + _b[1], _a[2] + _b[2]);
+	}
+	
+	friend sVec3D< T > operator -(const sVec3D< T >& _a, const sVec3D< T >& _b) {
+		return sVec3D< T >(_a[0] - _b[0], _a[1] - _b[1], _a[2] - _b[2]);
+	}
+	
+	friend sVec3D< T > operator *(const sVec3D< T >& _a, const sVec3D< T >& _b) {
+		return sVec3D< T >(_a[0] * _b[0], _a[1] * _b[1], _a[2] * _b[2]);
+	}
+	
+	friend sVec3D< T > operator /(const sVec3D< T >& _a, const sVec3D< T >& _b) {
+		return sVec2D< T >(_a[0] / _b[0], _a[1] / _b[1], _a[2] / _b[2]);
+	}
+	
+	friend sVec3D< T > operator *(const sVec3D< T >& _a, const T& _b) {
+		return sVec3D< T >(_a[0] * _b, _a[1] * _b, _a[2] * _b);
+	}
 };
+
+template < typename T >
+sVec3D< T > normalOfPlane(const sVec3D< T >& _a, const sVec3D< T >& _b) {
+	return sVec3D< T >((_a[1] * _b[2]) - (_a[2] * _b[1]),
+			(_a[2] * _b[0]) - (_a[0] * _b[2]),
+			(_a[0] * _b[1]) - (_a[1] * _b[0])
+		);
+}
 
 typedef sVec3D< GLdouble > sVector;
 typedef sVec3D< GLfloat > sPosition;

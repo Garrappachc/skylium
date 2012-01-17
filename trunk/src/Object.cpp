@@ -32,12 +32,16 @@
 #include "../include/Shader.h"
 #include "../include/Skylium.h"
 #include "../include/Texture.h"
+#include "../include/MatricesManager.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
 #include "../include/utils.h"
 
 using namespace std;
+
+static const double PI = 3.1415265359;
+static const double PIdiv180 = PI/180.0;
 
 
 enum {
@@ -71,17 +75,18 @@ struct IndexComp {
 
 
 Object::Object(const string &_name) :
-		 name(_name),
-		 __defColor(1, 1, 1, 1),
-		 __mov(0, 0, 0),
-		 __rot(0, 0, 0),
-		 __scale(1, 1, 1),
-		 __shader(NULL),
-		 __children(0),
+		name(_name),
+		__defColor(1, 1, 1, 1),
+		__mov(0, 0, 0),
+		__rot(0, 0, 0),
+		__scale(1, 1, 1),
+		__shader(NULL),
+		__children(0),
 		__childrenIterator(),
-		 __meshes(0),
-		 __meshesIterator(),
-		 __materials(0) {
+		__meshes(0),
+		__meshesIterator(),
+		__materials(0),
+		__matrices(MatricesManager::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Object (\"" << _name << "\") constructed.";
 }
@@ -97,7 +102,8 @@ Object::Object(const Object &_orig, const string &_name) :
 		__childrenIterator(),
 		__meshes(0),
 		__meshesIterator(),
-		__materials(0) {
+		__materials(0),
+		__matrices(MatricesManager::GetSingleton()) {
 	for (unsigned i = 0; i < _orig.__meshes.size(); i++) {
 		Mesh *tempMtl = new Mesh(*_orig.__meshes[i]);
 		__meshes.push_back(tempMtl);
@@ -124,27 +130,29 @@ Object::~Object() {
 
 void
 Object::show() {
-	glPushMatrix();
+	__matrices.store();
+			__matrices.translate(__mov);
+			__matrices.scale(__scale);
+			__matrices.rotate(__rot.x, X);
+			__matrices.rotate(__rot.y, Y);
+			__matrices.rotate(__rot.z, Z);
 		
 		if (__shader) {
 			__shader -> toggle();
+			__shader -> setMatrixFloat("sModelViewMatrix", __matrices.getModelViewMatrix());
+			__shader -> setMatrixFloat("sProjectionMatrix", __matrices.getProjectionMatrix());
 			__shader -> setUniformFloat("sDefColor", __defColor);
-		} else
+		} else {
 			glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
+			glMatrixMode(GL_MODELVIEW);
+			glLoadMatrixf(__matrices.getModelViewMatrix());
+			glMatrixMode(GL_PROJECTION);
+			glLoadMatrixf(__matrices.getProjectionMatrix());
+		}
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		checkGLErrors(AT);
-		
-		glTranslated(__mov.x, __mov.y, __mov.z);
-		
-		glScaled(__scale.x, __scale.y, __scale.z);
-		
-		glRotated(__rot.x, 1.0, 0.0, 0.0);
-		glRotated(__rot.y, 0.0, 1.0, 0.0);
-		glRotated(__rot.z, 0.0, 0.0, 1.0);
-		checkGLErrors(AT);
-		
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end())
 			(*__meshesIterator) -> show(), ++__meshesIterator;
@@ -160,8 +168,7 @@ Object::show() {
 		
 		__wasShown = true;
 		
-	glPopMatrix();
-	checkGLErrors(AT);
+	__matrices.restore();
 }
 
 void

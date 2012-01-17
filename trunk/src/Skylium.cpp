@@ -47,8 +47,10 @@ Skylium::Skylium() :
 		Textures(__textureManagement),
 		TheHud(__hud),
 		GlobalTimer(__timer),
+		Matrices(__matricesManagement),
 		__sceneManagement(new SceneManager()),
 		__textureManagement(new TextureManager()),
+		__matricesManagement(new MatricesManager()),
 		__pendingKeys(KEY_NOKEY),
 		__isMouseMotionEnabled(false),
 		__lastMousePositionX(0),
@@ -154,24 +156,24 @@ Skylium::createShader(const unsigned &_type, const string &_vertFile, const stri
 	string vertFile, fragFile;
 	switch (_type) {
 		case IDENTITY:
-			vertFile = "shaders/identity.vert";
-			fragFile = "shaders/identity.frag";
+			vertFile = "identity.vert";
+			fragFile = "identity.frag";
 			break;
 		case PHONG_SHADING:
-			vertFile = "shaders/shadow.vert";
-			fragFile = "shaders/shadow.frag";
+			vertFile = "shadow.vert";
+			fragFile = "shadow.frag";
 			break;
 		case TOON:
-			vertFile = "shaders/toon.vert";
-			fragFile = "shaders/toon.frag";
+			vertFile = "toon.vert";
+			fragFile = "toon.frag";
 			break;
 		case CUSTOM:
 			vertFile = _vertFile;
 			fragFile = _fragFile;
 			break;
 		default:
-			vertFile = "shaders/identity.vert";
-			fragFile = "shaders/identity.frag";
+			vertFile = "identity.vert";
+			fragFile = "identity.frag";
 			break;
 	}
 	

@@ -34,6 +34,8 @@
 
 class Shader;
 class SkyliumConfig;
+class Skylium;
+class MatricesManager;
 struct Position;
 struct TexCoords;
 struct Normal;
@@ -189,6 +191,8 @@ private:
 	void __parseMtl(const std::string&);
 	
 	SkyliumConfig * __config;
+	
+	MatricesManager& __matrices;
 	
 };
 
