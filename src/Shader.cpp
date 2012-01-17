@@ -48,6 +48,16 @@ Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileNam
 
 	__initGLExtensionsPointers();
 	
+	__vertFile = "shaders/" +
+			T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
+			T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
+			"/" + __vertFile;
+	
+	__fragFile = "shaders/" +
+			T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
+			T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
+			"/" + __fragFile;
+	
 	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	
@@ -202,8 +212,8 @@ Shader::isBound(Object *_dest) {
 		return true;
 }
 
-bool
-Shader::setUniformFloat(const string &_name, const sVec< GLfloat > &_params) {
+void
+Shader::setUniformFloat(const string& _name, const sVec< GLfloat >& _params) {
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	
@@ -216,8 +226,15 @@ Shader::setUniformFloat(const string &_name, const sVec< GLfloat > &_params) {
 			glUniform4f(location, _params[0], _params[1], _params[2], _params[3]);
 	}
 	checkGLErrors(AT);
+}
+
+void
+Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) {
+	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
+	checkGLErrors(AT);
 	
-	return true;
+	glUniformMatrix4fv(location, 1, GL_FALSE, _matrix);
+	checkGLErrors(AT);
 }
 
 void
@@ -240,6 +257,7 @@ Shader::__initGLExtensionsPointers() {
 	glUniform2f = getProcAddr< decltype(glUniform2f) >("glUniform2f");
 	glUniform3f = getProcAddr< decltype(glUniform3f) >("glUniform3f");
 	glUniform4f = getProcAddr< decltype(glUniform4f) >("glUniform4f");
+	glUniformMatrix4fv = getProcAddr< decltype(glUniformMatrix4fv) >("glUniformMatrix4fv");
 }
 
 bool

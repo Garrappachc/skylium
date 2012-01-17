@@ -34,6 +34,7 @@
 #include "Shader.h"
 #include "Hud.h"
 #include "Timer.h"
+#include "MatricesManager.h"
 
 #include "keysdef.h"
 
@@ -146,6 +147,7 @@ public:
 	TextureManager*& Textures;
 	Hud*& TheHud;
 	Timer*& GlobalTimer;
+	MatricesManager*& Matrices;
 	
 	
 private:
@@ -197,6 +199,9 @@ private:
 	
 	/* TextureManager instance */
 	TextureManager * __textureManagement;
+	
+	/* MatricesManager instance */
+	MatricesManager * __matricesManagement;
 	
 	/* Keeps the rendering context */
 	sContextStruct __GLXContext;

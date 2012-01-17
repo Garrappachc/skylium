@@ -32,6 +32,7 @@
 #include <skylium/Light.h>
 #include <skylium/Material.h>
 #include <skylium/Matrices.h>
+#include <skylium/MatricesManager.h>
 #include <skylium/Mesh.h>
 #include <skylium/Object.h>
 #include <skylium/Scene.h>
