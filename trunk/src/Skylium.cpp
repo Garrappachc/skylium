@@ -48,9 +48,11 @@ Skylium::Skylium() :
 		TheHud(__hud),
 		GlobalTimer(__timer),
 		Matrices(__matricesManagement),
+		Shaders(__shaderDataHandling),
 		__sceneManagement(new SceneManager()),
 		__textureManagement(new TextureManager()),
 		__matricesManagement(new MatricesManager()),
+		__shaderDataHandling(new ShaderDataHandler()),
 		__pendingKeys(KEY_NOKEY),
 		__isMouseMotionEnabled(false),
 		__lastMousePositionX(0),
@@ -70,6 +72,8 @@ Skylium::~Skylium() {
 	delete __textureManagement;
 	delete __sceneManagement;
 	delete __hud;
+	delete __matricesManagement;
+	delete __shaderDataHandling;
 	
 	while (!__shaderList.empty())
 		delete __shaderList.back(), __shaderList.pop_back();
@@ -320,14 +324,6 @@ Skylium::__loadConfig(const string &_fileName) {
 			else
 				cout << LOG_ERROR << "Value " << value <<
 					" invalid. Possible values for \"" << param << "\" are 0, 1, false or true.";
-		} else if (param == "opengl_version") {
-			sGlobalConfig::OPENGL_VERSION_MAJOR = string2T< unsigned >(value);
-			if (line.eof())
-				sGlobalConfig::OPENGL_VERSION_MINOR = 0;
-			else {
-				line >> value;
-				sGlobalConfig::OPENGL_VERSION_MINOR = string2T< unsigned >(value);
-			}
 		} else if (param == "tellmeabout") {
 			sGlobalConfig::DEBUGGING = D_NOTHING;
 			
@@ -390,40 +386,39 @@ Skylium::__earlyInitGLXFnPointers() {
 
 void
 Skylium::__getExtensionList() {
-	if (sGlobalConfig::OPENGL_VERSION_MAJOR >= 3) {
-		int n;
-		glGetIntegerv(GL_NUM_EXTENSIONS, &n);
-		checkGLErrors(AT);
+	/* Code for OpenGL >= 3.0 */
+	/*int n;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+	checkGLErrors(AT);
+	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+		cout << LOG_INFO << "List of available extensions: " << n;
+	for (int i = 0; i < n; i++) {
+		const char *temp = (const char*)glGetStringi(GL_EXTENSIONS, i);
+		__extensions.push_back(new string(temp));
 		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-			cout << LOG_INFO << "List of available extensions: " << n;
-		for (int i = 0; i < n; i++) {
-			const char *temp = (const char*)glGetStringi(GL_EXTENSIONS, i);
+			cout << LOG_INFO << "Found an extension: " << temp;
+	}
+	*/
+	const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
+	checkGLErrors(AT);
+	string tempExt(pszExtensions);
+	string temp = "";
+	for (unsigned i = 0; i < tempExt.length(); i++) {
+		if (tempExt[i] == ' ') {
 			__extensions.push_back(new string(temp));
 			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
 				cout << LOG_INFO << "Found an extension: " << temp;
+			cout.flush();
+			temp = "";
+		} else {
+			temp += tempExt[i];
 		}
-	} else {
-		const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
-		checkGLErrors(AT);
-		string tempExt(pszExtensions);
-		string temp = "";
-		for (unsigned i = 0; i < tempExt.length(); i++) {
-			if (tempExt[i] == ' ') {
-				__extensions.push_back(new string(temp));
-				if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-					cout << LOG_INFO << "Found an extension: " << temp;
-				cout.flush();
-				temp = "";
-			} else {
-				temp += tempExt[i];
-			}
-		}
-		
-		if (temp != "") {
-			__extensions.push_back(new string(temp));
-			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-					cout << LOG_INFO << "Found an extension: " << temp;
-		}
+	}
+	
+	if (temp != "") {
+		__extensions.push_back(new string(temp));
+		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+				cout << LOG_INFO << "Found an extension: " << temp;
 	}
 	
 	auto comparator = [](string *a, string *b) -> bool {
@@ -572,13 +567,13 @@ bool
 Skylium::__createGLXContext(GLXFBConfig& _bestFbConfig) {
 	/* Create the new OpenGL context */
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Initializing OpenGL version " << sGlobalConfig::OPENGL_VERSION_MAJOR
-			<< "." << sGlobalConfig::OPENGL_VERSION_MINOR << "...";
+		cout << LOG_INFO << "Initializing OpenGL version " << OPENGL_VERSION_MAJOR
+			<< "." << OPENGL_VERSION_MINOR << "...";
 	
 	if (glXCreateContextAttribsARB) {
 		GLint attribs[] = {
-			GLX_CONTEXT_MAJOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MAJOR,
-			GLX_CONTEXT_MINOR_VERSION_ARB,	sGlobalConfig::OPENGL_VERSION_MINOR,
+			GLX_CONTEXT_MAJOR_VERSION_ARB,	OPENGL_VERSION_MAJOR,
+			GLX_CONTEXT_MINOR_VERSION_ARB,	OPENGL_VERSION_MINOR,
 			//GLX_CONTEXT_FLAGS_ARB,			GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
 			0 };
 	

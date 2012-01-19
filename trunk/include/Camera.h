@@ -26,7 +26,6 @@
 #include <stack>
 
 #include <GL/gl.h>
-#include <GL/glu.h>
 
 #include "Vectors.h"
 #include "Matrices.h"

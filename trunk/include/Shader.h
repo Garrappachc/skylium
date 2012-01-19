@@ -85,14 +85,16 @@ public:
 	 * @param name Name of variable in the shader.
 	 * @param params Vector of N float to be sent.
 	 */
-	void setUniformFloat(const std::string&, const sVec< GLfloat >&);
+	void setUniformFloat(const std::string&, const sVec< GLfloat >&) const;
+	void setUniformFloat(const std::string&, GLfloat) const;
 	
 	/**
 	 * Sends a matrix to the shader.
 	 * @param name Name of variable in the shader.
 	 * @param matrix Matrix of 16 floats to be sent.
 	 */
-	void setMatrixFloat(const std::string&, const sMat16&);
+	void setMatrixFloat(const std::string&, const sMat16&) const;
+	void setMatrixFloat(const std::string&, const sMat9&) const;
 
 private:
 	std::string __vertFile;
@@ -125,10 +127,12 @@ private:
 	void		(*glGetProgramInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
 	void		(*glUseProgram) (GLuint);
 	GLint	(*glGetUniformLocation) (GLuint, const GLchar*);
+	void		(*glUniform1f) (GLint, GLfloat);
 	void		(*glUniform2f) (GLint, GLfloat, GLfloat);
 	void		(*glUniform3f) (GLint, GLfloat, GLfloat, GLfloat);
 	void		(*glUniform4f) (GLint, GLfloat, GLfloat, GLfloat, GLfloat);
 	void		(*glUniformMatrix4fv) (GLint, GLsizei, GLboolean, const GLfloat*);
+	void		(*glUniformMatrix3fv) (GLint, GLsizei, GLboolean, const GLfloat*);
 	
 };
 

@@ -53,7 +53,7 @@ main() {
 	table -> loadFromObj("objects/table.obj");
 	table -> move(0, -2, 0);
 	table -> scale (6, 6, 6);
-	table -> setColor(0.7f, 0.7f, 0.7f);
+	table -> setColor(186, 242, 254);
 	
 	Object *monkey = sScene -> createObject("monkey"); // monkey
 	if (!monkey -> loadFromObj("objects/monkey.obj"))
@@ -61,11 +61,11 @@ main() {
 	monkey -> move(0, 7, 0);
 	monkey -> scale(3, 3, 3);
 	monkey -> rotate(0, -45, 40);
-	monkey -> setColor(54, 18, 0);
+	monkey -> setColor(238, 104, 43);
 	
 	/* Camera of (0, 4, -20) position, looking at (0, 7, 20) */
-	Camera* fppCamera = sScene -> createCamera(0, 4.0, -20, FPP);
-	fppCamera -> lookAt(0, 7, 20);
+	Camera* fppCamera = sScene -> createCamera(0, 10, -20, FPP);
+	fppCamera -> lookAt(0, 9, -19);
 	
 	Camera *sphereCamera = sScene -> createCamera(0, 4, -20, SPHERICAL);
 	sphereCamera -> lookAt(0, 7, 0);
@@ -75,11 +75,9 @@ main() {
 	shadow -> bind(table);
 	
 	/* Light on (7, 3, 0) position */
-	int light = sScene -> createLight(7, 3, 0);
+	int light = sScene -> createLight(5, 15, -10);
 	/* Set ambient light */
 	sScene -> setAmbientLight(light, 0.5, 0.5, 0.5, 1.0);
-	/* Switch the light on. By default, all lights are off */
-	sScene -> toggleLight();
 	
 	/* Timer for animation */
 	Timer *Tanimation = new Timer();
@@ -156,6 +154,7 @@ main() {
 		if (Tanimation -> passed(2500, MICROSECONDS)) {
 			table -> rotate(0, 0.1, 0);
 			monkey -> rotate(0, 0.1, 0);
+			//sScene -> moveLight(light, 0.0, 0.5, 0.0);
 		}
 		
 		fps++;

@@ -38,6 +38,7 @@ static const double PIdiv180 = PI/180.0;
 MatricesManager::MatricesManager() {
 	__modelViewMatrix.loadIdentity();
 	__projectionMatrix.loadIdentity();
+	__normalMatrix.loadIdentity();
 	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "MatricesManager constructed.";
@@ -150,6 +151,12 @@ MatricesManager::rotate(GLdouble _angle, Axis _axis) {
 }
 
 void
+MatricesManager::produceNormalMatrix() {
+	__normalMatrix = __modelViewMatrix.getMinor(3, 3).inversion();
+	__normalMatrix.transpose();
+}
+
+void
 MatricesManager::storeModelViewMatrix() {
 	__MVStack.push(__modelViewMatrix);
 	
@@ -182,3 +189,21 @@ MatricesManager::restoreProjectionMatrix() {
 	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
 		cout << LOG_INFO << "MatricesManager: Projection matrix popped. Current stack size: " << __PStack.size();
 }
+
+void
+MatricesManager::storeNormalMatrix() {
+	__NStack.push(__normalMatrix);
+	
+	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+		cout << LOG_INFO << "MatricesManager: Normal matrix pushed. Current stack size: " << __NStack.size();
+}
+
+void
+MatricesManager::restoreNormalMatrix() {
+	__normalMatrix = __NStack.top();
+	__NStack.pop();
+	
+	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+		cout << LOG_INFO << "MatricesManager: Normal matrix popped. Current stack size: " << __PStack.size();
+}
+

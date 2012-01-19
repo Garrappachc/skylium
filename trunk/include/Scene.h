@@ -31,8 +31,9 @@
 #include "Light.h"
 #include "Vectors.h"
 
+class ShaderDataHandler;
+
 class Scene {
-	
 public:
 	
 	/**
@@ -165,18 +166,6 @@ public:
 	bool moveLight(int, GLfloat, GLfloat, GLfloat);
 	
 	/**
-	 * Toggles lights on/off.
-	 */
-	void toggleLight();
-	
-	/**
-	 * Toggles one particular light.
-	 * @param id Light's ID (from 0 to 7).
-	 * @return False if there is no light found with this ID.
-	 */
-	bool toggleLight(int);
-	
-	/**
 	 * Removes light from the scene. The rest of lights keep their
 	 * IDs unchanged.
 	 * @param id Light's ID. By default it is the last known light.
@@ -218,8 +207,9 @@ private:
 	 * Patrz metoda __setLights(). */
 	std::vector< Light* >::const_iterator __lightIterator;
 	
-	/* Is the light turned on? */
-	bool __isLightOn;
+	sColor __lightModelAmbient;
+	
+	ShaderDataHandler& __shaders;
 
 };
 

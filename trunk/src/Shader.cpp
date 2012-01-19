@@ -41,6 +41,7 @@ using namespace std;
 
 static const unsigned int MAX_LOG_SIZE = 4096;
 
+
 Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileName) : 
 		__vertFile(_vertFileName),
 		__fragFile(_fragFileName),
@@ -49,16 +50,10 @@ Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileNam
 	__initGLExtensionsPointers();
 	
 	if (__vertFile.find('/') == string::npos)
-		__vertFile = "shaders/" +
-				T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
-				T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
-				"/" + __vertFile;
+		__vertFile = "shaders/" + __vertFile;
 	
 	if (__fragFile.find('/') == string::npos)
-		__fragFile = "shaders/" +
-				T2String(sGlobalConfig::OPENGL_VERSION_MAJOR) +
-				T2String(sGlobalConfig::OPENGL_VERSION_MINOR) +
-				"/" + __fragFile;
+		__fragFile = "shaders/" + __fragFile;
 	
 	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -94,6 +89,34 @@ Shader::make() {
 		return false;
 	}
 	
+	string HEADER = 
+			"struct sMaterialParams {"
+			"	vec4 emission;"
+			"	vec4 ambient;"
+			"	vec4 diffuse;"
+			"	vec4 specular;"
+			"	float shininess;"
+			"};"
+			
+			"struct sLightParams {"
+			"	vec4 ambient;"
+			"	vec4 diffuse;"
+			"	vec4 specular;"
+			"	vec4 position;"
+			"};"
+			
+			"struct sLightModelParameters {"
+			"	vec4 ambient;"
+			"};"
+
+			"uniform vec4 sDefColor;"
+			"uniform mat4 sModelViewMatrix;"
+			"uniform mat4 sProjectionMatrix;"
+			"uniform mat3 sNormalMatrix;"
+			"uniform sMaterialParams sFrontMaterial;"
+			"uniform sLightParams sLightSource[7];"
+			"uniform sLightModelParameters sLightModel;";
+	
 	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
 		cout << LOG_INFO << "Reading shaders' sources... ";
 	ifstream vertFile(__vertFile.c_str());
@@ -103,6 +126,9 @@ Shader::make() {
 		getline(vertFile, temp);
 		vertData += temp;
 		vertData += "\n";
+		if (temp.find("#version") != string::npos)
+			vertData += HEADER;
+		
 	}
 	vertFile.close();
 
@@ -113,14 +139,17 @@ Shader::make() {
 		getline(fragFile, temp);
 		fragData += temp;
 		fragData += "\n";
+		if (temp.find("#version") != string::npos)
+			fragData += HEADER;
 	}
 	fragFile.close();
 	
 	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
 		cout << "Done. " << LOG_INFO << "Compiling shaders' sources... ";
-
+	
 	const char *vert = vertData.c_str();
 	const char *frag = fragData.c_str();
+
 
 	GLint vlength = vertData.length();
 	GLint flength = fragData.length();
@@ -215,7 +244,7 @@ Shader::isBound(Object *_dest) {
 }
 
 void
-Shader::setUniformFloat(const string& _name, const sVec< GLfloat >& _params) {
+Shader::setUniformFloat(const string& _name, const sVec< GLfloat >& _params) const {
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	
@@ -231,11 +260,29 @@ Shader::setUniformFloat(const string& _name, const sVec< GLfloat >& _params) {
 }
 
 void
-Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) {
+Shader::setUniformFloat(const string& _name, GLfloat _param) const {
+	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
+	checkGLErrors(AT);
+	
+	glUniform1f(location, _param);
+	checkGLErrors(AT);
+}
+
+void
+Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) const {
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	
 	glUniformMatrix4fv(location, 1, GL_FALSE, _matrix);
+	checkGLErrors(AT);
+}
+
+void
+Shader::setMatrixFloat(const string& _name, const sMat9& _matrix) const {
+	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
+	checkGLErrors(AT);
+	
+	glUniformMatrix3fv(location, 1, GL_FALSE, _matrix);
 	checkGLErrors(AT);
 }
 
@@ -256,10 +303,12 @@ Shader::__initGLExtensionsPointers() {
 	glGetProgramInfoLog = getProcAddr< decltype(glGetProgramInfoLog) >("glGetProgramInfoLog");
 	glUseProgram = getProcAddr< decltype(glUseProgram) >("glUseProgram");
 	glGetUniformLocation = getProcAddr< decltype(glGetUniformLocation) >("glGetUniformLocation");
+	glUniform1f = getProcAddr< decltype(glUniform1f) >("glUniform1f");
 	glUniform2f = getProcAddr< decltype(glUniform2f) >("glUniform2f");
 	glUniform3f = getProcAddr< decltype(glUniform3f) >("glUniform3f");
 	glUniform4f = getProcAddr< decltype(glUniform4f) >("glUniform4f");
 	glUniformMatrix4fv = getProcAddr< decltype(glUniformMatrix4fv) >("glUniformMatrix4fv");
+	glUniformMatrix3fv = getProcAddr< decltype(glUniformMatrix3fv) >("glUniformMatrix3fv");
 }
 
 bool

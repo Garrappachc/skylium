@@ -29,7 +29,7 @@
 
 #include <assert.h>
 
-#include <skylium/Vectors.h>
+#include "Vectors.h"
 
 /*
  * This matrix is a column-order matrix, as OpenGL prefers.
@@ -169,8 +169,40 @@ public:
 			at(_r, i) = _vector[v];
 	}
 	
+	/**
+	 * Calculates the matrix inversion.
+	 * @return Inverted matrix.
+	 */
+	sMatrix< T, N > inversion() {
+		sMatrix< T, N > result;
+		double det = (T)1.0 / determinant();
+		for (int j = 0; j < N; ++j) {
+			for (int i = 0; i < N; ++i) {
+				sMatrix< T, N - 1 > mMinor = getMinor(j, i);
+				result.at(i, j) = det * mMinor.determinant();
+				if ((i + j) % 2 == 1)
+					result.at(i, j) = -result.at(i, j);
+			}
+		}
+		
+		return result;
+	}
+	
+	void transpose() {
+		for (int i = 0; i < N; ++i) {
+			for (int j = i; j < N; ++j) {
+				T temp = at(i, j);
+				at(i, j) = at(j, i);
+				at(j, i) = temp;
+			}
+			
+		}
+		
+	}
 	
 };
+
+typedef	sMatrix< float, 3 >	sMat9;
 
 template< typename T >
 class sMatrix< T, 4 > {
@@ -301,6 +333,25 @@ public:
 		int v = 0;
 		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
 			at(_r, i) = _vector[v];
+	}
+	
+	/**
+	 * Calculates the matrix inversion.
+	 * @return Inverted matrix.
+	 */
+	sMatrix< T, 4 > inversion() {
+		sMatrix< T, 4 > result;
+		double det = (T)1.0 / determinant();
+		for (int j = 0; j < 4; ++j) {
+			for (int i = 0; i < 4; ++i) {
+				sMatrix< T, 3 > mMinor = getMinor(j, i);
+ 				result.at(i, j) = det * mMinor.determinant();
+				if ((i + j) % 2 == 1)
+					result.at(i, j) = -result.at(i, j);
+			}
+		}
+		
+		return result;
 	}
 };
 	

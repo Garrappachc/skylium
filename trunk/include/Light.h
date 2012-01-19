@@ -27,6 +27,7 @@
 #include "Vectors.h"
 
 class Scene;
+class ShaderDataHandler;
 
 class Light {
 	
@@ -76,6 +77,12 @@ public:
 	 */
 	void toggle();
 	
+	/**
+	 * Sends data to the shader.
+	 * @param count Number of the light.
+	 */
+	void makeLight(unsigned) const;
+	
 private:
 	
 	/* Is light on? */
@@ -91,7 +98,9 @@ private:
 	sColor __specularLight;
 
 	/* Light source's position */
-	sVec3D < GLfloat > __lightSrc;
+	sPosition __lightSrc;
+	
+	ShaderDataHandler& __shaders;
 
 };
 #endif // LIGHT_H

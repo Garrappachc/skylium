@@ -30,6 +30,7 @@
 #include "Vectors.h"
 
 class Texture;
+class ShaderDataHandler;
 
 enum {
 	MATERIAL_AMBIENT	= 1,
@@ -113,12 +114,15 @@ private:
 	sColor			__mAmbient;
 	sColor			__mDiffuse;
 	sColor			__mSpecular;
+	sColor			__mEmission;
 	GLfloat			__mAlpha;
-	GLint				__mShininess;
+	GLfloat			__mShininess;
 	
 	/* Textures */
 	std::vector< Texture* >				__textures;
 	std::vector< Texture* >::const_iterator	__texturesIterator;
+	
+	ShaderDataHandler&	__shaders;
 
 	
 };

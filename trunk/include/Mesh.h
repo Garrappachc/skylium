@@ -57,6 +57,11 @@ public:
 	virtual ~Mesh();
 	
 	/**
+	 * Sets shader data.
+	 */
+	void setAllParams();
+	
+	/**
 	 * Renders the mesh.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glShadeModel.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
@@ -65,13 +70,6 @@ public:
 	
 	/**
 	 * Sends all of the vertices to GPU's buffer.
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glGenBuffers.xml
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glBindBuffer.xml
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glBufferSubData.xml
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glTexCoordPointer.xml
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glNormalPointer.xml
-	 * http://www.opengl.org/sdk/docs/man/xhtml/glVertexPointer.xml
 	 */
 	void loadIntoVbo();
 	
@@ -131,10 +129,10 @@ private:
 	GLuint __vboID;
 	
 	/* Vertices' index */
-	std::vector< GLushort > __index;
+	std::vector< GLushort > __indices;
 	
-	/* Indexes' room in VBO */
-	GLuint __vboIndexID;
+	/* Indices' room in VBO */
+	GLuint __vaoID;
 	
 	/* Do we have normals? */
 	bool __hasNormals;
@@ -152,10 +150,10 @@ private:
 	GLenum __mode;
 	
 	/* GL's extensions' pointers */
-	void	(*glBindBuffer) (GLenum, GLuint);
-	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
 	void	(*glGenBuffers) (GLsizei, GLuint*);
+	void	(*glBindBuffer) (GLenum, GLuint);
 	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
+	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
 	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
 	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
 	
