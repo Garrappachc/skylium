@@ -1,6 +1,4 @@
-#version 150
-
-uniform vec4 sDefColor;
+#version 120
 
 void main() {
 	gl_FragColor = sDefColor;

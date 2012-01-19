@@ -26,9 +26,11 @@
 #include "../include/Light.h"
 
 #include "../include/Skylium.h"
+#include "../include/ShaderDataHandler.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
+#include "../include/utils.h"
 
 using namespace std;
 
@@ -37,7 +39,8 @@ Light::Light() :
 		__ambientLight(1.0, 1.0, 1.0, 0.0),
 		__diffuseLight(1.0, 1.0, 1.0, 0.0),
 		__specularLight(1.0, 1.0, 1.0, 0.0),
-		__lightSrc(0.0, 0.0, 0.0) {
+		__lightSrc(0.0, 0.0, 0.0),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Light (0, 0, 0) constructed.";
 }
@@ -47,7 +50,8 @@ Light::Light(const sPosition &_position) :
 		__ambientLight(1.0, 1.0, 1.0, 0.0),
 		__diffuseLight(1.0, 1.0, 1.0, 0.0),
 		__specularLight(1.0, 1.0, 1.0, 0.0),
-		__lightSrc(&_position[0]) {
+		__lightSrc(&_position[0]),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Light ( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ") constructed.";
 }
@@ -57,7 +61,8 @@ Light::Light(GLfloat _x, GLfloat _y, GLfloat _z) :
 		__ambientLight(1.0, 1.0, 1.0, 0.0),
 		__diffuseLight(1.0, 1.0, 1.0, 0.0),
 		__specularLight(1.0, 1.0, 1.0, 0.0),
-		__lightSrc(_x, _y, _z) {
+		__lightSrc(_x, _y, _z),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Light( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ") constructed.";
 
@@ -118,3 +123,17 @@ Light::toggle() {
 	__working = !__working;
 }
 
+void
+Light::makeLight(unsigned _count) const {
+	if (!__working)
+		return;
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].ambient", __ambientLight);
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].diffuse", __diffuseLight);
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].specular", __specularLight);
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].position", sVec4D< GLfloat >(
+			__lightSrc[0],
+			__lightSrc[1],
+			__lightSrc[2],
+			1.0f
+		));
+}

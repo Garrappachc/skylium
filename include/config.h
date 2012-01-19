@@ -68,10 +68,6 @@ struct sGlobalConfig {
 	static short		GL_BLUE_SIZE;
 	static short		GL_DEPTH_SIZE;
 	
-	/* OpenGL's version to initialize. */
-	static unsigned	OPENGL_VERSION_MAJOR;
-	static unsigned	OPENGL_VERSION_MINOR;
-	
 	/* If true, Skylium will generate mipmaps. */
 	static bool		CREATE_MIPMAPS;
 	

@@ -27,6 +27,8 @@
 
 #include "../include/Texture.h"
 #include "../include/Skylium.h"
+#include "../include/Shader.h"
+#include "../include/ShaderDataHandler.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -39,9 +41,11 @@ Material::Material(const string &_name) :
 		__mAmbient(0.2, 0.2, 0.2, 1.0),
 		__mDiffuse(0.8, 0.8, 0.8, 1.0),
 		__mSpecular(0.0, 0.0, 0.0, 1.0),
+		__mEmission(0.0, 0.0, 0.0, 1.0),
 		__mAlpha(1.0),
 		__mShininess(0),
-		__textures(0) {
+		__textures(0),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Material (\"" << name << "\") constructed.";
 	cout.flush();
@@ -49,12 +53,14 @@ Material::Material(const string &_name) :
 
 Material::Material(const Material &_orig) :
 		name(_orig.name),
-		__mAmbient(0.2, 0.2, 0.2, 1.0),
-		__mDiffuse(0.8, 0.8, 0.8, 1.0),
-		__mSpecular(0.0, 0.0, 0.0, 1.0),
-		__mAlpha(1.0),
-		__mShininess(0),
-		__textures(0) {
+		__mAmbient(_orig.__mAmbient),
+		__mDiffuse(_orig.__mDiffuse),
+		__mSpecular(_orig.__mSpecular),
+		__mEmission(_orig.__mEmission),
+		__mAlpha(_orig.__mAlpha),
+		__mShininess(_orig.__mShininess),
+		__textures(0),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	__textures = _orig.__textures;
 	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
 		cout << LOG_INFO << "Material (\"" << name << "\") constructed as a copy.";
@@ -98,12 +104,11 @@ Material::setTextures() {
 
 void
 Material::setMaterial() {
-	glMaterialfv(GL_FRONT, GL_AMBIENT, &__mAmbient[0]);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, &__mDiffuse[0]);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, &__mSpecular[0]);
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-	glMateriali(GL_FRONT, GL_SHININESS, __mShininess);
-	checkGLErrors(AT);
+	__shaders.updateData("sFrontMaterial.ambient", __mAmbient);
+	__shaders.updateData("sFrontMaterial.diffuse", __mDiffuse);
+	__shaders.updateData("sFrontMaterial.specular", __mSpecular);
+	__shaders.updateData("sFrontMaterial.shininess", __mShininess);
+	__shaders.updateData("sFrontMaterial.emission", __mEmission);
 }
 
 void

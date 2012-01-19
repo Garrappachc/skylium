@@ -26,6 +26,7 @@
 #include "../include/Scene.h"
 
 #include "../include/Skylium.h"
+#include "../include/ShaderDataHandler.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -52,7 +53,8 @@ Scene::Scene(const string &_name) :
 		__activeCamera(NULL),
 		__lightList(8, (Light*)NULL),
 		__lightIterator(),
-		__isLightOn(false) {
+		__lightModelAmbient(0.2, 0.2, 0.2, 1.0),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Scene (\"" << _name << "\") constructed.";
 }
@@ -74,13 +76,9 @@ Scene::show() {
 	if (__activeCamera)
 		__activeCamera -> setView();
 	
-	if (__isLightOn) {
-		glEnable(GL_LIGHTING);
-		glEnable(GL_COLOR_MATERIAL);
-		checkGLErrors(AT);
-	}
-	
 	__setLights();
+	
+	__shaders.updateData("sLightModel.ambient", __lightModelAmbient);
 	
 	__setObjects();
 	
@@ -227,29 +225,6 @@ Scene::moveLight(int _id, GLfloat _x, GLfloat _y, GLfloat _z) {
 	return true;
 }
 
-void
-Scene::toggleLight() {
-	__isLightOn = !__isLightOn;
-
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
-		if (__isLightOn)
-			cout << LOG_INFO << "Lights on scene \"" << name << "\" switched ON.";
-		else
-			cout << LOG_INFO << "Lights on scene \"" << name << "\" switched OFF.";
-	}
-}
-
-bool
-Scene::toggleLight(int _id) {
-	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	__lightList[_id] -> toggle();
-	return true;
-}
-
 bool
 Scene::removeLight(int _id) {
 	if (_id >= static_cast< int >(__lightList.size()) || __lightList[_id] == 0) {
@@ -289,25 +264,13 @@ Scene::__setObjects() {
 
 void
 Scene::__setLights() {
-	short i = 0;
+	unsigned i = 0;
 	__lightIterator = __lightList.begin();
 	while (__lightIterator != __lightList.end()) {
 		if (*__lightIterator != 0) {
-			if ((*__lightIterator) -> __working )
-				glEnable(lights[i]);
-			else
-				glDisable(lights[i]);
-			checkGLErrors(AT);
-			glLightfv(lights[i],	GL_AMBIENT,	&(*__lightIterator)->__ambientLight[0]);
-			checkGLErrors(AT);
-			glLightfv(lights[i],	GL_DIFFUSE,	&(*__lightIterator)->__diffuseLight[0]);
-			checkGLErrors(AT);
-			glLightfv(lights[i],	GL_SPECULAR,	&(*__lightIterator)->__specularLight[0]);
-			checkGLErrors(AT);
-			glLightfv(lights[i],	GL_POSITION,	&(*__lightIterator)->__lightSrc[0]);
-			checkGLErrors(AT);
-			i++;
+			(*__lightIterator) -> makeLight(i);
 		}
+		++i;
 		__lightIterator++;
 	}
 	

@@ -1,14 +1,10 @@
-#version 150
-
-uniform vec4 sDefColor;
-uniform mat4 sModelViewMatrix;
-uniform mat4 sProjectionMatrix;
+#version 120
 
 varying vec3 normal;
 
 
 void main() {
-	vec3 lightDir = normalize(vec3(gl_LightSource[0].position));
+	vec3 lightDir = normalize(vec3(sLightSource[0].position * sModelViewMatrix));
 	float intensity = dot(lightDir, normalize(normal));
 	vec4 color;
 	if (intensity > 0.95)

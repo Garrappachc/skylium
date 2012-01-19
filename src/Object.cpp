@@ -33,6 +33,7 @@
 #include "../include/Skylium.h"
 #include "../include/Texture.h"
 #include "../include/MatricesManager.h"
+#include "../include/ShaderDataHandler.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -86,7 +87,8 @@ Object::Object(const string &_name) :
 		__meshes(0),
 		__meshesIterator(),
 		__materials(0),
-		__matrices(MatricesManager::GetSingleton()) {
+		__matrices(MatricesManager::GetSingleton()),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Object (\"" << _name << "\") constructed.";
 }
@@ -103,7 +105,8 @@ Object::Object(const Object &_orig, const string &_name) :
 		__meshes(0),
 		__meshesIterator(),
 		__materials(0),
-		__matrices(MatricesManager::GetSingleton()) {
+		__matrices(MatricesManager::GetSingleton()),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	for (unsigned i = 0; i < _orig.__meshes.size(); i++) {
 		Mesh *tempMtl = new Mesh(*_orig.__meshes[i]);
 		__meshes.push_back(tempMtl);
@@ -131,40 +134,47 @@ Object::~Object() {
 void
 Object::show() {
 	__matrices.storeModelViewMatrix();
-			__matrices.translate(__mov);
-			__matrices.scale(__scale);
-			__matrices.rotate(__rot.x, X);
-			__matrices.rotate(__rot.y, Y);
-			__matrices.rotate(__rot.z, Z);
+		__matrices.translate(__mov);
+		__matrices.scale(__scale);
+		__matrices.rotate(__rot.x, X);
+		__matrices.rotate(__rot.y, Y);
+		__matrices.rotate(__rot.z, Z);
+		
+		__matrices.produceNormalMatrix();
 		
 		if (__shader) {
 			__shader -> toggle();
-			__shader -> setMatrixFloat("sModelViewMatrix", __matrices.getModelViewMatrix());
-			__shader -> setMatrixFloat("sProjectionMatrix", __matrices.getProjectionMatrix());
-			__shader -> setUniformFloat("sDefColor", __defColor);
+			__shaders.updateData("sDefColor", __defColor);
 		} else {
 			glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
 			glMatrixMode(GL_MODELVIEW);
 			glLoadMatrixf(__matrices.getModelViewMatrix());
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(__matrices.getProjectionMatrix());
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			checkGLErrors(AT);
 		}
 		
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		checkGLErrors(AT);
 		__meshesIterator = __meshes.begin();
-		while (__meshesIterator != __meshes.end())
-			(*__meshesIterator) -> show(), ++__meshesIterator;
+		while (__meshesIterator != __meshes.end()) {
+			(*__meshesIterator) -> setAllParams();
+			
+			if (__shader)
+				__shaders.sendDataToShader(*__shader);
+			
+			(*__meshesIterator) -> show();
+			++__meshesIterator;
+		}
+		
+		if (__shader)
+			__shader -> toggle();
 		
 		if (!__children.empty()) {
 			__childrenIterator = __children.begin();
 			while (__childrenIterator != __children.end())
 				(*__childrenIterator) -> show(), ++__childrenIterator;
 		}
-		
-		if (__shader)
-			__shader -> toggle();
 		
 		__wasShown = true;
 		

@@ -146,7 +146,7 @@ void
 Camera::lookAt(GLdouble x, GLdouble y, GLdouble z) {
 	__center = sVector(x, y, z);
 	if (__type == FPP) {
-		__center += __eye;
+		//__center += __eye;
 		__center.normalize();
 	}
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)

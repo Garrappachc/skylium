@@ -28,6 +28,7 @@
 #include "../include/Mesh.h"
 
 #include "../include/Skylium.h"
+#include "../include/Shader.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -42,8 +43,8 @@ Mesh::Mesh(const string &_name) :
 		name(_name),
 		__vertices(0),
 		__vboID(0),
-		__index(0),
-		__vboIndexID(0),
+		__indices(0),
+		__vaoID(0),
 		__hasNormals(false),
 		__material(NULL),
 		__smooth(false),
@@ -59,8 +60,8 @@ Mesh::Mesh(const Mesh &_orig) :
 		name(_orig.name),
 		__vertices(_orig.__vertices),
 		__vboID(_orig.__vboID),
-		__index(_orig.__index),
-		__vboIndexID(_orig.__vboIndexID),
+		__indices(_orig.__indices),
+		__vaoID(_orig.__vaoID),
 		__hasNormals(_orig.__hasNormals),
 		__material(NULL),
 		__smooth(_orig.__smooth),
@@ -74,14 +75,14 @@ Mesh::Mesh(const Mesh &_orig) :
 Mesh::~Mesh() {
 	if (__vboID != 0)
 		glDeleteBuffers(1, &__vboID);
-	if (__vboIndexID != 0)
-		glDeleteBuffers(1, &__vboIndexID);
+	if (__vaoID != 0)
+		glDeleteBuffers(1, &__vaoID);
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
 }
 
 void
-Mesh::show() {
+Mesh::setAllParams() {
 	if (__smooth) // smooth shading?
 		glShadeModel(GL_SMOOTH);
 	
@@ -102,8 +103,10 @@ Mesh::show() {
 	// set the material
 	if (__material)
 		__material -> setMaterial();
-	
-	
+}
+
+void
+Mesh::show() {
 	// there we go!
 	if (__vboID != 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, __vboID); // sets the active pointer on the correct buffer
@@ -128,20 +131,20 @@ Mesh::show() {
 		checkGLErrors(AT);
 	}
 	
-	if (__vboIndexID != 0) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID); // now, what we want is the buffer with indices
+	if (__vaoID != 0) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vaoID); // now, what we want is the buffer with indices
 		checkGLErrors(AT);
 
 		// Now we draw all.
 		// __mode - GL_TRIANGLES by default.
-		// __index.size() - number of vertices to be drawn.
+		// __indices.size() - number of vertices to be drawn.
 		// GL_UNSIGNED_SHORT - Indices data type. Out vector is std::vector<GLushort>, so it is
 		// 	exactly unsigned short.
 		// BUFFER_OFFSET(0) - where do we want the OpenGL to start getting the vertices from.
-		glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+		glDrawElements(__mode, __indices.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 		checkGLErrors(AT);
 	} else { // no VBO
-		glDrawElements(__mode, __index.size(), GL_UNSIGNED_SHORT, &__index[0]);
+		glDrawElements(__mode, __indices.size(), GL_UNSIGNED_SHORT, &__indices[0]);
 		checkGLErrors(AT);
 	}
 	
@@ -164,6 +167,11 @@ Mesh::show() {
 
 void
 Mesh::loadIntoVbo() {
+	// generates VBO ID for indices, sets the active pointer
+	glGenBuffers(1, &__vaoID);
+	checkGLErrors(AT);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vaoID);
+	checkGLErrors(AT);
 	
 	// generates the VBO ID
 	glGenBuffers(1, &__vboID);
@@ -188,16 +196,10 @@ Mesh::loadIntoVbo() {
 	glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // 20 = rozmiar Position + rozmiar TexCoords
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // 0, żeby aktywny wskaźnik był na początku
 	
-	// generates VBO ID for indices, sets the active pointer
-	glGenBuffers(1, &__vboIndexID);
-	checkGLErrors(AT);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vboIndexID);
-	checkGLErrors(AT);
-	
 	// indices array to the buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * __index.size(), NULL, __usage);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * __indices.size(), NULL, __usage);
 	checkGLErrors(AT);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * __index.size(), &__index[0]);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * __indices.size(), &__indices[0]);
 	checkGLErrors(AT);
 	int bufferSize_i;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_i);
@@ -211,6 +213,7 @@ Mesh::loadIntoVbo() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	checkGLErrors(AT);
+	
 }
 
 void
@@ -231,14 +234,14 @@ Mesh::push_back(const Vertex &_v) {
 
 void
 Mesh::addNewIdx(int _idx) {
-	__index.push_back(_idx);
+	__indices.push_back(_idx);
 }
 
 void
 Mesh::addThreeIdxs(int _idx) {
-	__index.push_back(__index[__index.size() - 3]);
-	__index.push_back(__index[__index.size() - 2]);
-	__index.push_back(_idx);
+	__indices.push_back(__indices[__indices.size() - 3]);
+	__indices.push_back(__indices[__indices.size() - 2]);
+	__indices.push_back(_idx);
 }
 
 void

@@ -60,5 +60,4 @@
 #define SCOLORS_GREEN	0.0, 1.0, 0.0, 1.0
 #define SCOLORS_YELLOW	1.0, 1.0, 0.0, 1.0
 
-
 #endif

@@ -45,6 +45,9 @@ public:
 	sMat16 & getProjectionMatrix() { return __projectionMatrix; }
 	const sMat16 & getProjectionMatrix() const { return __projectionMatrix; }
 	
+	sMat9 & getNormalMatrix() { return __normalMatrix; }
+	const sMat9 & getNormalMatrix() const { return __normalMatrix; }
+	
 	/**
 	 * Produces a viewing transform.
 	 * @param eye Eye point.
@@ -61,6 +64,12 @@ public:
 	 * @param zFar Specifies the distance from the viewer to the far clipping plane (>0).
 	 */
 	void sPerspective(GLdouble, GLdouble, GLdouble, GLdouble);
+	
+	/**
+	 * Generates the Normal Matrix.
+	 * Normal matrix is the transpose of the inverse of the modelView Matrix.
+	 */
+	void produceNormalMatrix();
 	
 	/**
 	 * Translate by (x, y, z). The current ModelView Matrix is being multiplied
@@ -87,24 +96,18 @@ public:
 	void rotate(GLdouble, Axis);
 	
 	/**
-	 * Pushes the current ModelView matrix on the stack.
+	 * Pushes the current matrix on the stack.
 	 */
 	void storeModelViewMatrix();
+	void storeProjectionMatrix();
+	void storeNormalMatrix();
 	
 	/**
-	 * Pops the ModelView matrix from the stack.
+	 * Pops the matrix from the stack.
 	 */
 	void restoreModelViewMatrix();
-	
-	/**
-	 * Pushes the current Projection matrix on the stack.
-	 */
-	void storeProjectionMatrix();
-	
-	/**
-	 * Pops the Projection Matrix from the stack.
-	 */
 	void restoreProjectionMatrix();
+	void restoreNormalMatrix();
 	
 	
 	
@@ -114,9 +117,13 @@ private:
 	
 	sMat16 __projectionMatrix;
 	
+	sMat9 __normalMatrix;
+	
 	std::stack< sMat16 > __MVStack;
 	
 	std::stack< sMat16 > __PStack;
+	
+	std::stack< sMat9 > __NStack;
 	
 	
 	

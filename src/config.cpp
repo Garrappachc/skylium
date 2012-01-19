@@ -34,6 +34,4 @@ short	sGlobalConfig::GL_RED_SIZE			= 5;
 short	sGlobalConfig::GL_GREEN_SIZE			= 5;
 short	sGlobalConfig::GL_BLUE_SIZE			= 5;
 short	sGlobalConfig::GL_DEPTH_SIZE			= 16;
-unsigned	sGlobalConfig::OPENGL_VERSION_MAJOR	= 4;
-unsigned	sGlobalConfig::OPENGL_VERSION_MINOR	= 0;
 bool		sGlobalConfig::CREATE_MIPMAPS			= true;

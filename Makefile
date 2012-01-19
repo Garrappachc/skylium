@@ -28,8 +28,8 @@ DESTDIR = $(prefix)/lib
 INCDIR = $(prefix)/include
 
 OBJS = Camera.o FontBase.o Hud.o HudData.o Light.o Material.o MatricesManager.o \
-	Mesh.o Object.o Scene.o SceneManager.o Shader.o Skylium.o Texture.o \
-	TextureManager.o Timer.o Vertex.o config.o keysfunc.o utils.o
+	Mesh.o Object.o Scene.o SceneManager.o Shader.o ShaderDataHandler.o Skylium.o \
+	Texture.o TextureManager.o Timer.o Vertex.o config.o keysfunc.o utils.o
 
 D = include
 
@@ -37,7 +37,7 @@ INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h \
 	$(D)/FontBase.h $(D)/Hud.h $(D)/HudData.h $(D)/keysdef.h \
 	$(D)/keysfunc.h $(D)/Light.h $(D)/Material.h $(D)/Matrices.h \
 	$(D)/MatricesManager.h $(D)/Mesh.h $(D)/Object.h $(D)/Scene.h $(D)/SceneManager.h \
-	$(D)/Shader.h $(D)/Singleton.h $(D)/Skylium.h $(D)/Texture.h \
+	$(D)/Shader.h $(D)/ShaderDataHandler.h $(D)/Singleton.h $(D)/Skylium.h $(D)/Texture.h \
 	$(D)/TextureManager.h $(D)/Timer.h $(D)/utils.h	$(D)/Vectors.h $(D)/Vertex.h
 
 SKYLIUM_MAIN = skylium.h

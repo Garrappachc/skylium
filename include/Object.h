@@ -36,6 +36,7 @@ class Shader;
 class SkyliumConfig;
 class Skylium;
 class MatricesManager;
+class ShaderDataHandler;
 struct Position;
 struct TexCoords;
 struct Normal;
@@ -193,6 +194,8 @@ private:
 	SkyliumConfig * __config;
 	
 	MatricesManager& __matrices;
+	
+	ShaderDataHandler& __shaders;
 	
 };
 
