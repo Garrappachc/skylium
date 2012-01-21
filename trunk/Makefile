@@ -42,7 +42,7 @@ INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h \
 
 SKYLIUM_MAIN = skylium.h
 
-LDLIBS = -lGL -lGLU -lSOIL
+LDLIBS = -lGL -lSOIL
 
 LFLAGS = -Wl,-soname,$(LIB)
 

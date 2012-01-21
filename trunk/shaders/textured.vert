@@ -7,7 +7,7 @@ out vec3 v;
 
 void main() {
 	v = vec3(sModelViewMatrix * sVertex);
-	N = normalize(sNormalMatrix * sNormal);
+	N = normalize(sNormal * sNormalMatrix);
 	
 	sVaryingTexCoords = sTexCoords;
 

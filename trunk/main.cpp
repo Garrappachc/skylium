@@ -64,7 +64,7 @@ main() {
 	/* Light on (7, 3, 0) position */
 	int light = sScene -> createLight(5, 15, -10);
 	/* Set ambient light */
-	sScene -> setAmbientLight(light, 0.5, 0.5, 0.5, 1.0);
+	sScene -> setAmbientLight(light, 0.8, 0.8, 0.8, 1.0);
 	
 	/* Timer for animation */
 	Timer *Tanimation = new Timer();
