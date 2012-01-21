@@ -8,21 +8,6 @@ There are several settings for Skylium that are read during Skylium::init(). The
 tellmeabout warnings,errors
 }}}
 </li>
-<li> *using_vbo* - if true, skylium will load _some_ meshes into the GPU buffer (VBO), if false - rendering data will be taken from RAM, what is much slower. Objects that are in VBO have their copy in RAM.
-{{{
-using_vbo true
-}}}
-</li>
-<li> *min_vbo_size* - if a single mesh is smaller, it will be not loaded into VBO. Some graphic cards prefers different settings than others. Data is given in bytes. Default:
-{{{
-min_vbo_size 256
-}}}
-</li>
-<li> *max_vbo_size* - specifies the maximum size of a single mesh to be loaded into VBO. It does _not_ define the maximum size of memory that will be located on GPU's buffer. Default value is 256 MB:
-{{{
-max_vbo_size 268435456
-}}}
-</li>
 <li> *fullscreen* - there's probably nothing to explain. True/false. Default:
 {{{
 fullscreen false
@@ -44,11 +29,6 @@ gl_red_size 8
 gl_green_size 8
 gl_blue_size 8
 gl_depth_size 24
-}}}
-</li>
-<li> *opengl_version* - defines the OpenGL version to be initialized. Note, that versions >2.1 are not supported really well yet - Skylium will work, but using some deprecated functions.
-{{{
-opengl_version 2 1
 }}}
 </li>
 <li> *create_mipmaps* - if true, Skylium will generate mipmaps.
