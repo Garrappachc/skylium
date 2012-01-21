@@ -59,11 +59,10 @@ public:
 	/**
 	 * Creates new object with the name given.
 	 * @param name Name of the new object.
-	 * @param orig Pointer to the object, which has to be copied (defualt NULL).
 	 * @param parent Pointer to the object, which has to be parent (default NULL).
 	 * @return Pointer to the newly created object.
 	 */
-	Object * createObject(const std::string&, const Object* = (Object*)NULL, Object* = (Object*)NULL);
+	Object * createObject(const std::string&, Object* = (Object*)NULL);
 	
 	/**
 	 * Look for the object.

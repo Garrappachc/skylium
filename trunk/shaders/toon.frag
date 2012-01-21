@@ -1,7 +1,6 @@
-#version 120
+#version 330
 
-varying vec3 normal;
-
+in vec3 normal;
 
 void main() {
 	vec3 lightDir = normalize(vec3(sLightSource[0].position * sModelViewMatrix));
@@ -16,5 +15,5 @@ void main() {
 	else
 		color = vec4(0.2, 0.1, 0.1, 1.0);
 
-	gl_FragColor = color * sDefColor;
+	sFragColor = color * sDefColor;
 }

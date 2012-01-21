@@ -30,6 +30,7 @@ typedef struct Position {
 	GLfloat x;
 	GLfloat y;
 	GLfloat z;
+	GLfloat w;
 	
 	Position();
 	Position(const Position&);
@@ -62,10 +63,12 @@ public:
 	Vertex();
 	Vertex(const Position&, const TexCoords&, const Normal&);
 
-//private:
 	Position	vertexPosition;
 	TexCoords	textureCoords;
 	Normal	normalVector;
+	
+private:
+	char		__align[28];
 };
 
 #endif // VERTEX_H

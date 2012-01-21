@@ -41,10 +41,11 @@ using namespace std;
 
 Mesh::Mesh(const string &_name) :
 		name(_name),
-		__vertices(0),
-		__vboID(0),
-		__indices(0),
 		__vaoID(0),
+		__vertices(0),
+		__verticesVboID(0),
+		__indices(0),
+		__indicesVboID(0),
 		__hasNormals(false),
 		__material(NULL),
 		__smooth(false),
@@ -58,10 +59,11 @@ Mesh::Mesh(const string &_name) :
 
 Mesh::Mesh(const Mesh &_orig) :
 		name(_orig.name),
-		__vertices(_orig.__vertices),
-		__vboID(_orig.__vboID),
-		__indices(_orig.__indices),
 		__vaoID(_orig.__vaoID),
+		__vertices(_orig.__vertices),
+		__verticesVboID(_orig.__verticesVboID),
+		__indices(_orig.__indices),
+		__indicesVboID(_orig.__indicesVboID),
 		__hasNormals(_orig.__hasNormals),
 		__material(NULL),
 		__smooth(_orig.__smooth),
@@ -73,10 +75,12 @@ Mesh::Mesh(const Mesh &_orig) :
 }
 
 Mesh::~Mesh() {
-	if (__vboID != 0)
-		glDeleteBuffers(1, &__vboID);
+	if (__verticesVboID != 0)
+		glDeleteBuffers(1, &__verticesVboID);
+	if (__indicesVboID != 0)
+		glDeleteBuffers(1, &__indicesVboID);
 	if (__vaoID != 0)
-		glDeleteBuffers(1, &__vaoID);
+		glDeleteVertexArrays(1, &__vaoID);
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
 }
@@ -86,19 +90,8 @@ Mesh::setAllParams() {
 	if (__smooth) // smooth shading?
 		glShadeModel(GL_SMOOTH);
 	
-	if (__material && __material -> hasAnyTexture()) { // do we have any texture?
-		glColor4f(1.0, 1.0, 1.0, 1.0); // must be white - otherwise there's no texture visible
-		__material -> setTextures(); // we set texture parameters
-		glEnable(GL_TEXTURE_2D); // textures enabled
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY); // and texture's coords
-	}
-	
-	if (__hasNormals) // do we have normals?
-		glEnableClientState(GL_NORMAL_ARRAY); // tell that GL
-	
-	// we want vertices array
-	glEnableClientState(GL_VERTEX_ARRAY);
-	checkGLErrors(AT);
+	if (__material && __material -> hasAnyTexture()) // do we have any texture?
+		__material -> setTextures(); // we set texture parameters 
 	
 	// set the material
 	if (__material)
@@ -108,76 +101,41 @@ Mesh::setAllParams() {
 void
 Mesh::show() {
 	// there we go!
-	if (__vboID != 0) {
-		glBindBuffer(GL_ARRAY_BUFFER, __vboID); // sets the active pointer on the correct buffer
-		checkGLErrors(AT); // if not -D__DEBUG__, it does not retards the rendering process
-	
-		if (__material && __material -> hasAnyTexture())
-			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // textures coordinates
-	
-		if (__hasNormals)
-			glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // normals
-
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // and vertices
-		checkGLErrors(AT);
-	} else {
-		if (__material && __material -> hasAnyTexture())
-			glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), &__vertices[0].textureCoords);
-		
-		if (__hasNormals)
-			glNormalPointer(GL_FLOAT, sizeof(Vertex), &__vertices[0].normalVector);
-		
-		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), &__vertices[0]);
-		checkGLErrors(AT);
-	}
-	
-	if (__vaoID != 0) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vaoID); // now, what we want is the buffer with indices
-		checkGLErrors(AT);
-
-		// Now we draw all.
-		// __mode - GL_TRIANGLES by default.
-		// __indices.size() - number of vertices to be drawn.
-		// GL_UNSIGNED_SHORT - Indices data type. Out vector is std::vector<GLushort>, so it is
-		// 	exactly unsigned short.
-		// BUFFER_OFFSET(0) - where do we want the OpenGL to start getting the vertices from.
-		glDrawElements(__mode, __indices.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
-		checkGLErrors(AT);
-	} else { // no VBO
-		glDrawElements(__mode, __indices.size(), GL_UNSIGNED_SHORT, &__indices[0]);
-		checkGLErrors(AT);
-	}
-	
-	if (__material && __material -> hasAnyTexture()) // disable
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	
-	if (__hasNormals) // disable
-		glDisableClientState(GL_NORMAL_ARRAY);
-	
-	glDisableClientState(GL_VERTEX_ARRAY); // disable
-	
-	if (__vboID != 0) {
-		glBindBuffer(GL_ARRAY_BUFFER, 0); // we do not need buffer any more - get back to RAM
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
+	//if (__vaoID == 0)
+	//	loadIntoVbo();
+	glBindVertexArray(__vaoID);
 	checkGLErrors(AT);
+	
+	glDrawElements(__mode, __indices.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+	checkGLErrors(AT);
+	
+	glBindVertexArray(0);
 	
 	glShadeModel(GL_FLAT); // always!
 }
 
 void
 Mesh::loadIntoVbo() {
-	// generates VBO ID for indices, sets the active pointer
-	glGenBuffers(1, &__vaoID);
-	checkGLErrors(AT);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __vaoID);
+	// generate VAO
+	glGenVertexArrays(1, &__vaoID);
 	checkGLErrors(AT);
 	
-	// generates the VBO ID
-	glGenBuffers(1, &__vboID);
+	// generates the VBO ID for indices
+	glGenBuffers(1, &__indicesVboID);
 	checkGLErrors(AT);
+	
+	// generates the VBO ID for vertices
+	glGenBuffers(1, &__verticesVboID);
+	checkGLErrors(AT);
+	
+	glBindVertexArray(__vaoID);
+	checkGLErrors(AT);
+	
 	// sets the active pointer
-	glBindBuffer(GL_ARRAY_BUFFER, __vboID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __indicesVboID);
+	checkGLErrors(AT);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, __verticesVboID);
 	checkGLErrors(AT);
 	
 	// reservate the room in the buffer
@@ -191,10 +149,9 @@ Mesh::loadIntoVbo() {
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_v);
 	checkGLErrors(AT);
 	
-	// we tell where is what
-	glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12)); // 12 = rozmiar Position
-	glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20)); // 20 = rozmiar Position + rozmiar TexCoords
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0)); // 0, żeby aktywny wskaźnik był na początku
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(0)); // vertex
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(16)); // texture
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(24)); // normal
 	
 	// indices array to the buffer
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * __indices.size(), NULL, __usage);
@@ -210,9 +167,12 @@ Mesh::loadIntoVbo() {
 		cout.flush();
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	checkGLErrors(AT);
+	
+	glBindVertexArray(0);
 	
 }
 
@@ -246,10 +206,16 @@ Mesh::addThreeIdxs(int _idx) {
 
 void
 Mesh::__initGLExtensionsPointers() {
+	glGenVertexArrays = getProcAddr< decltype(glGenVertexArrays) >("glGenVertexArrays");
+	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
 	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
 	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");
+	glDeleteVertexArrays = getProcAddr< decltype(glDeleteVertexArrays) >("glDeleteVertexArrays");
 	glGenBuffers = getProcAddr< decltype(glGenBuffers) >("glGenBuffersARB");
 	glBufferData = getProcAddr< decltype(glBufferData) >("glBufferDataARB");
 	glBufferSubData = getProcAddr< decltype(glBufferSubData) >("glBufferSubDataARB");
 	glGetBufferParameteriv = getProcAddr< decltype(glGetBufferParameteriv) >("glGetBufferParameterivARB");
+	glVertexAttribPointer = getProcAddr< decltype(glVertexAttribPointer) >("glVertexAttribPointer");
+	glEnableVertexAttribArray = getProcAddr< decltype(glEnableVertexAttribArray) >("glEnableVertexAttribArray");
+	glDisableVertexAttribArray = getProcAddr< decltype(glDisableVertexAttribArray) >("glDisableVertexAttribArray");
 }

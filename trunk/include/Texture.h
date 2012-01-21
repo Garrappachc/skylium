@@ -29,6 +29,7 @@
 #include <GL/gl.h>
 
 class TextureManager;
+class ShaderDataHandler;
 
 class Texture {
 
@@ -97,6 +98,8 @@ private:
 	
 	/* TM's instance */
 	TextureManager * __boss;
+	
+	ShaderDataHandler& __shaders;
 };
 
 #endif // TEXTURE_H

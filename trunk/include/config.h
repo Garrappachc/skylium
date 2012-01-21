@@ -44,15 +44,6 @@ struct sGlobalConfig {
 	/* Configures the output verbosity. */
 	static unsigned	DEBUGGING;
 	
-	/* If true and graphics card supports VBO, Skylium will use it. */
-	static bool		USING_VBO;
-	
-	/* Maximum size for meshes to be located in the VBO. */
-	static unsigned	MAX_VBO_SIZE;
-	
-	/* Minimum size for meshes to be located in the VBO. */
-	static unsigned	MIN_VBO_SIZE;
-	
 	/* If true, Skylium renders on the fullscreen. */
 	static bool		FULLSCREEN_RENDERING;
 	

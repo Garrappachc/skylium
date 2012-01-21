@@ -1,10 +1,9 @@
-#version 120
+#version 330
 
-varying vec3 normal;
+out vec3 normal;
 
 void main() {
-	normal = sNormalMatrix * gl_Normal;
+	normal = sNormalMatrix * sNormal;
 
-	gl_Position = sProjectionMatrix * sModelViewMatrix * gl_Vertex;
-	gl_FrontColor = sDefColor;
+	gl_Position = sModelViewProjectionMatrix * sVertex;
 }

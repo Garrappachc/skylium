@@ -140,7 +140,7 @@ Object::show() {
 		__matrices.rotate(__rot.y, Y);
 		__matrices.rotate(__rot.z, Z);
 		
-		__matrices.produceNormalMatrix();
+		
 		
 		if (__shader) {
 			__shader -> toggle();
@@ -152,8 +152,6 @@ Object::show() {
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(__matrices.getProjectionMatrix());
 			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			checkGLErrors(AT);
 		}
 		
 		__meshesIterator = __meshes.begin();
@@ -231,22 +229,21 @@ Object::loadFromObj(const string &_objFile) {
 	}
 	
 	__parseObj(_objFile);
-	
-	if (sGlobalConfig::USING_VBO)
-		loadIntoVBO();
+	loadIntoVBO();
 	
 	return true;
 }
 
 void
 Object::loadIntoVBO() {
-	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_buffer_object"))
-		return;
+	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_buffer_object")) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Your GPU does not support VBO! Skylium will exit now.\n";
+		exit(1);
+	}
 	__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end()) {
-			if ((*__meshesIterator) -> getSizeOfVertices() > sGlobalConfig::MIN_VBO_SIZE &&
-				(*__meshesIterator) -> getSizeOfVertices() <  sGlobalConfig::MAX_VBO_SIZE)
-				(*__meshesIterator) -> loadIntoVbo();
+			(*__meshesIterator) -> loadIntoVbo();
 			__meshesIterator++;
 		}
 }
@@ -299,7 +296,7 @@ Object::__parseObj(const string &_fileName) {
 		
 		if (buffer[0] == '#')
 			continue;	// comment, pass this
-			
+		
 		istringstream line(buffer);
 		
 		if (buffer.substr(0, 6) == "mtllib") {
@@ -315,7 +312,6 @@ Object::__parseObj(const string &_fileName) {
 				while (!line.eof()) {
 					gName += temp;
 					line >> temp;
-
 				}
 			}
 			if (current)

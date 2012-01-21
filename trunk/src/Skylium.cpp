@@ -62,7 +62,6 @@ Skylium::Skylium() :
 		__shaderList(0),
 		__hud(new Hud()),
 		__timer(new Timer()) {
-	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Skylium constructed.";
 	cout.flush();
@@ -121,10 +120,8 @@ Skylium::init(const string &_windowName) {
 		__hideMousePointer();
 	
 	swapBuffers();
-	checkGLErrors(AT);
 	
-	glViewport(0, 0, __GLXContext.winWidth, __GLXContext.winHeight);
-	checkGLErrors(AT);
+	glViewport(0, 0, __GLXContext.winWidth, __GLXContext.winHeight); checkGLErrors(AT);
 	
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -264,11 +261,7 @@ Skylium::__loadConfig(const string &_fileName) {
 		
 		line >> param >> value;
 		
-		if (param == "min_vbo_size") {
-			sGlobalConfig::MIN_VBO_SIZE = string2T< unsigned >(value);
-		} else if (param == "max_vbo_size") {
-			sGlobalConfig::MAX_VBO_SIZE = string2T< unsigned >(value);
-		} else if (param == "fullscreen") {
+		if (param == "fullscreen") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::FULLSCREEN_RENDERING = false;
 			else if (value == "true" || value == "1")
@@ -276,14 +269,6 @@ Skylium::__loadConfig(const string &_fileName) {
 			else
 				cout << LOG_ERROR << "Value " << value <<
 					" invalid. Possible values for \"fullscreen\" are 0, 1, false or true.";
-		} else if (param == "using_vbo") {
-			if (value == "false" || value == "0")
-				sGlobalConfig::USING_VBO = false;
-			else if (value == "true" || value == "1")
-				sGlobalConfig::USING_VBO = true;
-			else
-				cout << LOG_ERROR << "Value " << value <<
-					" invalid. Possible values for \"using_vbo\" are 0, 1, false or true.";
 		} else if (param == "hud_exists") {
 			if (value == "false" || value == "0")
 				sGlobalConfig::HUD_EXISTS = false;
@@ -386,8 +371,7 @@ Skylium::__earlyInitGLXFnPointers() {
 
 void
 Skylium::__getExtensionList() {
-	/* Code for OpenGL >= 3.0 */
-	/*int n;
+	int n;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
 	checkGLErrors(AT);
 	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
@@ -397,28 +381,6 @@ Skylium::__getExtensionList() {
 		__extensions.push_back(new string(temp));
 		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
 			cout << LOG_INFO << "Found an extension: " << temp;
-	}
-	*/
-	const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
-	checkGLErrors(AT);
-	string tempExt(pszExtensions);
-	string temp = "";
-	for (unsigned i = 0; i < tempExt.length(); i++) {
-		if (tempExt[i] == ' ') {
-			__extensions.push_back(new string(temp));
-			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-				cout << LOG_INFO << "Found an extension: " << temp;
-			cout.flush();
-			temp = "";
-		} else {
-			temp += tempExt[i];
-		}
-	}
-	
-	if (temp != "") {
-		__extensions.push_back(new string(temp));
-		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-				cout << LOG_INFO << "Found an extension: " << temp;
 	}
 	
 	auto comparator = [](string *a, string *b) -> bool {
@@ -437,7 +399,6 @@ Skylium::__openXServerConnection() {
 			cout << LOG_ERROR << "Connection with X server failed! Exiting.";
 		return false;
 	}
-	checkGLErrors(AT);
 	return true;
 }
 
@@ -447,14 +408,12 @@ Skylium::__getGLXVersion() {
 	glXQueryVersion(__GLXContext.display, &__GLXContext.GLXVersionMajor, &__GLXContext.GLXVersionMinor);
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << "GLX version: " << __GLXContext.GLXVersionMajor << "." << __GLXContext.GLXVersionMinor << ".";
-	checkGLErrors(AT);
 	
 	if (__GLXContext.GLXVersionMajor <= 1 && __GLXContext.GLXVersionMinor < 3) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
 			cout << LOG_ERROR << "GLX version too old. Exiting.";
 		return false;
 	}
-	checkGLErrors(AT);
 	return true;
 }
 
@@ -483,7 +442,6 @@ Skylium::__getBestConfig(XVisualInfo*& _visualInfo, GLXFBConfig& _bestFbConfig) 
 			cout << LOG_ERROR << "Frame buffer configuration failed to be fetched! Exiting.";
 		return false;
 	}
-	checkGLErrors(AT);
 	
 	/* Choose the best configuration */
 	int bestFbConfigNum = -1, worstFbConfigNum = -1, bestNumSamp = -1, worstNumSamp = 999;
@@ -501,7 +459,6 @@ Skylium::__getBestConfig(XVisualInfo*& _visualInfo, GLXFBConfig& _bestFbConfig) 
 		}
 		XFree(vi);
 	}
-	checkGLErrors(AT);
 	
 	_bestFbConfig = fbConfigs[bestFbConfigNum];
 	XFree(fbConfigs);
@@ -522,7 +479,6 @@ Skylium::__getBestConfig(XVisualInfo*& _visualInfo, GLXFBConfig& _bestFbConfig) 
 										_visualInfo->visual,
 										AllocNone
 						    );
-	checkGLErrors(AT);
 	return true;
 }
 
@@ -537,7 +493,6 @@ Skylium::__openXWindow(XVisualInfo* _visualInfo, const string& _windowName) {
 		__GLXContext.winWidth -= 50;
 		__GLXContext.winHeight -= 100;
 	}
-	checkGLErrors(AT);
 	
 	/* Create the new window */
 	__GLXContext.window = XCreateWindow(__GLXContext.display,
@@ -548,7 +503,6 @@ Skylium::__openXWindow(XVisualInfo* _visualInfo, const string& _windowName) {
 						   _visualInfo -> visual, winmask,
 						   &__GLXContext.winAttribs
 			    );
-	checkGLErrors(AT);
 	
 	if (sGlobalConfig::FULLSCREEN_RENDERING) {
 		XGrabKeyboard(__GLXContext.display, __GLXContext.window, True, GrabModeAsync, GrabModeAsync, CurrentTime);                                     
@@ -558,7 +512,6 @@ Skylium::__openXWindow(XVisualInfo* _visualInfo, const string& _windowName) {
 	
 	XStoreName(__GLXContext.display, __GLXContext.window, _windowName.c_str());
 	XMapWindow(__GLXContext.display, __GLXContext.window);
-	checkGLErrors(AT);
 	
 	return true;
 }
@@ -588,7 +541,6 @@ Skylium::__createGLXContext(GLXFBConfig& _bestFbConfig) {
 	}
 	
 	glXMakeCurrent(__GLXContext.display, __GLXContext.window, __GLXContext.context);
-	checkGLErrors(AT);
 	
 	return true;
 }

@@ -24,9 +24,6 @@
 #include "../include/config.h"
 
 unsigned	sGlobalConfig::DEBUGGING				= D_ERRORS | D_WARNINGS;
-bool		sGlobalConfig::USING_VBO				= true;
-unsigned	sGlobalConfig::MAX_VBO_SIZE			= 268435456;
-unsigned	sGlobalConfig::MIN_VBO_SIZE			= 256;
 bool		sGlobalConfig::FULLSCREEN_RENDERING	= false;
 bool		sGlobalConfig::HUD_EXISTS			= true;
 bool		sGlobalConfig::MOUSE_VISIBLE			= true;

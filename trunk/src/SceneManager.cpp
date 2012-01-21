@@ -66,10 +66,19 @@ SceneManager::displayActiveScene() {
 	//glLoadIdentity( );
 	checkGLErrors(AT);
 	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glEnable(GL_DEPTH_TEST);
+	
+	glEnable(GL_LINE_SMOOTH);
+	
 	
 	if (__activeScene) {
 		__activeScene -> show();	
 	}
+	
+	glDisable(GL_BLEND);
 }
 
 bool

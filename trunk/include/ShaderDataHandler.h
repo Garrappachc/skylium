@@ -51,6 +51,7 @@ public:
 	void updateData(const std::string&, const sVec3D< GLfloat >&);
 	void updateData(const std::string&, const sVec4D< GLfloat >&);
 	void updateData(const std::string&, GLfloat);
+	void updateSampler2D(const std::string&, GLint);
 	
 	/**
 	 * Sends all stored data to the shader.
@@ -67,6 +68,8 @@ public:
 	std::map< std::string, sVec4D< GLfloat > > __4Dvectors;
 	
 	std::map< std::string, GLfloat > __values;
+	
+	std::map< std::string, GLint > __textures;
 	
 	MatricesManager& __matrices;
 	
