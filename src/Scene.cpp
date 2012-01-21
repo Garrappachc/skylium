@@ -86,13 +86,9 @@ Scene::show() {
 }
 
 Object *
-Scene::createObject(const string &_name, const Object *_orig, Object *_parent) {
+Scene::createObject(const string &_name, Object *_parent) {
 	Object *newObject;
-	if (_orig == NULL) // default value
-		newObject = new Object(_name);
-	else {
-		newObject = new Object(*_orig, _name);
-	}
+	newObject = new Object(_name);
 	
 	if (_parent != NULL)
 		_parent -> addChild(newObject);

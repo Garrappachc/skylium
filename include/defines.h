@@ -26,10 +26,11 @@
 #define OPENGL_VERSION_MAJOR	2
 #define OPENGL_VERSION_MINOR	1
 
-#define MODELVIEWMATRIXNAME	"sModelViewMatrix"
-#define PROJECTIONMATRIXNAME	"sProjectionMatrix"
-#define NORMALMATRIXNAME		"sNormalMatrix"
-#define DEFAULTCOLORNAME		"sDefColor"
+#define MODELVIEWMATRIXNAME			"sModelViewMatrix"
+#define PROJECTIONMATRIXNAME			"sProjectionMatrix"
+#define NORMALMATRIXNAME				"sNormalMatrix"
+#define DEFAULTCOLORNAME				"sDefColor"
+#define MODELVIEWPROJECTIONMATRIXNAME	"sModelViewProjectionMatrix"
 
 #define LOG_INFO "\n\e[36m(II)\e[0m "
 #define LOG_ERROR "\n\e[31m(EE)\e[0m "

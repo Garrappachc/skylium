@@ -57,7 +57,10 @@ public:
 	 * Compiles and links the shader program.
 	 * @return False if something went wrong.
 	 */
-	bool make();
+	bool make(GLuint = 0, const std::string& = "sVertex",
+			GLuint = 1, const std::string& = "sTexCoord",
+			GLuint = 2, const std::string& = "sNormal"
+    		);
 
 	/**
 	 * Toggles on/off.
@@ -87,7 +90,7 @@ public:
 	 */
 	void setUniformFloat(const std::string&, const sVec< GLfloat >&) const;
 	void setUniformFloat(const std::string&, GLfloat) const;
-	
+	void setUniformInt(const std::string&, GLint) const;	
 	/**
 	 * Sends a matrix to the shader.
 	 * @param name Name of variable in the shader.
@@ -122,11 +125,13 @@ private:
 	void		(*glGetShaderInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
 	GLuint	(*glCreateProgram) (void);
 	void		(*glAttachShader) (GLuint, GLuint);
+	void		(*glBindAttribLocation) (GLuint, GLuint, const GLchar*);
 	void		(*glLinkProgram) (GLuint);
 	void		(*glGetProgramiv) (GLuint, GLenum, GLint*);
 	void		(*glGetProgramInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
 	void		(*glUseProgram) (GLuint);
 	GLint	(*glGetUniformLocation) (GLuint, const GLchar*);
+	void		(*glUniform1i) (GLint, GLint);
 	void		(*glUniform1f) (GLint, GLfloat);
 	void		(*glUniform2f) (GLint, GLfloat, GLfloat);
 	void		(*glUniform3f) (GLint, GLfloat, GLfloat, GLfloat);

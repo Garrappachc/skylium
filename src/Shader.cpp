@@ -77,7 +77,9 @@ Shader::~Shader() {
 }
 
 bool
-Shader::make() {
+Shader::make(GLuint _var1, const string& _param1,
+		GLuint _var2, const string& _param2,
+		GLuint _var3, const string& _param3) {
 	if (!__fileExists(__vertFile)) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
 			cout << LOG_ERROR << "File \"" << __vertFile << "\" not found!";
@@ -89,7 +91,7 @@ Shader::make() {
 		return false;
 	}
 	
-	string HEADER = 
+	static const string HEADER = 
 			"struct sMaterialParams {"
 			"	vec4 emission;"
 			"	vec4 ambient;"
@@ -108,39 +110,59 @@ Shader::make() {
 			"struct sLightModelParameters {"
 			"	vec4 ambient;"
 			"};"
-
+			
 			"uniform vec4 sDefColor;"
 			"uniform mat4 sModelViewMatrix;"
 			"uniform mat4 sProjectionMatrix;"
+			"uniform mat4 sModelViewProjectionMatrix;"
 			"uniform mat3 sNormalMatrix;"
 			"uniform sMaterialParams sFrontMaterial;"
 			"uniform sLightParams sLightSource[7];"
 			"uniform sLightModelParameters sLightModel;";
 	
+	static const string VERTEX_HEADER =
+			"in vec4 sVertex;"
+			"in vec3 sNormal;"
+			"in vec2 sTexCoords;"
+			"smooth out vec2 sVaryingTexCoords;";
+	
+	static const string FRAGMENT_HEADER =
+			"out vec4 sFragColor;"
+			"smooth in vec2 sVaryingTexCoords;"
+			"uniform sampler2D colorMap;";
+	
 	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
 		cout << LOG_INFO << "Reading shaders' sources... ";
 	ifstream vertFile(__vertFile.c_str());
+	bool headerAttached = false;
 	string vertData = "";
 	while (!vertFile.eof()) {
 		string temp = "";
 		getline(vertFile, temp);
 		vertData += temp;
 		vertData += "\n";
-		if (temp.find("#version") != string::npos)
+		if ((temp.find("#version") != string::npos) && !headerAttached) {
 			vertData += HEADER;
+			vertData += VERTEX_HEADER;
+			headerAttached = true;
+		}
 		
 	}
 	vertFile.close();
 
 	ifstream fragFile(__fragFile.c_str());
+	headerAttached = false;
 	string fragData = "";
 	while (!fragFile.eof()) {
 		string temp = "";
 		getline(fragFile, temp);
 		fragData += temp;
 		fragData += "\n";
-		if (temp.find("#version") != string::npos)
+		if ((temp.find("#version") != string::npos) && !headerAttached) {
 			fragData += HEADER;
+			fragData += FRAGMENT_HEADER;
+			headerAttached = true;
+		}
 	}
 	fragFile.close();
 	
@@ -191,6 +213,13 @@ Shader::make() {
 	checkGLErrors(AT);
 	glAttachShader(__shaderProgram, __fragmentShader);
 	checkGLErrors(AT);
+	
+	if (!_param1.empty())
+		glBindAttribLocation(__shaderProgram, _var1, _param1.c_str());
+	if (!_param2.empty())
+		glBindAttribLocation(__shaderProgram, _var2, _param2.c_str());
+	if (!_param3.empty())
+		glBindAttribLocation(__shaderProgram, _var3, _param3.c_str());
 
 	glLinkProgram(__shaderProgram);
 	checkGLErrors(AT);
@@ -201,7 +230,7 @@ Shader::make() {
 		char msg[MAX_LOG_SIZE];
 		glGetProgramInfoLog(__shaderProgram, MAX_LOG_SIZE, NULL, msg);
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Error linking shader program! Linking log:\n" << msg << endl;
+			cout << LOG_ERROR << "Error linking shader program! Link log:\n" << msg << endl;
 		return false;
 	}
 	checkGLErrors(AT);
@@ -269,6 +298,15 @@ Shader::setUniformFloat(const string& _name, GLfloat _param) const {
 }
 
 void
+Shader::setUniformInt(const string& _name, GLint _value) const {
+	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
+	checkGLErrors(AT);
+	
+	glUniform1i(location, _value);
+	checkGLErrors(AT);
+}
+
+void
 Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) const {
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
@@ -298,11 +336,13 @@ Shader::__initGLExtensionsPointers() {
 	glGetShaderInfoLog = getProcAddr< decltype(glGetShaderInfoLog) >("glGetShaderInfoLog");
 	glCreateProgram = getProcAddr< decltype(glCreateProgram) >("glCreateProgram");
 	glAttachShader = getProcAddr< decltype(glAttachShader) >("glAttachShader");
+	glBindAttribLocation = getProcAddr< decltype(glBindAttribLocation) >("glBindAttribLocation");
 	glLinkProgram = getProcAddr< decltype(glLinkProgram) >("glLinkProgram");
 	glGetProgramiv = getProcAddr< decltype(glGetProgramiv) >("glGetProgramiv");
 	glGetProgramInfoLog = getProcAddr< decltype(glGetProgramInfoLog) >("glGetProgramInfoLog");
 	glUseProgram = getProcAddr< decltype(glUseProgram) >("glUseProgram");
 	glGetUniformLocation = getProcAddr< decltype(glGetUniformLocation) >("glGetUniformLocation");
+	glUniform1i = getProcAddr< decltype(glUniform1i) >("glUniform1i");
 	glUniform1f = getProcAddr< decltype(glUniform1f) >("glUniform1f");
 	glUniform2f = getProcAddr< decltype(glUniform2f) >("glUniform2f");
 	glUniform3f = getProcAddr< decltype(glUniform3f) >("glUniform3f");

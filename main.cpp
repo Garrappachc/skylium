@@ -13,66 +13,53 @@ using namespace std;
 int
 main() {
 	
+	/* create the main Skylium class instance */
 	Skylium *s_main = new Skylium();
 	
+	/* Init - create rendering context, initialize OpenGL, create window, etc etc.
+	 * As an argument we give the window title */
 	if (!s_main -> init("Skylium sample")) {
 		return 1;
 	}
-	
 	
 	Shader *shadow = s_main -> createShader(PHONG_SHADING);
 	/* compilation + link */
 	if (!shadow -> make())
 		exit(1);
 	
+	Shader* textured = s_main -> createShader(CUSTOM, "textured.vert", "textured.frag");
+	if (!textured -> make())
+		exit(1);
+	
 	/* create the scene */
 	Scene *sScene = s_main -> createScene("SampleScene");
 
-	/* create the object */
-	Object *surface = sScene -> createObject("surface_0");
-	/* read the vertices from the .obj file */
-	if (!surface -> loadFromObj("objects/surface.obj"))
-		exit(1);
-	/* translate */
-	surface -> move(-6, -2.65, -10);
-	surface -> scale(4, 4, 4);
-	
-	/* let's crate the larger surface */
-	for (int k = 0; k < 5; k++ ) {
-		for (int i = -1; i < 4; i++) {
-			ostringstream temp;
-			temp << (int)((i+2) + k * 5);
-			string str = "surface_" + temp.str();
-			Object *surface_new = sScene -> createObject(str, surface);
-			surface_new -> move(10*i, 0, 10*k);
-		}
-	}
 	
 	/* create second object and load its data from file */
-	Object *table = sScene -> createObject("table");
-	table -> loadFromObj("objects/table.obj");
-	table -> move(0, -2, 0);
-	table -> scale (6, 6, 6);
-	table -> setColor(186, 242, 254);
+	Object* crate = sScene -> createObject("crate");
+	if (!crate -> loadFromObj("objects/crate.obj"))
+		exit(1);
+	crate -> scale(4, 4, 4);
+	textured -> bind(crate);
 	
 	Object *monkey = sScene -> createObject("monkey"); // monkey
 	if (!monkey -> loadFromObj("objects/monkey.obj"))
 		exit(1);
 	monkey -> move(0, 7, 0);
 	monkey -> scale(3, 3, 3);
-	monkey -> rotate(0, -45, 40);
-	monkey -> setColor(238, 104, 43);
+	monkey -> rotate(0, -45, 35);
+	monkey -> setColor(126, 54, 25);
 	
 	/* Camera of (0, 4, -20) position, looking at (0, 7, 20) */
 	Camera* fppCamera = sScene -> createCamera(0, 10, -20, FPP);
-	fppCamera -> lookAt(0, 9, -19);
+	fppCamera -> lookAt(-0.1, 9.7, -19);
 	
-	Camera *sphereCamera = sScene -> createCamera(0, 4, -20, SPHERICAL);
-	sphereCamera -> lookAt(0, 7, 0);
+	Camera *sphereCamera = sScene -> createCamera(-0.63, 3.56, -0.7, SPHERICAL);
+	sphereCamera -> lookAt(0, 3.2, 0);
 	
 	/* Let's bind our shading shader to the monkey and the table */
 	shadow -> bind(monkey);
-	shadow -> bind(table);
+	//shadow -> bind(table);
 	
 	/* Light on (7, 3, 0) position */
 	int light = sScene -> createLight(5, 15, -10);
@@ -105,7 +92,7 @@ main() {
 	s_main -> TheHud -> attachData(&cameraCenter);
 	sVector camCenter;
 	
-	s_main -> TheHud -> setColor(sColor(0.0f, 0.0f, 1.0f, 0.5f), sColor(0.0f, 0.0f, 1.0f, 0.8f));
+	s_main -> TheHud -> setColor(sColor(0.21f, 0.21f, 0.21f, 0.5f), sColor(1.0f, 1.0f, 1.0f, 0.8f));
 	
 	/* FPS counting */
 	short fps = 0;
@@ -144,17 +131,22 @@ main() {
 		}
 		if (keyPressed == KEY_backquote && Thud -> passed(250000, MICROSECONDS))
 			s_main -> TheHud -> toggle();
+		
 		if (keyPressed == KEY_Tab && Ttabulator -> passed(250000, MICROSECONDS)) {
 			if (shadow -> isBound(monkey))
 				shadow -> unbind(monkey);
 			else
 				shadow -> bind(monkey);
+			
+			if (textured -> isBound(crate))
+				textured -> unbind(crate);
+			else
+				textured -> bind(crate);
 		}
 		
 		if (Tanimation -> passed(2500, MICROSECONDS)) {
-			table -> rotate(0, 0.1, 0);
+			crate -> rotate(0, 0.1, 0);
 			monkey -> rotate(0, 0.1, 0);
-			//sScene -> moveLight(light, 0.0, 0.5, 0.0);
 		}
 		
 		fps++;

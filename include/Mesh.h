@@ -122,17 +122,19 @@ private:
 	
 	void __initGLExtensionsPointers();
 	
+	GLuint __vaoID;
+	
 	/* Vertices' vector */
 	std::vector< Vertex > __vertices;
 	
 	/* Vertices' room in VBO */
-	GLuint __vboID;
+	GLuint __verticesVboID;
 	
 	/* Vertices' index */
 	std::vector< GLushort > __indices;
 	
 	/* Indices' room in VBO */
-	GLuint __vaoID;
+	GLuint __indicesVboID;
 	
 	/* Do we have normals? */
 	bool __hasNormals;
@@ -150,12 +152,18 @@ private:
 	GLenum __mode;
 	
 	/* GL's extensions' pointers */
+	void (*glGenVertexArrays) (GLsizei, GLuint*);
 	void	(*glGenBuffers) (GLsizei, GLuint*);
+	void (*glBindVertexArray) (GLuint);
 	void	(*glBindBuffer) (GLenum, GLuint);
 	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
 	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
+	void (*glDeleteVertexArrays) (GLsizei, const GLuint*);
 	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
 	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
+	void (*glVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid*);
+	void (*glEnableVertexAttribArray) (GLuint);
+	void (*glDisableVertexAttribArray) (GLuint);
 	
 };
 

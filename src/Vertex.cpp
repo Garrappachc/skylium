@@ -26,17 +26,20 @@
 Position::Position() :
 		x(0),
 		y(0),
-		z(0) {}
+		z(0),
+		w(1) {}
 
 Position::Position(const Position &_orig) :
 		x(_orig.x),
 		y(_orig.y),
-		z(_orig.z) {}
+		z(_orig.z),
+		w(1) {}
 
 Position::Position(GLfloat _x, GLfloat _y, GLfloat _z) :
 		x(_x),
 		y(_y),
-		z(_z) {}
+		z(_z),
+		w(1) {}
 		
 TexCoords::TexCoords() :
 		u(0),

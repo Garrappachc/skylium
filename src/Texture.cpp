@@ -30,6 +30,7 @@
 
 #include "../include/TextureManager.h"
 #include "../include/Skylium.h"
+#include "../include/ShaderDataHandler.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -44,7 +45,8 @@ Texture::Texture(const string &_fileName) :
 		__wrapping(GL_CLAMP_TO_BORDER),
 		__file(_fileName),
 		__channels(4),
-		__boss(TextureManager::GetSingletonPtr()) {
+		__boss(TextureManager::GetSingletonPtr()),
+		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Loading texture: " << _fileName << "... ";
 	
@@ -83,6 +85,8 @@ Texture::setTexture() {
 	checkGLErrors(AT);
 	glTexParameteri(__type, GL_TEXTURE_WRAP_S, __wrapping);
 	checkGLErrors(AT);
+
+	__shaders.updateSampler2D("colorMap", 0);
 }
 
 bool

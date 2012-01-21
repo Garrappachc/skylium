@@ -100,14 +100,12 @@ public:
 	 */
 	void storeModelViewMatrix();
 	void storeProjectionMatrix();
-	void storeNormalMatrix();
 	
 	/**
 	 * Pops the matrix from the stack.
 	 */
 	void restoreModelViewMatrix();
 	void restoreProjectionMatrix();
-	void restoreNormalMatrix();
 	
 	
 	

@@ -1,5 +1,5 @@
-#version 120
+#version 330
 
 void main() {
-	gl_FragColor = sDefColor;
+	sFragColor = sDefColor;
 }

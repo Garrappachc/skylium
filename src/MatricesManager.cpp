@@ -159,51 +159,21 @@ MatricesManager::produceNormalMatrix() {
 void
 MatricesManager::storeModelViewMatrix() {
 	__MVStack.push(__modelViewMatrix);
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: ModelView matrix pushed. Current stack size: " << __MVStack.size();
 }
 
 void
 MatricesManager::restoreModelViewMatrix() {
 	__modelViewMatrix = __MVStack.top();
 	__MVStack.pop();
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: ModelView matrix popped. Current stack size: " << __MVStack.size();
 }
 
 void
 MatricesManager::storeProjectionMatrix() {
 	__PStack.push(__projectionMatrix);
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: Projection matrix pushed. Current stack size: " << __PStack.size();
 }
 
 void
 MatricesManager::restoreProjectionMatrix() {
 	__projectionMatrix = __PStack.top();
 	__PStack.pop();
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: Projection matrix popped. Current stack size: " << __PStack.size();
 }
-
-void
-MatricesManager::storeNormalMatrix() {
-	__NStack.push(__normalMatrix);
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: Normal matrix pushed. Current stack size: " << __NStack.size();
-}
-
-void
-MatricesManager::restoreNormalMatrix() {
-	__normalMatrix = __NStack.top();
-	__NStack.pop();
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "MatricesManager: Normal matrix popped. Current stack size: " << __PStack.size();
-}
-

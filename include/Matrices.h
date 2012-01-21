@@ -119,8 +119,11 @@ public:
 	
 	friend std::ostream& operator <<(std::ostream& _result, const sMatrix< T, N >& _orig) {
 		for (int i = 0; i < N; ++i) {
-			for (int j = 0; j < N; ++j)
+			for (int j = 0; j < N; ++j) {
+				if (_orig.at(i, j) >= 0)
+					_result << " ";
 				_result << _orig.at(i, j) << "\t";
+			}
 			_result << "\n";
 		}
 		return _result;

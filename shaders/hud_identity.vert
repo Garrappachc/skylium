@@ -1,5 +1,5 @@
-#version 120
+#version 330
+
 void main() {
-	gl_Position = gl_Vertex;
-	gl_FrontColor = sDefColor;
+	gl_Position = sVertex;
 }

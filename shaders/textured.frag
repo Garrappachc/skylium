@@ -3,7 +3,7 @@
 in vec3 N;
 in vec3 v;
 
-void main () {  
+void main() {
 	vec3 L = normalize((sLightSource[0].position * sModelViewMatrix).xyz - v);
 	vec3 E = normalize(-v);
 	vec3 R = normalize(-reflect(L,N));
@@ -21,5 +21,6 @@ void main () {
 	Ispec = clamp(Ispec, 0.0, 1.0); 
 	
 	// write Total Color:
-	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient) + Iamb + Idiff + Ispec) * sDefColor;
+	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient) + Iamb + Idiff + Ispec)
+			* texture(colorMap, sVaryingTexCoords.st); // colorMap is texture
 }

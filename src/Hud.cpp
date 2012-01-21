@@ -36,13 +36,21 @@
 using namespace std;
 
 Hud::Hud() :
-		__vertices({-0.8, 1.0, -0.8, 0.6, 0.8, 0.6, 0.8, 1.0}),
+		__vertices({
+				-0.8, 1.0, 0.0, 1.0,
+				-0.8, 0.6, 0.0, 1.0,
+				0.8, 0.6, 0.0, 1.0,
+				0.8, 1.0, 0.0, 1.0
+			
+			}),
 		__visible(false),
 		__toDisplay(0),
 		__background(1.0f, 0.0f, 0.0f, 0.6f),
 		__border(1.0f, 0.0f, 0.0f, 0.8f),
 		__hudShader(NULL),
 		__matrices(MatricesManager::GetSingleton()) {
+			
+	__initGLExtensionsPointers();
 	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Hud constructed.";
@@ -56,29 +64,22 @@ Hud::~Hud() {
 
 void
 Hud::draw() {
-	//  Hud Mode on
+		//  Hud Mode on
 	__hudMode(true);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	checkGLErrors(AT);
 	
 	__hudShader -> toggle();
 	__hudShader -> setUniformFloat("sDefColor", __background);
 	
-	glVertexPointer(2, GL_FLOAT, 0, __vertices);
-	checkGLErrors(AT);
+	glBindVertexArray(__vaoID);
 	glDrawArrays(GL_QUADS, 0, 4);
 	checkGLErrors(AT);
 	
 	__hudShader -> setUniformFloat("sDefColor", __border);
-	glVertexPointer(2, GL_FLOAT, 0, __vertices);
 	glLineWidth(2.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	glDisableClientState(GL_VERTEX_ARRAY);
 	checkGLErrors(AT);
 	
 	__hudShader -> toggle();
-	
 	checkGLErrors(AT);
 	
 	__displayList = __toDisplay.begin();
@@ -98,6 +99,9 @@ Hud::draw() {
 	}
 	
 	__hudMode(false);
+	
+	glBindVertexArray(0);
+	checkGLErrors(AT);
 }
 
 void
@@ -116,11 +120,27 @@ Hud::attachData(HudData *_newdata) {
 void
 Hud::prepare() {
 	__hudShader = new Shader("hud_identity.vert", "hud_identity.frag");
-	if (!__hudShader -> make()) {
+	if (!__hudShader -> make(0, "sVertex", 0, "", 0, "")) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
 			cout << LOG_ERROR << "Hud: shader compilation error occured; exiting.\n";
 		exit(1);
 	}
+	
+	glGenVertexArrays(1, &__vaoID);
+	glGenBuffers(1, &__vboID);
+	
+	glBindVertexArray(__vaoID);
+	glBindBuffer(GL_ARRAY_BUFFER, __vboID);
+	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16, __vertices);
+	
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	
+	glEnableVertexAttribArray(0);
+	
+	glBindVertexArray(0);
+	checkGLErrors(AT);
 }
 
 void
@@ -137,8 +157,8 @@ Hud::__hudMode(bool flag) {
 		glLoadIdentity();
 
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_COLOR_MATERIAL);
-		glDisable(GL_LIGHTING);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	} else {
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
@@ -146,9 +166,24 @@ Hud::__hudMode(bool flag) {
 		glPopMatrix();
 		
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_COLOR_MATERIAL);
-		glEnable(GL_LIGHTING);
+		glDisable(GL_BLEND);
 	}
 	checkGLErrors(AT);
+}
+
+void
+Hud::__initGLExtensionsPointers() {
+	glGenVertexArrays = getProcAddr< decltype(glGenVertexArrays) >("glGenVertexArrays");
+	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
+	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
+	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");
+	glDeleteVertexArrays = getProcAddr< decltype(glDeleteVertexArrays) >("glDeleteVertexArrays");
+	glGenBuffers = getProcAddr< decltype(glGenBuffers) >("glGenBuffersARB");
+	glBufferData = getProcAddr< decltype(glBufferData) >("glBufferDataARB");
+	glBufferSubData = getProcAddr< decltype(glBufferSubData) >("glBufferSubDataARB");
+	glGetBufferParameteriv = getProcAddr< decltype(glGetBufferParameteriv) >("glGetBufferParameterivARB");
+	glVertexAttribPointer = getProcAddr< decltype(glVertexAttribPointer) >("glVertexAttribPointer");
+	glEnableVertexAttribArray = getProcAddr< decltype(glEnableVertexAttribArray) >("glEnableVertexAttribArray");
+	glDisableVertexAttribArray = getProcAddr< decltype(glDisableVertexAttribArray) >("glDisableVertexAttribArray");
 }
 

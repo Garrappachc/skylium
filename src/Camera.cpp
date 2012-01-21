@@ -62,10 +62,9 @@ Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
 		__up(0, 1, 0),
 		__range(20),
 		__matrices(MatricesManager::GetSingleton()) {
-	if (__type == SPHERICAL) {
+	if (__type == SPHERICAL)
 		__eye.normalize();
-		__eye *= (double)20;
-	}
+	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Camera (" << __eye.x << ", " << __eye.y << ", " << __eye.z << ") constructed.";
 }
@@ -93,6 +92,9 @@ Camera::setView() {
 		__matrices.sLookAt(__eye, __center + __eye, __up);
 	else if (__type == SPHERICAL)
 		__matrices.sLookAt((__eye * __range) + __center, __center, __up);
+	
+	// we have modelViewMatrix set, we can count the normal matrix now.
+	__matrices.produceNormalMatrix();
 }
 
 void
@@ -145,10 +147,9 @@ Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
 void
 Camera::lookAt(GLdouble x, GLdouble y, GLdouble z) {
 	__center = sVector(x, y, z);
-	if (__type == FPP) {
-		//__center += __eye;
+	if (__type == FPP)
 		__center.normalize();
-	}
+
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << "LookAt: (" << __center.x << ", " << __center.y << ", " << __center.z << ")";
 }

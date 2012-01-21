@@ -76,11 +76,23 @@ ShaderDataHandler::updateData(const string& _uniformName, GLfloat _value) {
 }
 
 void
+ShaderDataHandler::updateSampler2D(const string& _uniformName, GLint _sampler) {
+	auto result = __textures.find(_uniformName);
+	if (result == __textures.end())
+		__textures.insert(make_pair(_uniformName, _sampler));
+	else
+		result -> second = _sampler;
+}
+
+void
 ShaderDataHandler::sendDataToShader(const Shader& _shader) {
 	// first, send matrices
 	_shader.setMatrixFloat(MODELVIEWMATRIXNAME,	__matrices.getModelViewMatrix());
 	_shader.setMatrixFloat(PROJECTIONMATRIXNAME,	__matrices.getProjectionMatrix());
 	_shader.setMatrixFloat(NORMALMATRIXNAME,	__matrices.getNormalMatrix());
+	_shader.setMatrixFloat(MODELVIEWPROJECTIONMATRIXNAME,
+			__matrices.getProjectionMatrix() * __matrices.getModelViewMatrix()
+		);
 	
 	// then send vectors
 	for (auto it = __2Dvectors.begin(); it != __2Dvectors.end(); ++it)
@@ -95,4 +107,7 @@ ShaderDataHandler::sendDataToShader(const Shader& _shader) {
 	// and then single values
 	for (auto it = __values.begin(); it != __values.end(); ++it)
 		_shader.setUniformFloat(it -> first, it -> second);
+	
+	for (auto it = __textures.begin(); it != __textures.end(); ++it)
+		_shader.setUniformInt(it -> first, it -> second);
 }
