@@ -75,4 +75,6 @@ void explode(const std::string&, char, std::vector< std::string >&);
 
 void checkGLErrors(const std::string&);
 
+std::string getErrorString(GLenum);
+
 #endif // UTILS_H

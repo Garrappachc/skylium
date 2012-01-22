@@ -21,8 +21,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <GL/glu.h>
-
 #include "../include/utils.h"
 #include "../include/config.h"
 
@@ -52,13 +50,30 @@ void checkGLErrors(const string &_at) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS) {
 			cout << "\n\e[33m(WW)\e[0m " << "OpenGL error!" 
 				<< "\nAt: " << _at << "\nError code: " << err
-				<< "\nError message: " << gluErrorString(err) << endl;
+				<< "\nError message: " << getErrorString(err);
 			cout.flush();
 		}
 		err = glGetError();
 		iserror = true;
 	}
 	if (iserror)
-		sleep(2);
+		sleep(1);
 #endif
+}
+
+string getErrorString(GLenum _err) {
+	switch (_err) {
+		case 0x0500:
+			return "GL_INVALID_ENUM";
+		case 0x0501:
+			return "GL_INVALID_VALUE";
+		case 0x0502:
+			return "GL_INVALID_OPERATION";
+		case 0x0503:
+			return "GL_OUT_OF_MEMORY";
+		case 0x0506:
+			return "GL_INVALID_FRAMEBUFFER_OPERATION​";
+		default:
+			return "unknown error code";
+	}
 }

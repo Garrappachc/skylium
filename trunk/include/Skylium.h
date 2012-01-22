@@ -43,8 +43,7 @@
 enum {
 	IDENTITY = 1,
 	PHONG_SHADING,
-	TOON,
-	CUSTOM
+	TOON
 };
 
 
@@ -96,10 +95,10 @@ public:
 	/**
 	 * Creates the new shader.
 	 * @param type Type of the new shader. Possible values are: IDENTITY, PHONG_SHADING, TOON, CUSTOM.
-	 * @param vertFile Source file of the vertex shader, if type == CUSTOM.
-	 * @param fragFile Source file of the fragment shader, if type == CUSTOM.
+	 * @param vertFile Source file of both - vertex and fragment shaders.
 	 */
-	Shader * createShader(const unsigned&, const std::string& = "", const std::string& = "");
+	Shader * createShader(unsigned);
+	Shader * createShader(const std::string&);
 	
 	/**
 	 * Returns the current window's dimensions.

@@ -80,7 +80,6 @@ Hud::draw() {
 	checkGLErrors(AT);
 	
 	__hudShader -> toggle();
-	checkGLErrors(AT);
 	
 	__displayList = __toDisplay.begin();
 	while (__displayList != __toDisplay.end()) {
@@ -90,11 +89,12 @@ Hud::draw() {
 				(*__displayList) -> color.b,
 				(*__displayList) -> color.a
 			);
+
 		(*__displayList) -> font -> print(
 				(*__displayList) -> position.x,
 				(*__displayList) -> position.y,
 				(*__displayList) -> text
-		);
+			);
 		__displayList++;
 	}
 	
@@ -119,7 +119,17 @@ Hud::attachData(HudData *_newdata) {
 
 void
 Hud::prepare() {
-	__hudShader = new Shader("hud_identity.vert", "hud_identity.frag");
+	string vertexCode = 
+		"void main() {"
+		"	gl_Position = sVertex;"
+		"}";
+	
+	string fragmentCode =
+		"void main() {"
+		"	sFragColor = sDefColor;"
+		"}";
+	
+	__hudShader = new Shader(vertexCode, fragmentCode);
 	if (!__hudShader -> make(0, "sVertex", 0, "", 0, "")) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
 			cout << LOG_ERROR << "Hud: shader compilation error occured; exiting.\n";
@@ -128,45 +138,35 @@ Hud::prepare() {
 	
 	glGenVertexArrays(1, &__vaoID);
 	glGenBuffers(1, &__vboID);
+	checkGLErrors(AT);
 	
 	glBindVertexArray(__vaoID);
 	glBindBuffer(GL_ARRAY_BUFFER, __vboID);
+	checkGLErrors(AT);
 	
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16, __vertices);
+	checkGLErrors(AT);
 	
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	
 	glEnableVertexAttribArray(0);
+	checkGLErrors(AT);
 	
 	glBindVertexArray(0);
-	checkGLErrors(AT);
 }
 
 void
 Hud::__hudMode(bool flag) {
 	if (flag) {
-		/* At this point, we don't manipulate Skylium's matrices,
-		   as in the hud shader we don't get any matrices for transform.
-		   But we use GL's lists. */
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
-
-		glDisable(GL_DEPTH_TEST);
+		__matrices.storeProjectionMatrix();
+		__matrices.sOrtho(-1.0, 1.0, 1.0, -1.0, 0.0, 1.0);
+		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	} else {
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
-		
-		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
+		
+		__matrices.restoreProjectionMatrix();
 	}
 	checkGLErrors(AT);
 }

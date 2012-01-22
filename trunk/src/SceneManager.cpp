@@ -61,17 +61,18 @@ void
 SceneManager::displayActiveScene() {
 	
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	//glColor4f(0.0, 0.0, 0.0, 1.0);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-	//glLoadIdentity( );
 	checkGLErrors(AT);
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	checkGLErrors(AT);
 	
 	glEnable(GL_DEPTH_TEST);
+	checkGLErrors(AT);
 	
 	glEnable(GL_LINE_SMOOTH);
+	checkGLErrors(AT);
 	
 	
 	if (__activeScene) {
@@ -79,6 +80,7 @@ SceneManager::displayActiveScene() {
 	}
 	
 	glDisable(GL_BLEND);
+	checkGLErrors(AT);
 }
 
 bool

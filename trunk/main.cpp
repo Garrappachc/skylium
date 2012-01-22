@@ -27,7 +27,7 @@ main() {
 	if (!shadow -> make())
 		exit(1);
 	
-	Shader* textured = s_main -> createShader(CUSTOM, "textured.vert", "textured.frag");
+	Shader* textured = s_main -> createShader("textured");
 	if (!textured -> make())
 		exit(1);
 	

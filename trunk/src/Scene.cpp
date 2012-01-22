@@ -72,7 +72,6 @@ Scene::~Scene() {
 
 void
 Scene::show() {
-	
 	if (__activeCamera)
 		__activeCamera -> setView();
 	

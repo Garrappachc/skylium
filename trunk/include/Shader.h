@@ -42,9 +42,16 @@ class Shader {
 
 public:
 	/**
+	 * Ctor that gets one argument.
+	 * @param fileName Source file name for both - vertex and fragment shaders.
+	 * 		Vertex shader source file is fileName +".vert", fragment - +".frag".
+	 */
+	Shader(const std::string&);
+	
+	/**
 	 * Ctor that gets two arguments.
-	 * @param vertFileName Vertex shader source file;
-	 * @param fragFileName Flagment shader source file.
+	 * @param vertexCode Full source code for vertex shader.
+	 * @param fragmentCode Full source code for fragment shader.
 	 */
 	Shader(const std::string&, const std::string&);
 	
@@ -102,6 +109,9 @@ public:
 private:
 	std::string __vertFile;
 	std::string __fragFile;
+	
+	std::string __vertCode;
+	std::string __fragCode;
 
 	GLint __vertexShader;
 	GLint __fragmentShader;

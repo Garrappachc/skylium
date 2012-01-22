@@ -38,6 +38,7 @@
 #include <skylium/Scene.h>
 #include <skylium/SceneManager.h>
 #include <skylium/Shader.h>
+#include <skylium/ShaderDataHandler.h>
 #include <skylium/Singleton.h>
 #include <skylium/Skylium.h>
 #include <skylium/Texture.h>

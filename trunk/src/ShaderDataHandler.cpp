@@ -110,4 +110,6 @@ ShaderDataHandler::sendDataToShader(const Shader& _shader) {
 	
 	for (auto it = __textures.begin(); it != __textures.end(); ++it)
 		_shader.setUniformInt(it -> first, it -> second);
+	
+	checkGLErrors(AT);
 }
