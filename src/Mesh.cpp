@@ -81,15 +81,13 @@ Mesh::~Mesh() {
 		glDeleteBuffers(1, &__indicesVboID);
 	if (__vaoID != 0)
 		glDeleteVertexArrays(1, &__vaoID);
+	checkGLErrors(AT);
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
 }
 
 void
 Mesh::setAllParams() {
-	if (__smooth) // smooth shading?
-		glShadeModel(GL_SMOOTH);
-	
 	if (__material && __material -> hasAnyTexture()) // do we have any texture?
 		__material -> setTextures(); // we set texture parameters 
 	
@@ -101,8 +99,6 @@ Mesh::setAllParams() {
 void
 Mesh::show() {
 	// there we go!
-	//if (__vaoID == 0)
-	//	loadIntoVbo();
 	glBindVertexArray(__vaoID);
 	checkGLErrors(AT);
 	
@@ -110,12 +106,11 @@ Mesh::show() {
 	checkGLErrors(AT);
 	
 	glBindVertexArray(0);
-	
-	glShadeModel(GL_FLAT); // always!
 }
 
 void
 Mesh::loadIntoVbo() {
+	checkGLErrors(AT);
 	// generate VAO
 	glGenVertexArrays(1, &__vaoID);
 	checkGLErrors(AT);
@@ -206,6 +201,7 @@ Mesh::addThreeIdxs(int _idx) {
 
 void
 Mesh::__initGLExtensionsPointers() {
+	checkGLErrors(AT);
 	glGenVertexArrays = getProcAddr< decltype(glGenVertexArrays) >("glGenVertexArrays");
 	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
 	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
@@ -218,4 +214,5 @@ Mesh::__initGLExtensionsPointers() {
 	glVertexAttribPointer = getProcAddr< decltype(glVertexAttribPointer) >("glVertexAttribPointer");
 	glEnableVertexAttribArray = getProcAddr< decltype(glEnableVertexAttribArray) >("glEnableVertexAttribArray");
 	glDisableVertexAttribArray = getProcAddr< decltype(glDisableVertexAttribArray) >("glDisableVertexAttribArray");
+	checkGLErrors(AT);
 }

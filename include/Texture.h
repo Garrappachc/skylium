@@ -66,9 +66,10 @@ private:
 	/**
 	 * Loads the texture.
 	 * @param fileName Name of the file.
+	 * @param texturePtr Pointer to OpenGL texture.
 	 * @return Texture.
 	 */
-	GLuint __loadImage(const std::string&);
+	GLuint __loadTexture(const std::string&);
 	
 	/* Pointer to GL's texture */
 	GLuint __texture;

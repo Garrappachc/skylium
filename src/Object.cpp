@@ -140,19 +140,8 @@ Object::show() {
 		__matrices.rotate(__rot.y, Y);
 		__matrices.rotate(__rot.z, Z);
 		
-		
-		
-		if (__shader) {
-			__shader -> toggle();
-			__shaders.updateData("sDefColor", __defColor);
-		} else {
-			glColor4f(__defColor.r, __defColor.g, __defColor.b, __defColor.a); // RGBA
-			glMatrixMode(GL_MODELVIEW);
-			glLoadMatrixf(__matrices.getModelViewMatrix());
-			glMatrixMode(GL_PROJECTION);
-			glLoadMatrixf(__matrices.getProjectionMatrix());
-			glEnable(GL_BLEND);
-		}
+		__shader -> toggle();
+		__shaders.updateData("sDefColor", __defColor);
 		
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end()) {
@@ -164,9 +153,8 @@ Object::show() {
 			(*__meshesIterator) -> show();
 			++__meshesIterator;
 		}
-		
-		if (__shader)
-			__shader -> toggle();
+
+		__shader -> toggle();
 		
 		if (!__children.empty()) {
 			__childrenIterator = __children.begin();

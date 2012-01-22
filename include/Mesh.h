@@ -152,18 +152,18 @@ private:
 	GLenum __mode;
 	
 	/* GL's extensions' pointers */
-	void (*glGenVertexArrays) (GLsizei, GLuint*);
+	void	(*glGenVertexArrays) (GLsizei, GLuint*);
 	void	(*glGenBuffers) (GLsizei, GLuint*);
-	void (*glBindVertexArray) (GLuint);
+	void	(*glBindVertexArray) (GLuint);
 	void	(*glBindBuffer) (GLenum, GLuint);
 	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
 	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
-	void (*glDeleteVertexArrays) (GLsizei, const GLuint*);
+	void	(*glDeleteVertexArrays) (GLsizei, const GLuint*);
 	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
 	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
-	void (*glVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid*);
-	void (*glEnableVertexAttribArray) (GLuint);
-	void (*glDisableVertexAttribArray) (GLuint);
+	void	(*glVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid*);
+	void	(*glEnableVertexAttribArray) (GLuint);
+	void	(*glDisableVertexAttribArray) (GLuint);
 	
 };
 

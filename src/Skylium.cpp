@@ -156,32 +156,31 @@ Skylium::createScene(const string &_sceneName) {
 }
 
 Shader *
-Skylium::createShader(const unsigned &_type, const string &_vertFile, const string &_fragFile) {
-	string vertFile, fragFile;
+Skylium::createShader(unsigned _type) {
+	string shaderFile;
 	switch (_type) {
 		case IDENTITY:
-			vertFile = "identity.vert";
-			fragFile = "identity.frag";
+			shaderFile = "identity";
 			break;
 		case PHONG_SHADING:
-			vertFile = "shadow.vert";
-			fragFile = "shadow.frag";
+			shaderFile = "shadow";
 			break;
 		case TOON:
-			vertFile = "toon.vert";
-			fragFile = "toon.frag";
-			break;
-		case CUSTOM:
-			vertFile = _vertFile;
-			fragFile = _fragFile;
+			shaderFile = "toon";
 			break;
 		default:
-			vertFile = "identity.vert";
-			fragFile = "identity.frag";
+			shaderFile = "identity";
 			break;
 	}
 	
-	Shader *newShader = new Shader(vertFile, fragFile);
+	Shader *newShader = new Shader(shaderFile);
+	__shaderList.push_back(newShader);
+	return newShader;
+}
+
+Shader*
+Skylium::createShader(const string& _fileName) {
+	Shader* newShader = new Shader(_fileName);
 	__shaderList.push_back(newShader);
 	return newShader;
 }
@@ -382,6 +381,7 @@ Skylium::__getExtensionList() {
 		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
 			cout << LOG_INFO << "Found an extension: " << temp;
 	}
+	checkGLErrors(AT);
 	
 	auto comparator = [](string *a, string *b) -> bool {
 		return (*a) < (*b);

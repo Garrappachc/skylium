@@ -66,6 +66,17 @@ public:
 	void sPerspective(GLdouble, GLdouble, GLdouble, GLdouble);
 	
 	/**
+	 * Generates a pararell projection.
+	 * @param left Specify the coordinates for the left vertical clipping planes.
+	 * @param right Specify the coordinates for the right vertical clipping planes.
+	 * @param bottom Specify the coordinates for the bottom horizontal clipping planes.
+	 * @param top Specify the coordinates for the top horizontal clipping planes.
+	 * @param nearVal Specify the distances to the nearer depth clipping planes.
+	 * @param farVal Specify the distances to the farther depth clipping planes.
+	 */
+	void sOrtho(GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble);
+	
+	/**
 	 * Generates the Normal Matrix.
 	 * Normal matrix is the transpose of the inverse of the modelView Matrix.
 	 */

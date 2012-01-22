@@ -89,6 +89,22 @@ MatricesManager::sPerspective(GLdouble _fovy, GLdouble _aspect, GLdouble _zNear,
 }
 
 void
+MatricesManager::sOrtho(GLdouble _left, GLdouble _right,
+		GLdouble _bottom, GLdouble _top,
+		GLdouble _nearVal, GLdouble _farVal) {
+	
+	__projectionMatrix.loadIdentity();
+	
+	__projectionMatrix[0] = 2 / (_right - _left);
+	__projectionMatrix[5] = 2 / (_top - _bottom);
+	__projectionMatrix[10] = -2 / (_farVal - _nearVal);
+	__projectionMatrix[12] = -((_right + _left) / (_right - _left));
+	__projectionMatrix[13] = -((_top + _bottom) / (_top - _bottom));
+	__projectionMatrix[14] = -((_farVal + _nearVal) / (_farVal - _nearVal));
+	__projectionMatrix[15] = 1;
+}
+
+void
 MatricesManager::translate(const sVector& _trans) {
 	sMat16 temp;
 	temp.loadIdentity();

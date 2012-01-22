@@ -22,8 +22,8 @@
 */
 
 #include <iostream>
+#include <cstring>
 
-#include <SOIL/SOIL.h>
 #include <sys/stat.h>
 
 #include "../include/Texture.h"
@@ -31,6 +31,9 @@
 #include "../include/TextureManager.h"
 #include "../include/Skylium.h"
 #include "../include/ShaderDataHandler.h"
+
+#include "../include/stb_image.h"
+#include "../include/imgUtils.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -56,8 +59,8 @@ Texture::Texture(const string &_fileName) :
 	unsigned lastDot = 0;
 	lastDot = _fileName.rfind('.');
 		name = (lastDot != string::npos) ? _fileName.substr(0, lastDot) : _fileName;
-
-	__texture = __loadImage(_fileName);
+	
+	__texture = __loadTexture(_fileName);
 	
 	if (!__texture) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
@@ -73,6 +76,7 @@ Texture::Texture(const string &_fileName) :
 
 Texture::~Texture() {
 	glDeleteTextures(1, &__texture);
+	checkGLErrors(AT);
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Texture (\"" << name << "\") destructed.";
 }
@@ -80,10 +84,6 @@ Texture::~Texture() {
 void
 Texture::setTexture() {
 	glBindTexture(__type, __texture);
-	checkGLErrors(AT);
-	glTexParameteri(__type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	checkGLErrors(AT);
-	glTexParameteri(__type, GL_TEXTURE_WRAP_S, __wrapping);
 	checkGLErrors(AT);
 
 	__shaders.updateSampler2D("colorMap", 0);
@@ -99,16 +99,118 @@ Texture::__fileExists(const string &_fileName) {
 }
 
 GLuint
-Texture::__loadImage(const string &_fileName) {
-	unsigned flags = SOIL_FLAG_POWER_OF_TWO;
-	if (sGlobalConfig::CREATE_MIPMAPS)
-		flags |= SOIL_FLAG_MIPMAPS;
-	return SOIL_load_OGL_texture(
-		_fileName.c_str(),
-		__channels,
-		0,
-		flags
+Texture::__loadTexture(const string &_filename) {
+	/* Based on SOIL library */
+	unsigned char* img;
+	int width, height, channels;
+	
+	img = stbi_load(_filename.c_str(), &width, &height, &channels, __channels);
+	
+	if (!img) {
+		const char* result = stbi_failure_reason();
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Error while loading texture! Stb says:\n" << result;
+		return 0;
+	}
+	
+	GLint maxTextureSize;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+	
+	if (sGlobalConfig::CREATE_MIPMAPS || (width > maxTextureSize) || (height > maxTextureSize)) {
+		int newWidth = 1, newHeight = 1;
+		while (newWidth < width)
+			newWidth *= 2;
+		while (newHeight < height)
+			newHeight *= 2;
+		
+		if ((newWidth != width) || (newHeight != height)) {
+			unsigned char* resampled = new unsigned char[newWidth * newHeight * __channels];
+			up_scale_image(img, width, height, __channels, resampled, newWidth, newHeight);
+			
+			delete [] img;
+			img = resampled;
+			width = newWidth;
+			height = newHeight;
+		}
+	}
+	
+	if ((width > maxTextureSize) || (height > maxTextureSize)) {
+		unsigned char* resampled;
+		int reduceBlockX = 1, reduceBlockY = 1;
+		int newWidth, newHeight;
+		
+		if (width > maxTextureSize)
+			reduceBlockX = width / maxTextureSize;
+		if (height > maxTextureSize)
+			reduceBlockY = height / maxTextureSize;
+		
+		newWidth = width / reduceBlockX;
+		newHeight = height / reduceBlockY;
+		
+		resampled = new unsigned char[newWidth * newHeight * __channels];
+		mipmap_image(img, width, height, __channels, resampled, reduceBlockX, reduceBlockY);
+		
+		delete [] img;
+		img = resampled;
+		width = newWidth;
+		height = newHeight;
+	}
+	
+	GLuint texID;
+	glGenTextures(1, &texID);
+	checkGLErrors(AT);
+	
+	if (!texID)
+		return 0;
+	
+	unsigned originalTextureFormat = GL_RGBA, internalTextureFormat = GL_RGBA;
+	
+	glBindTexture(GL_TEXTURE_2D, texID);
+	checkGLErrors(AT);
+	
+	glTexImage2D(
+			GL_TEXTURE_2D, 0,
+			internalTextureFormat, width, height, 0,
+			originalTextureFormat, GL_UNSIGNED_BYTE, img
 	);
+	checkGLErrors(AT);
+	
+	if (sGlobalConfig::CREATE_MIPMAPS) {
+		int MIPlevel = 1, MIPwidth = (width + 1) / 2, MIPheight = (height + 1) / 2;
+		unsigned char* resampled = new unsigned char[MIPwidth * MIPheight * __channels];
+		while (((1 << MIPlevel) <= width) || ((1 << MIPlevel) <= height)) {
+			mipmap_image(img, width, height, __channels, resampled,
+				(1 << MIPlevel), (1 << MIPlevel)
+			);
+			glTexImage2D(
+				GL_TEXTURE_2D, MIPlevel,
+				internalTextureFormat, MIPwidth, MIPheight, 0,
+				originalTextureFormat, GL_UNSIGNED_BYTE, resampled
+			);
+			checkGLErrors(AT);
+			
+			++MIPlevel;
+			MIPwidth = (MIPwidth + 1) / 2;
+			MIPheight = (MIPheight + 1) / 2;
+		}
+		delete [] resampled;
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		checkGLErrors(AT);
+	} else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		checkGLErrors(AT);
+	}
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, __wrapping);
+	checkGLErrors(AT);
+	
+	delete [] img;
+	
+	return texID;
 }
 		
 

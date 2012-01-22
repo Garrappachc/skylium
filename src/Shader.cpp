@@ -42,9 +42,11 @@ using namespace std;
 static const unsigned int MAX_LOG_SIZE = 4096;
 
 
-Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileName) : 
-		__vertFile(_vertFileName),
-		__fragFile(_fragFileName),
+Shader::Shader(const string& _fileName) : 
+		__vertFile(_fileName + ".vert"),
+		__fragFile(_fileName + ".frag"),
+		__vertCode(""),
+		__fragCode(""),
 		__isRunning(false) {
 
 	__initGLExtensionsPointers();
@@ -60,6 +62,22 @@ Shader::Shader(const std::string &_vertFileName, const std::string &_fragFileNam
 	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Shader (\"" << __vertFile << "\", \"" << __fragFile << "\") constructed.";
+}
+
+Shader::Shader(const string& _vertexCode, const string& _fragmentCode) :
+		__vertFile(""),
+		__fragFile(""),
+		__vertCode(_vertexCode),
+		__fragCode(_fragmentCode),
+		__isRunning(false) {
+	
+	__initGLExtensionsPointers();
+	
+	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	
+	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
+		cout << LOG_INFO << "Shader constructed (from source code).";
 }
 
 Shader::~Shader() {
@@ -80,101 +98,112 @@ bool
 Shader::make(GLuint _var1, const string& _param1,
 		GLuint _var2, const string& _param2,
 		GLuint _var3, const string& _param3) {
-	if (!__fileExists(__vertFile)) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "File \"" << __vertFile << "\" not found!";
-		return false;
-	}
-	if (!__fileExists(__fragFile)) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "File \"" << __fragFile << "\" not found!";
-		return false;
-	}
+	const char *vert;
+	const char *frag;
 	
 	static const string HEADER = 
-			"struct sMaterialParams {"
-			"	vec4 emission;"
-			"	vec4 ambient;"
-			"	vec4 diffuse;"
-			"	vec4 specular;"
-			"	float shininess;"
-			"};"
-			
-			"struct sLightParams {"
-			"	vec4 ambient;"
-			"	vec4 diffuse;"
-			"	vec4 specular;"
-			"	vec4 position;"
-			"};"
-			
-			"struct sLightModelParameters {"
-			"	vec4 ambient;"
-			"};"
-			
-			"uniform vec4 sDefColor;"
-			"uniform mat4 sModelViewMatrix;"
-			"uniform mat4 sProjectionMatrix;"
-			"uniform mat4 sModelViewProjectionMatrix;"
-			"uniform mat3 sNormalMatrix;"
-			"uniform sMaterialParams sFrontMaterial;"
-			"uniform sLightParams sLightSource[7];"
-			"uniform sLightModelParameters sLightModel;";
+		"struct sMaterialParams {"
+		"	vec4 emission;"
+		"	vec4 ambient;"
+		"	vec4 diffuse;"
+		"	vec4 specular;"
+		"	float shininess;"
+		"};"
+		
+		"struct sLightParams {"
+		"	vec4 ambient;"
+		"	vec4 diffuse;"
+		"	vec4 specular;"
+		"	vec4 position;"
+		"};"
+		
+		"struct sLightModelParameters {"
+		"	vec4 ambient;"
+		"};"
+		
+		"uniform vec4 sDefColor;"
+		"uniform mat4 sModelViewMatrix;"
+		"uniform mat4 sProjectionMatrix;"
+		"uniform mat4 sModelViewProjectionMatrix;"
+		"uniform mat3 sNormalMatrix;"
+		"uniform sMaterialParams sFrontMaterial;"
+		"uniform sLightParams sLightSource[7];"
+		"uniform sLightModelParameters sLightModel;";
 	
 	static const string VERTEX_HEADER =
-			"in vec4 sVertex;"
-			"in vec3 sNormal;"
-			"in vec2 sTexCoords;"
-			"smooth out vec2 sVaryingTexCoords;";
+		"in vec4 sVertex;"
+		"in vec3 sNormal;"
+		"in vec2 sTexCoords;"
+		"smooth out vec2 sVaryingTexCoords;";
 	
 	static const string FRAGMENT_HEADER =
-			"out vec4 sFragColor;"
-			"smooth in vec2 sVaryingTexCoords;"
-			"uniform sampler2D colorMap;";
+		"out vec4 sFragColor;"
+		"smooth in vec2 sVaryingTexCoords;"
+		"uniform sampler2D colorMap;";
 	
-	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
-		cout << LOG_INFO << "Reading shaders' sources... ";
-	ifstream vertFile(__vertFile.c_str());
-	bool headerAttached = false;
-	string vertData = "";
-	while (!vertFile.eof()) {
-		string temp = "";
-		getline(vertFile, temp);
-		vertData += temp;
-		vertData += "\n";
-		if ((temp.find("#version") != string::npos) && !headerAttached) {
-			vertData += HEADER;
-			vertData += VERTEX_HEADER;
-			headerAttached = true;
+	if (!__vertFile.empty() && !__fragFile.empty()) {
+		if (!__fileExists(__vertFile)) {
+			if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+				cout << LOG_ERROR << "File \"" << __vertFile << "\" not found!";
+			return false;
 		}
-		
-	}
-	vertFile.close();
+		if (!__fileExists(__fragFile)) {
+			if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+				cout << LOG_ERROR << "File \"" << __fragFile << "\" not found!";
+			return false;
+		}
+	
+		if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
+			cout << LOG_INFO << "Reading shaders' sources... ";
+		ifstream vertFile(__vertFile.c_str());
+		bool headerAttached = false;
+		__vertCode = "";
+		while (!vertFile.eof()) {
+			string temp = "";
+			getline(vertFile, temp);
+			__vertCode += temp;
+			__vertCode += "\n";
+			if ((temp.find("#version") != string::npos) && !headerAttached) {
+				__vertCode += HEADER;
+				__vertCode += VERTEX_HEADER;
+				headerAttached = true;
+			}		
+		}
+		vertFile.close();
 
-	ifstream fragFile(__fragFile.c_str());
-	headerAttached = false;
-	string fragData = "";
-	while (!fragFile.eof()) {
-		string temp = "";
-		getline(fragFile, temp);
-		fragData += temp;
-		fragData += "\n";
-		if ((temp.find("#version") != string::npos) && !headerAttached) {
-			fragData += HEADER;
-			fragData += FRAGMENT_HEADER;
-			headerAttached = true;
+		ifstream fragFile(__fragFile.c_str());
+		headerAttached = false;
+		__fragCode = "";
+		while (!fragFile.eof()) {
+			string temp = "";
+			getline(fragFile, temp);
+			__fragCode += temp;
+			__fragCode += "\n";
+			if ((temp.find("#version") != string::npos) && !headerAttached) {
+				__fragCode += HEADER;
+				__fragCode += FRAGMENT_HEADER;
+				headerAttached = true;
+			}
 		}
+		fragFile.close();
+	} else if (!__vertCode.empty() && !__fragCode.empty()) {
+		static const string VERSION = "#version 330\n";
+		__vertCode = VERSION + HEADER + VERTEX_HEADER + __vertCode + "\n\n\n\n";
+		__fragCode = VERSION + HEADER + FRAGMENT_HEADER + __fragCode + "\n\n\n\n";
+	} else {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Shader source could not be obtained!\n";
+		exit(1);
 	}
-	fragFile.close();
 	
 	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
 		cout << "Done. " << LOG_INFO << "Compiling shaders' sources... ";
-	
-	const char *vert = vertData.c_str();
-	const char *frag = fragData.c_str();
 
+	vert = __vertCode.c_str();
+	frag = __fragCode.c_str();
 
-	GLint vlength = vertData.length();
-	GLint flength = fragData.length();
+	GLint vlength = __fragCode.length();
+	GLint flength = __fragCode.length();
 	
 	glShaderSource(__vertexShader, 1, (const GLchar**)&vert, &vlength);
 	checkGLErrors(AT);
@@ -244,6 +273,7 @@ Shader::make(GLuint _var1, const string& _param1,
 
 void
 Shader::toggle() {
+	checkGLErrors(AT);
 	if (!__isRunning) {
 		glUseProgram(__shaderProgram);
 		__isRunning = true;
@@ -308,6 +338,7 @@ Shader::setUniformInt(const string& _name, GLint _value) const {
 
 void
 Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) const {
+	checkGLErrors(AT);
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	

@@ -12,6 +12,10 @@ CXX = g++
 CXXFLAGS += -O2 -g -Wall -pipe -std=c++0x
 CXXLFLAGS = -fPIC -shared
 
+C = gcc
+CFLAGS += -O2 -g -Wall -pipe
+CLFLAGS = -fPIC -shared
+
 CP = cp
 LN = ln -sf
 RM = rm -f
@@ -29,7 +33,9 @@ INCDIR = $(prefix)/include
 
 OBJS = Camera.o FontBase.o Hud.o HudData.o Light.o Material.o MatricesManager.o \
 	Mesh.o Object.o Scene.o SceneManager.o Shader.o ShaderDataHandler.o Skylium.o \
-	Texture.o TextureManager.o Timer.o Vertex.o config.o keysfunc.o utils.o
+	Texture.o TextureManager.o Timer.o Vertex.o config.o imgUtils.o keysfunc.o utils.o
+
+COBJS = stb_image.o
 
 D = include
 
@@ -42,18 +48,21 @@ INCLUDES = $(D)/Camera.h $(D)/config.h $(D)/defines.h \
 
 SKYLIUM_MAIN = skylium.h
 
-LDLIBS = -lGL -lSOIL
+LDLIBS = -lGL
 
 LFLAGS = -Wl,-soname,$(LIB)
 
 
 all: $(LIB)
 
-$(LIB): $(OBJS)
+$(LIB): $(OBJS) $(COBJS)
 	$(CXX) $(CXXFLAGS) $(CXXLFLAGS) $(LFLAGS) $(LDLIBS) -o $(LIB) $^
 
 $(OBJS): %.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(CXXLFLAGS) -c $< -o $@
+
+$(COBJS): %.o: src/%.c
+	$(C) $(CFLAGS) $(CLFLAGS) -c $< -o $@
 
 install:
 	$(INSTALL_DIR) $(INCDIR)/$(NAME)
