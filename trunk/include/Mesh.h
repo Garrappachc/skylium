@@ -47,11 +47,6 @@ public:
 	Mesh(const std::string& = "");
 	
 	/**
-	 * Copy ctor.
-	 */
-	Mesh(const Mesh&);
-	
-	/**
 	 * Empties the VBO (if used), some output.
 	 */
 	virtual ~Mesh();
@@ -107,14 +102,11 @@ public:
 	void addThreeIdxs(int);
 	
 	/**
-	 * Sets __hasNormals to true.
-	 */
-	void enableNormals() { __hasNormals = true; }
-	
-	/**
 	 * Returns size of vertices' vector in bytes.
 	 */
 	size_t getSizeOfVertices() { return sizeof(Vertex) * __vertices.size(); }
+	
+	bool empty() { return __vertices.empty() && __indices.empty(); }
 	
 	std::string name;
 	
@@ -135,9 +127,6 @@ private:
 	
 	/* Indices' room in VBO */
 	GLuint __indicesVboID;
-	
-	/* Do we have normals? */
-	bool __hasNormals;
 	
 	/* Material that has to be used */
 	Material * __material;

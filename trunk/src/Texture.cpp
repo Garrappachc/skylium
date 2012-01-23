@@ -86,7 +86,7 @@ Texture::setTexture() {
 	glBindTexture(__type, __texture);
 	checkGLErrors(AT);
 
-	__shaders.updateSampler2D("colorMap", 0);
+	__shaders.updateSampler2D("textureUnit", 0);
 }
 
 bool

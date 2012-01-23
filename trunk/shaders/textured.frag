@@ -22,5 +22,5 @@ void main() {
 	
 	// write Total Color:
 	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient) + Iamb + Idiff + Ispec)
-			* texture(colorMap, sVaryingTexCoords.st); // colorMap is texture
+			* texture(textureUnit, sVaryingTexCoords.st); // colorMap is texture
 }

@@ -71,8 +71,11 @@ SceneManager::displayActiveScene() {
 	glEnable(GL_DEPTH_TEST);
 	checkGLErrors(AT);
 	
-	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
 	checkGLErrors(AT);
+	
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	
 	
 	if (__activeScene) {

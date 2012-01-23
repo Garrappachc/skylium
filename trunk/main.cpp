@@ -59,7 +59,6 @@ main() {
 	
 	/* Let's bind our shading shader to the monkey and the table */
 	shadow -> bind(monkey);
-	//shadow -> bind(table);
 	
 	/* Light on (7, 3, 0) position */
 	int light = sScene -> createLight(5, 15, -10);
@@ -88,9 +87,9 @@ main() {
 	s_main -> TheHud -> attachData(&cameraLookAt);
 	sVector camLookAt;
 	
-	HudData cameraCenter(sXY(0.0, 0.8), sColor(SCOLORS_WHITE), "Center: ", sFont);
-	s_main -> TheHud -> attachData(&cameraCenter);
-	sVector camCenter;
+	HudData cameraEye(sXY(0.0, 0.8), sColor(SCOLORS_WHITE), "Center: ", sFont);
+	s_main -> TheHud -> attachData(&cameraEye);
+	sVector camEye;
 	
 	s_main -> TheHud -> setColor(sColor(0.21f, 0.21f, 0.21f, 0.5f), sColor(1.0f, 1.0f, 1.0f, 0.8f));
 	
@@ -161,10 +160,10 @@ main() {
 				", " + T2String(camLookAt.y) +
 				", " + T2String(camLookAt.z) + ")";
 		
-		camCenter = sScene -> getActiveCamera() -> getEye();
-		cameraCenter.text = "Center: (" + T2String(camCenter.x) +
-				", " + T2String(camCenter.y) +
-				", " + T2String(camCenter.z) + ")";
+		camEye = sScene -> getActiveCamera() -> getEye();
+		cameraEye.text = "Eye: (" + T2String(camEye.x) +
+				", " + T2String(camEye.y) +
+				", " + T2String(camEye.z) + ")";
 		
 		s_main -> execute(); // Skylium::execute() captures some events and renders the scene.
 		

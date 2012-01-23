@@ -253,7 +253,7 @@ Scene::__setObjects() {
 	while(__objectIterator != __objectList.end()) {
 		if (!(*__objectIterator) -> wasShown())
 			(*__objectIterator) -> show();
-		__objectIterator++;
+		++__objectIterator;
 	}
 }
 

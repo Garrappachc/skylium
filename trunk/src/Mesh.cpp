@@ -46,7 +46,6 @@ Mesh::Mesh(const string &_name) :
 		__verticesVboID(0),
 		__indices(0),
 		__indicesVboID(0),
-		__hasNormals(false),
 		__material(NULL),
 		__smooth(false),
 		__usage(GL_STATIC_DRAW),
@@ -55,23 +54,6 @@ Mesh::Mesh(const string &_name) :
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Mesh (\"" << name << "\") constructed.";
 
-}
-
-Mesh::Mesh(const Mesh &_orig) :
-		name(_orig.name),
-		__vaoID(_orig.__vaoID),
-		__vertices(_orig.__vertices),
-		__verticesVboID(_orig.__verticesVboID),
-		__indices(_orig.__indices),
-		__indicesVboID(_orig.__indicesVboID),
-		__hasNormals(_orig.__hasNormals),
-		__material(NULL),
-		__smooth(_orig.__smooth),
-		__usage(_orig.__usage),
-		__mode(_orig.__mode) {
-	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
-		cout << LOG_INFO << "Mesh (\"" << name << "\") constructed as a copy.";
-	__material = new Material(*_orig.__material);
 }
 
 Mesh::~Mesh() {

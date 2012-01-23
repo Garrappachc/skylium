@@ -150,6 +150,11 @@ public:
 	 */
 	void endFrame() { __wasShown = false; }
 	
+	/**
+	 * @return True if object has any texture.
+	 */
+	bool isTextured() { return __textured; }
+	
 	std::string name;
 	
 protected:
@@ -165,6 +170,8 @@ protected:
 	Shader * __shader;
 	
 	bool __wasShown;
+	
+	bool __textured;
 	
 private:
 	
