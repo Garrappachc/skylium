@@ -139,7 +139,7 @@ Shader::make(GLuint _var1, const string& _param1,
 	static const string FRAGMENT_HEADER =
 		"out vec4 sFragColor;"
 		"smooth in vec2 sVaryingTexCoords;"
-		"uniform sampler2D colorMap;";
+		"uniform sampler2D textureUnit;";
 	
 	if (!__vertFile.empty() && !__fragFile.empty()) {
 		if (!__fileExists(__vertFile)) {

@@ -147,8 +147,7 @@ Object::show() {
 		while (__meshesIterator != __meshes.end()) {
 			(*__meshesIterator) -> setAllParams();
 			
-			if (__shader)
-				__shaders.sendDataToShader(*__shader);
+			__shaders.sendDataToShader(*__shader);
 			
 			(*__meshesIterator) -> show();
 			++__meshesIterator;
@@ -273,7 +272,6 @@ Object::__parseObj(const string &_fileName) {
 	string buffer, temp;
 	long p = 0;
 	GLfloat x, y, z;
-	bool hasNormals = false;
 	
 	Mesh *current = NULL;
 	
@@ -284,6 +282,13 @@ Object::__parseObj(const string &_fileName) {
 		
 		if (buffer[0] == '#')
 			continue;	// comment, pass this
+		
+		if (buffer.find((char)92) != string::npos) { // we have backslash - divided to next line
+			buffer.erase(buffer.find((char)92), 1);
+			string secondLine;
+			getline(objFile, secondLine);
+			buffer += secondLine;
+		}
 		
 		istringstream line(buffer);
 		
@@ -302,9 +307,13 @@ Object::__parseObj(const string &_fileName) {
 					line >> temp;
 				}
 			}
-			if (current)
+			if (current && !current -> empty()) {
 				__meshes.push_back(current);
-			current = new Mesh(gName);
+				current = new Mesh(gName);
+			} else if (current && current -> empty())
+				current -> name = gName;
+			else
+				current = new Mesh(gName);
 			
 			gLastPosSize = tempPos.size();
 			gLastTexSize = tempTex.size();
@@ -338,6 +347,7 @@ Object::__parseObj(const string &_fileName) {
 			tempTex.push_back(TexCoords(x, y));
 			if (!textureChecked) {
 				howToParse |= GET_TEXTURE;
+				__textured = true;
 				textureChecked = true;
 			}
 		} else if (buffer.substr(0, 2) == "vn") {
@@ -345,7 +355,6 @@ Object::__parseObj(const string &_fileName) {
 			tempNor.push_back(Normal(x, y, z));
 			if (!normalsChecked) {
 				howToParse |= GET_NORMALS;
-				hasNormals = true;
 				normalsChecked = true;
 			}
 		} else if (buffer[0] == 'f')
@@ -370,12 +379,6 @@ Object::__parseObj(const string &_fileName) {
 			cout << "normals.";
 		else
 			cout << "only vertices.";
-	}
-	
-	if (hasNormals) {
-		__meshesIterator = __meshes.begin();
-		while (__meshesIterator != __meshes.end())
-			(*__meshesIterator) -> enableNormals(), ++__meshesIterator;
 	}
 
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
@@ -539,6 +542,7 @@ Object::__parseMtl(const string &_fileName) {
 			if (!__fileExists("texture/" + texfile)) {
 				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
 					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
+				exit(1);
 			}
 			Texture *newTex = new Texture("texture/" + texfile);
 			current -> appendTexture(newTex);
