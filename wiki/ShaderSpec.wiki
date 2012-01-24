@@ -95,9 +95,14 @@ and that's it. Nothing more is needed.
 
 *Variables available only for fragment shaders:*
 {{{
-uniform sampler2D colorMap;
+uniform sampler2D textureUnit;
 }}}
 This is current texture color map. Set by `Texture::setTexture()`.
+----
+{{{
+uniform sampler2D normalMap;
+}}}
+There you can find the normal map (if available).
 ----
 {{{
 smooth in vec2 sVaryingTexCoords;
