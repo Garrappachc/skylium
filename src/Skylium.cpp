@@ -49,10 +49,14 @@ Skylium::Skylium() :
 		GlobalTimer(__timer),
 		Matrices(__matricesManagement),
 		Shaders(__shaderDataHandling),
-		__sceneManagement(new SceneManager()),
-		__textureManagement(new TextureManager()),
-		__matricesManagement(new MatricesManager()),
-		__shaderDataHandling(new ShaderDataHandler()),
+		identityShader(NULL),
+		shadingShader(NULL),
+		texturedShadingShader(NULL),
+		normalMapShader(NULL),
+		__sceneManagement(NULL),
+		__textureManagement(NULL),
+		__matricesManagement(NULL),
+		__shaderDataHandling(NULL),
 		__pendingKeys(KEY_NOKEY),
 		__isMouseMotionEnabled(false),
 		__lastMousePositionX(0),
@@ -60,8 +64,20 @@ Skylium::Skylium() :
 		__windowWidth(__GLXContext.winWidth),
 		__windowHeight(__GLXContext.winHeight),
 		__shaderList(0),
-		__hud(new Hud()),
-		__timer(new Timer()) {
+		__hud(NULL),
+		__timer(NULL) {
+			
+	__loadConfig("skylium.cfg");
+	
+	/* Create instances of singletons */
+	__sceneManagement = new SceneManager();
+	__textureManagement = new TextureManager();
+	__matricesManagement = new MatricesManager();
+	__shaderDataHandling = new ShaderDataHandler();
+	__hud = new Hud();
+	
+	__timer = new Timer();
+	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Skylium constructed.";
 	cout.flush();
@@ -73,6 +89,8 @@ Skylium::~Skylium() {
 	delete __hud;
 	delete __matricesManagement;
 	delete __shaderDataHandling;
+	
+	delete __timer;
 	
 	while (!__shaderList.empty())
 		delete __shaderList.back(), __shaderList.pop_back();
@@ -88,8 +106,6 @@ Skylium::~Skylium() {
 
 bool
 Skylium::init(const string &_windowName) {
-	
-	__loadConfig("skylium.cfg");
 	
 	__earlyInitGLXFnPointers();
 	
@@ -129,8 +145,32 @@ Skylium::init(const string &_windowName) {
 	glDepthFunc(GL_LEQUAL);
 	checkGLErrors(AT);
 	
+	
 	if (sGlobalConfig::HUD_EXISTS)
 		TheHud -> prepare();
+	
+	/* Construct and compile default shaders. */
+	identityShader = new Shader("default/identity");
+	if (!identityShader -> make())
+		return false;
+	
+	shadingShader = new Shader("default/shadow");
+	if (!shadingShader -> make())
+		return false;
+	
+	texturedShadingShader = new Shader("default/textured");
+	if (!texturedShadingShader -> make())
+		return false;
+	
+	normalMapShader = new Shader("default/normalmap");
+	if (!normalMapShader -> make())
+		return false;
+	
+	
+	__shaderList.push_back(identityShader);
+	__shaderList.push_back(shadingShader);
+	__shaderList.push_back(texturedShadingShader);
+	__shaderList.push_back(normalMapShader);
 	
 	return true;
 	
@@ -153,29 +193,6 @@ Scene *
 Skylium::createScene(const string &_sceneName) {
 	Scene *newScene = __sceneManagement -> createScene(_sceneName);
 	return newScene;
-}
-
-Shader *
-Skylium::createShader(unsigned _type) {
-	string shaderFile;
-	switch (_type) {
-		case IDENTITY:
-			shaderFile = "identity";
-			break;
-		case PHONG_SHADING:
-			shaderFile = "shadow";
-			break;
-		case TOON:
-			shaderFile = "toon";
-			break;
-		default:
-			shaderFile = "identity";
-			break;
-	}
-	
-	Shader *newShader = new Shader(shaderFile);
-	__shaderList.push_back(newShader);
-	return newShader;
 }
 
 Shader*

@@ -34,6 +34,8 @@
 #include "../include/Texture.h"
 #include "../include/MatricesManager.h"
 #include "../include/ShaderDataHandler.h"
+#include "../include/TextureManager.h"
+#include "../include/Timer.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -87,6 +89,7 @@ Object::Object(const string &_name) :
 		__meshes(0),
 		__meshesIterator(),
 		__materials(0),
+		__content(0),
 		__matrices(MatricesManager::GetSingleton()),
 		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
@@ -105,6 +108,7 @@ Object::Object(const Object &_orig, const string &_name) :
 		__meshes(0),
 		__meshesIterator(),
 		__materials(0),
+		__content(0),
 		__matrices(MatricesManager::GetSingleton()),
 		__shaders(ShaderDataHandler::GetSingleton()) {
 	for (unsigned i = 0; i < _orig.__meshes.size(); i++) {
@@ -216,6 +220,8 @@ Object::loadFromObj(const string &_objFile) {
 	}
 	
 	__parseObj(_objFile);
+	__bindAppropriateShader();
+	
 	loadIntoVBO();
 	
 	return true;
@@ -223,16 +229,24 @@ Object::loadFromObj(const string &_objFile) {
 
 void
 Object::loadIntoVBO() {
+	/* Check whether client's GPU support VBO & VAO */
 	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_buffer_object")) {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
 			cout << LOG_ERROR << "Your GPU does not support VBO! Skylium will exit now.\n";
 		exit(1);
 	}
+	
+	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_array_object")) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Your GPU does not support VAO! Skylium will exit now.\n";
+		exit(1);
+	}
+	
 	__meshesIterator = __meshes.begin();
-		while (__meshesIterator != __meshes.end()) {
-			(*__meshesIterator) -> loadIntoVbo();
-			__meshesIterator++;
-		}
+	while (__meshesIterator != __meshes.end()) {
+		(*__meshesIterator) -> loadIntoVbo();
+		__meshesIterator++;
+	}
 }
 
 Material *
@@ -251,6 +265,8 @@ Object::addChild(Object* _childPtr) {
 
 void
 Object::__parseObj(const string &_fileName) {
+	Timer objTime;
+	auto now = objTime.update(MICROSECONDS);
 	unsigned int lastSlash = _fileName.rfind('/'); // we need the localization
 	string loc = (lastSlash == string::npos) ? "" : _fileName.substr(0, lastSlash+1);
 	
@@ -321,6 +337,11 @@ Object::__parseObj(const string &_fileName) {
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!current)
 				current = new Mesh();
+			if (!current -> empty()) {
+				string gName = current -> name;
+				__meshes.push_back(current);
+				current = new Mesh(gName);
+			}
 			string mtlName;
 			line >> temp >> mtlName;
 			for (unsigned int i = 0; i < __materials.size(); i++) {
@@ -347,7 +368,7 @@ Object::__parseObj(const string &_fileName) {
 			tempTex.push_back(TexCoords(x, y));
 			if (!textureChecked) {
 				howToParse |= GET_TEXTURE;
-				__textured = true;
+				__content |= TEXTURE;
 				textureChecked = true;
 			}
 		} else if (buffer.substr(0, 2) == "vn") {
@@ -355,6 +376,7 @@ Object::__parseObj(const string &_fileName) {
 			tempNor.push_back(Normal(x, y, z));
 			if (!normalsChecked) {
 				howToParse |= GET_NORMALS;
+				__content |= NORMALS;
 				normalsChecked = true;
 			}
 		} else if (buffer[0] == 'f')
@@ -371,18 +393,20 @@ Object::__parseObj(const string &_fileName) {
 	
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
 		cout << LOG_INFO << "Detected: ";
-		if ((howToParse & (GET_TEXTURE | GET_NORMALS)) == (GET_TEXTURE | GET_NORMALS))
+		if ((__content & (TEXTURE | NORMALS)) == (TEXTURE | NORMALS))
 			cout << "texture coordinates and normals.";
-		else if ((howToParse & GET_TEXTURE) == GET_TEXTURE)
+		else if (__content & TEXTURE)
 			cout << "texture coordinates.";
-		else if ((howToParse & GET_NORMALS) == GET_NORMALS)
+		else if (__content & NORMALS)
 			cout << "normals.";
 		else
 			cout << "only vertices.";
 	}
 
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << p << " vertices loaded.";
+	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
+		cout << LOG_INFO << p << " vertices loaded. ";
+		cout << "Time: " << (objTime.update(MICROSECONDS) - now) << " ms.";
+	}
 }
 
 void
@@ -406,9 +430,9 @@ Object::__parseFace(
 	for (int s = 0; s < 3; ++s) {
 		if ((_howToParse & (GET_TEXTURE | GET_NORMALS)) == (GET_TEXTURE | GET_NORMALS))
 			_line >> idx.v >> d >> idx.t >> d >> idx.n;
-		else if ((_howToParse & GET_TEXTURE) == GET_TEXTURE)
+		else if (_howToParse & GET_TEXTURE)
 			_line >> idx.v >> d >> idx.t;
-		else if ((_howToParse & GET_NORMALS) == GET_NORMALS)
+		else if (_howToParse & GET_NORMALS)
 			_line >> idx.v >> d >> d >> idx.n;
 		else
 			_line >> idx.v;
@@ -539,13 +563,36 @@ Object::__parseMtl(const string &_fileName) {
 			line >> temp >> texfile;
 			if (texfile == "")
 				continue;
+			Texture* newTex = TextureManager::GetSingleton().getTextureByName(Texture::getName(texfile));
+			if (newTex != NULL) {
+				current -> appendTexture(newTex);
+				continue;
+			}
 			if (!__fileExists("texture/" + texfile)) {
 				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
 					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
 				exit(1);
 			}
-			Texture *newTex = new Texture("texture/" + texfile);
+			newTex = new Texture("texture/" + texfile);
 			current -> appendTexture(newTex);
+		} else if (buffer.substr(0, 8) == "map_bump") {
+			string texfile;
+			line >> temp >> texfile;
+			if (texfile == "")
+				continue;
+			Texture* newTex = TextureManager::GetSingleton().getTextureByName(Texture::getName(texfile));
+			if (newTex != NULL) {
+				current -> appendTexture(newTex);
+				continue;
+			}
+			if (!__fileExists("texture/" + texfile)) {
+				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
+				exit(1);
+			}
+			newTex = new Texture("texture/" + texfile, MODE_NORMAL_MAP);
+			current -> appendTexture(newTex);
+			__content |= NORMAL_MAP;
 		}
 	}
 	
@@ -560,4 +607,22 @@ Object::__fileExists(const string &_fileName) {
 		return 1;
 	else
 		return 0;
+}
+
+void
+Object::__bindAppropriateShader() {
+	Skylium& global = Skylium::GetSingleton();
+	
+	if ((__content & (TEXTURE | NORMAL_MAP)) == (TEXTURE | NORMAL_MAP)) {
+		global.normalMapShader -> bind(this);
+		return;
+	} else if ((__content & (TEXTURE | NORMALS)) == (TEXTURE | NORMALS)) {
+		global.texturedShadingShader -> bind(this);
+		return;
+	} else if (__content & (NORMALS)) {
+		global.shadingShader -> bind(this);
+		return;
+	}
+	
+	global.identityShader -> bind(this);
 }

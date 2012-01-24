@@ -41,13 +41,14 @@
 
 using namespace std;
 
-Texture::Texture(const string &_fileName) :
+Texture::Texture(const string &_fileName, Mode _mode) :
 		name(""),
 		__texture(0),
 		__type(GL_TEXTURE_2D),
 		__wrapping(GL_CLAMP_TO_BORDER),
 		__file(_fileName),
 		__channels(4),
+		__mode(_mode),
 		__boss(TextureManager::GetSingletonPtr()),
 		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
@@ -56,9 +57,7 @@ Texture::Texture(const string &_fileName) :
 	if (!__fileExists(_fileName))
 		throw "File " + _fileName + " not found!";
 	
-	unsigned lastDot = 0;
-	lastDot = _fileName.rfind('.');
-		name = (lastDot != string::npos) ? _fileName.substr(0, lastDot) : _fileName;
+	name = getName(_fileName);
 	
 	__texture = __loadTexture(_fileName);
 	
@@ -68,7 +67,7 @@ Texture::Texture(const string &_fileName) :
 		throw "Texture loading failed!";
 	}
 	
-	__boss -> pushBack(this);
+	__boss -> insert(this);
 	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << "Done.";
@@ -82,11 +81,21 @@ Texture::~Texture() {
 }
 
 void
-Texture::setTexture() {
+Texture::setTexture(GLenum number) {
+	glActiveTexture(number);
 	glBindTexture(__type, __texture);
 	checkGLErrors(AT);
 
-	__shaders.updateSampler2D("textureUnit", 0);
+	if (__mode == MODE_TEXTURE)
+		__shaders.updateSampler2D("textureUnit", 0);
+	else
+		__shaders.updateSampler2D("normalMap", 0);
+}
+
+string
+Texture::getName(const string& _fileName) {
+	unsigned lastDot = _fileName.rfind('.');
+	return (lastDot != string::npos) ? _fileName.substr(0, lastDot) : _fileName;
 }
 
 bool

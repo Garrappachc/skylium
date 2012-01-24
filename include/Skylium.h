@@ -39,20 +39,13 @@
 
 #include "keysdef.h"
 
-/* Shaders' types */
-enum {
-	IDENTITY = 1,
-	PHONG_SHADING,
-	TOON
-};
-
-
 class Skylium : public Singleton < Skylium > {
 
 public:
 	
 	/**
-	 * Creates new SceneManager (singleton).
+	 * Creates the singleton's instances and reads
+	 * the config file.
 	 */
 	Skylium();
 	
@@ -94,10 +87,8 @@ public:
 	
 	/**
 	 * Creates the new shader.
-	 * @param type Type of the new shader. Possible values are: IDENTITY, PHONG_SHADING, TOON, CUSTOM.
-	 * @param vertFile Source file of both - vertex and fragment shaders.
+	 * @param sourceFiles Source file of both - vertex and fragment shaders (without extensions).
 	 */
-	Shader * createShader(unsigned);
 	Shader * createShader(const std::string&);
 	
 	/**
@@ -150,6 +141,10 @@ public:
 	MatricesManager*& Matrices;
 	ShaderDataHandler*& Shaders;
 	
+	Shader* identityShader;
+	Shader* shadingShader;
+	Shader* texturedShadingShader;
+	Shader* normalMapShader;
 	
 private:
 	

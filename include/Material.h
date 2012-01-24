@@ -38,6 +38,13 @@ enum {
 	MATERIAL_SPECULAR	= 4
 };
 
+static const GLenum GLTEXTURES[] = {
+	GL_TEXTURE0,
+	GL_TEXTURE1,
+	GL_TEXTURE2,
+	GL_TEXTURE3
+};
+
 class Material {
 	
 public:
@@ -120,7 +127,6 @@ private:
 	
 	/* Textures */
 	std::vector< Texture* >				__textures;
-	std::vector< Texture* >::const_iterator	__texturesIterator;
 	
 	ShaderDataHandler&	__shaders;
 

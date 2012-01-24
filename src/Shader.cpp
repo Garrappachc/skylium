@@ -47,15 +47,14 @@ Shader::Shader(const string& _fileName) :
 		__fragFile(_fileName + ".frag"),
 		__vertCode(""),
 		__fragCode(""),
-		__isRunning(false) {
+		__isRunning(false),
+		__isCompiled(false) {
 
 	__initGLExtensionsPointers();
 	
-	if (__vertFile.find('/') == string::npos)
-		__vertFile = "shaders/" + __vertFile;
+	__vertFile = "shaders/" + __vertFile;
 	
-	if (__fragFile.find('/') == string::npos)
-		__fragFile = "shaders/" + __fragFile;
+	__fragFile = "shaders/" + __fragFile;
 	
 	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -69,7 +68,8 @@ Shader::Shader(const string& _vertexCode, const string& _fragmentCode) :
 		__fragFile(""),
 		__vertCode(_vertexCode),
 		__fragCode(_fragmentCode),
-		__isRunning(false) {
+		__isRunning(false),
+		__isCompiled(false) {
 	
 	__initGLExtensionsPointers();
 	
@@ -102,6 +102,7 @@ Shader::make(GLuint _var1, const string& _param1,
 	const char *frag;
 	
 	static const string HEADER = 
+		"#version " GLSLLANGVERSION "\n"
 		"struct sMaterialParams {"
 		"	vec4 emission;"
 		"	vec4 ambient;"
@@ -128,18 +129,19 @@ Shader::make(GLuint _var1, const string& _param1,
 		"uniform mat3 sNormalMatrix;"
 		"uniform sMaterialParams sFrontMaterial;"
 		"uniform sLightParams sLightSource[7];"
-		"uniform sLightModelParameters sLightModel;";
+		"uniform sLightModelParameters sLightModel;\n";
 	
 	static const string VERTEX_HEADER =
 		"in vec4 sVertex;"
 		"in vec3 sNormal;"
 		"in vec2 sTexCoords;"
-		"smooth out vec2 sVaryingTexCoords;";
+		"smooth out vec2 sVaryingTexCoords;\n";
 	
 	static const string FRAGMENT_HEADER =
 		"out vec4 sFragColor;"
 		"smooth in vec2 sVaryingTexCoords;"
-		"uniform sampler2D textureUnit;";
+		"uniform sampler2D textureUnit;"
+		"uniform sampler2D normalMap;";
 	
 	if (!__vertFile.empty() && !__fragFile.empty()) {
 		if (!__fileExists(__vertFile)) {
@@ -156,53 +158,46 @@ Shader::make(GLuint _var1, const string& _param1,
 		if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
 			cout << LOG_INFO << "Reading shaders' sources... ";
 		ifstream vertFile(__vertFile.c_str());
-		bool headerAttached = false;
-		__vertCode = "";
+		__vertCode = HEADER + VERTEX_HEADER;
 		while (!vertFile.eof()) {
 			string temp = "";
 			getline(vertFile, temp);
 			__vertCode += temp;
-			__vertCode += "\n";
-			if ((temp.find("#version") != string::npos) && !headerAttached) {
-				__vertCode += HEADER;
-				__vertCode += VERTEX_HEADER;
-				headerAttached = true;
-			}		
+			__vertCode += "\n";	
 		}
 		vertFile.close();
 
 		ifstream fragFile(__fragFile.c_str());
-		headerAttached = false;
-		__fragCode = "";
+		__fragCode = HEADER + FRAGMENT_HEADER;
 		while (!fragFile.eof()) {
 			string temp = "";
 			getline(fragFile, temp);
+			
 			__fragCode += temp;
 			__fragCode += "\n";
-			if ((temp.find("#version") != string::npos) && !headerAttached) {
-				__fragCode += HEADER;
-				__fragCode += FRAGMENT_HEADER;
-				headerAttached = true;
-			}
 		}
 		fragFile.close();
+		
+			
+		if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
+			cout << "Done. ";
 	} else if (!__vertCode.empty() && !__fragCode.empty()) {
-		static const string VERSION = "#version 330\n";
-		__vertCode = VERSION + HEADER + VERTEX_HEADER + __vertCode + "\n\n\n\n";
-		__fragCode = VERSION + HEADER + FRAGMENT_HEADER + __fragCode + "\n\n\n\n";
+		__vertCode = HEADER + VERTEX_HEADER + __vertCode;
+		__fragCode = HEADER + FRAGMENT_HEADER + __fragCode;
 	} else {
 		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
 			cout << LOG_ERROR << "Shader source could not be obtained!\n";
 		exit(1);
 	}
 	
-	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
-		cout << "Done. " << LOG_INFO << "Compiling shaders' sources... ";
+	if (sGlobalConfig::DEBUGGING & D_SHADERS) {
+		cout << LOG_INFO << "Compiling shaders' sources... ";
+	}
 
 	vert = __vertCode.c_str();
 	frag = __fragCode.c_str();
 
-	GLint vlength = __fragCode.length();
+	GLint vlength = __vertCode.length();
 	GLint flength = __fragCode.length();
 	
 	glShaderSource(__vertexShader, 1, (const GLchar**)&vert, &vlength);
@@ -238,6 +233,12 @@ Shader::make(GLuint _var1, const string& _param1,
 
 	__shaderProgram = glCreateProgram();
 	checkGLErrors(AT);
+	if (!__shaderProgram) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Error creating the shader program!" << endl;
+		return false;
+	} 
+	
 	glAttachShader(__shaderProgram, __vertexShader);
 	checkGLErrors(AT);
 	glAttachShader(__shaderProgram, __fragmentShader);
@@ -263,9 +264,17 @@ Shader::make(GLuint _var1, const string& _param1,
 		return false;
 	}
 	checkGLErrors(AT);
+	
+	if (glIsProgram(__shaderProgram) == GL_FALSE) {
+		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+			cout << LOG_ERROR << "Shader program could not be created!";
+		return false;
+	}
 
 	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
 		cout << "Done. No errors reported.";
+	
+	__isCompiled = true;
 	
 	return true;
 
@@ -273,20 +282,26 @@ Shader::make(GLuint _var1, const string& _param1,
 
 void
 Shader::toggle() {
-	checkGLErrors(AT);
+	if (!__isCompiled)
+		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+			cout << LOG_WARN << "\nWarning: this shader is not compiled!";
+		
 	if (!__isRunning) {
 		glUseProgram(__shaderProgram);
+		checkGLErrors(AT);
 		__isRunning = true;
 	} else {
 		glUseProgram(0);
+		checkGLErrors(AT);
 		__isRunning = false;
 	}
-	checkGLErrors(AT);
 }
 
 void
 Shader::bind(Object *_dest) {
 	_dest -> __shader = this;
+	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
+		cout << LOG_INFO << "Shader bound to " << _dest -> name << ".";
 }
 
 void
@@ -365,6 +380,7 @@ Shader::__initGLExtensionsPointers() {
 	glCompileShader = getProcAddr< decltype(glCompileShader) >("glCompileShader");
 	glGetShaderiv = getProcAddr< decltype(glGetShaderiv) >("glGetShaderiv");
 	glGetShaderInfoLog = getProcAddr< decltype(glGetShaderInfoLog) >("glGetShaderInfoLog");
+	glIsProgram = getProcAddr< decltype(glIsProgram) >("glIsProgram");
 	glCreateProgram = getProcAddr< decltype(glCreateProgram) >("glCreateProgram");
 	glAttachShader = getProcAddr< decltype(glAttachShader) >("glAttachShader");
 	glBindAttribLocation = getProcAddr< decltype(glBindAttribLocation) >("glBindAttribLocation");

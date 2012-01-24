@@ -33,7 +33,6 @@
 #include "Mesh.h"
 
 class Shader;
-class SkyliumConfig;
 class Skylium;
 class MatricesManager;
 class ShaderDataHandler;
@@ -42,6 +41,12 @@ struct TexCoords;
 struct Normal;
 struct Index;
 struct IndexComp;
+
+enum {
+	TEXTURE = 1,
+	NORMALS = 2,
+	NORMAL_MAP = 4
+};
 
 typedef std::map< Index, long, IndexComp > indicesMap;
 
@@ -153,27 +158,66 @@ public:
 	/**
 	 * @return True if object has any texture.
 	 */
-	bool isTextured() { return __textured; }
+	bool isTextured() { return (__content & TEXTURE); }
 	
 	std::string name;
 	
 protected:
 	
+	/* Genera colour of the object.
+	 * Does not have to be set, if texture enabled. */
 	sColor __defColor;
 	
+	/* Vectors that the ModelView Matrix will be
+	 * multiplied by in MatricesManager::translate, ::rotate
+	 * and ::scale. */
 	sVector __mov;
-	
 	sVector __rot;
-	
 	sVector __scale;
 	
+	/* A pointer to object's shader */
 	Shader * __shader;
 	
+	/* To indicate if the object was already rendered in the current frame. */
 	bool __wasShown;
 	
-	bool __textured;
-	
 private:
+	
+	/**
+	 * Parses the .obj file and put results in current
+	 * object's instance.
+	 * @param fileName Name of the .obj file.
+	 */
+	void __parseObj(const std::string&);
+	
+	/**
+	 * Helpful function to shorten a bit parsing the obj file.
+	 * It just parses the one face's line.
+	 */
+	void __parseFace(std::istringstream&, Mesh*&,
+			std::vector< Position >&, std::vector< TexCoords >&,
+			std::vector< Normal >&, indicesMap&,
+			unsigned, unsigned, unsigned,
+			long&, unsigned);
+	
+	/**
+	 * Parses the .mtl file.
+	 */
+	void __parseMtl(const std::string&);
+	
+	/**
+	 * @param fileName Name of the file to be checked.
+	 * @return True, if the file exists.
+	 */
+	bool __fileExists(const std::string&);
+	
+	/**
+	 * According to what object has in __content,
+	 * binds the appropriate shader. Default shaders'
+	 * instances can be found in global Skylium's
+	 * instance.
+	 */
+	void __bindAppropriateShader();
 	
 	/* Vector of children's pointers. */
 	std::vector< Object* > __children;
@@ -186,19 +230,7 @@ private:
 	
 	std::vector< Material* > __materials;
 	
-	bool __fileExists(const std::string&);
-	
-	void __parseObj(const std::string&);
-	
-	void __parseFace(std::istringstream&, Mesh*&,
-			std::vector< Position >&, std::vector< TexCoords >&,
-			std::vector< Normal >&, indicesMap&,
-			unsigned, unsigned, unsigned,
-			long&, unsigned);
-	
-	void __parseMtl(const std::string&);
-	
-	SkyliumConfig * __config;
+	short unsigned __content;
 	
 	MatricesManager& __matrices;
 	

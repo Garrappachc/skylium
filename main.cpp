@@ -22,25 +22,14 @@ main() {
 		return 1;
 	}
 	
-	Shader *shadow = s_main -> createShader(PHONG_SHADING);
-	/* compilation + link */
-	if (!shadow -> make())
-		exit(1);
-	
-	Shader* textured = s_main -> createShader("textured");
-	if (!textured -> make())
-		exit(1);
-	
 	/* create the scene */
 	Scene *sScene = s_main -> createScene("SampleScene");
-
 	
 	/* create second object and load its data from file */
 	Object* crate = sScene -> createObject("crate");
 	if (!crate -> loadFromObj("objects/crate.obj"))
 		exit(1);
 	crate -> scale(4, 4, 4);
-	textured -> bind(crate);
 	
 	Object *monkey = sScene -> createObject("monkey"); // monkey
 	if (!monkey -> loadFromObj("objects/monkey.obj"))
@@ -57,9 +46,6 @@ main() {
 	Camera *sphereCamera = sScene -> createCamera(-0.63, 3.56, -0.7, SPHERICAL);
 	sphereCamera -> lookAt(0, 3.2, 0);
 	
-	/* Let's bind our shading shader to the monkey and the table */
-	shadow -> bind(monkey);
-	
 	/* Light on (7, 3, 0) position */
 	int light = sScene -> createLight(5, 15, -10);
 	/* Set ambient light */
@@ -70,7 +56,6 @@ main() {
 	/* Timer for fps counting */
 	Timer *Tfps = new Timer();
 	/* We have to count the time when the key is down to avoid "flashing-like" effect */
-	Timer *Ttabulator = new Timer();
 	Timer *Thud = new Timer();
 	
 	/* Let's create new bitmap font */
@@ -131,18 +116,6 @@ main() {
 		if (keyPressed == KEY_backquote && Thud -> passed(250000, MICROSECONDS))
 			s_main -> TheHud -> toggle();
 		
-		if (keyPressed == KEY_Tab && Ttabulator -> passed(250000, MICROSECONDS)) {
-			if (shadow -> isBound(monkey))
-				shadow -> unbind(monkey);
-			else
-				shadow -> bind(monkey);
-			
-			if (textured -> isBound(crate))
-				textured -> unbind(crate);
-			else
-				textured -> bind(crate);
-		}
-		
 		if (Tanimation -> passed(2500, MICROSECONDS)) {
 			crate -> rotate(0, 0.1, 0);
 			monkey -> rotate(0, 0.1, 0);
@@ -174,7 +147,6 @@ main() {
 	/* We have to delete everything that was made on our own. */
 	delete Tanimation;
 	delete Tfps;
-	delete Ttabulator;
 	delete Thud;
 	delete sFont;
 	

@@ -113,12 +113,14 @@ private:
 	std::string __vertCode;
 	std::string __fragCode;
 
-	GLint __vertexShader;
-	GLint __fragmentShader;
+	GLuint __vertexShader;
+	GLuint __fragmentShader;
 
-	GLint __shaderProgram;
+	GLuint __shaderProgram;
 
 	GLboolean __isRunning;
+	
+	bool __isCompiled;
 	
 	void __initGLExtensionsPointers();
 
@@ -139,6 +141,7 @@ private:
 	void		(*glLinkProgram) (GLuint);
 	void		(*glGetProgramiv) (GLuint, GLenum, GLint*);
 	void		(*glGetProgramInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
+	GLboolean	(*glIsProgram) (GLuint);
 	void		(*glUseProgram) (GLuint);
 	GLint	(*glGetUniformLocation) (GLuint, const GLchar*);
 	void		(*glUniform1i) (GLint, GLint);

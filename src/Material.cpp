@@ -97,9 +97,9 @@ void
 Material::setTextures() {
 	if (__textures.empty())
 		return;
-	__texturesIterator = __textures.begin();
-	while (__texturesIterator != __textures.end())
-		(*__texturesIterator) -> setTexture(), __texturesIterator++;
+	
+	for (unsigned i = 0; i < __textures.size(); ++i)
+		__textures[i] -> setTexture(GLTEXTURES[i]);
 }
 
 void
