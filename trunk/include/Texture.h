@@ -31,6 +31,11 @@
 class TextureManager;
 class ShaderDataHandler;
 
+enum Mode {
+	MODE_TEXTURE,
+	MODE_NORMAL_MAP
+};
+
 class Texture {
 
 public:
@@ -41,7 +46,7 @@ public:
 	 * vector. The name is the file name without an extension.
 	 * @param fileName Location of file with the texture.
 	 */
-	Texture(const std::string&);
+	Texture(const std::string&, Mode = MODE_TEXTURE);
 	
 	/**
 	 * Destructor destroys the texture and removes it from the GPU's buffer.
@@ -51,7 +56,14 @@ public:
 	/**
 	 * Binds the texture and sets the pipeline parameters.
 	 */
-	void setTexture();
+	void setTexture(GLenum);
+	
+	/**
+	 * Parses the file name and gives back the texture name.
+	 * @param fileName Name of the file with texture.
+	 * @return Name of the texture, if @fileName was texture's source.
+	 */
+	static std::string getName(const std::string&);
 
 	/* Name of the texture */
 	std::string name;
@@ -96,6 +108,8 @@ private:
 	
 	/* Channels, default 4 (RGBA) */
 	GLint __channels;
+	
+	Mode __mode;
 	
 	/* TM's instance */
 	TextureManager * __boss;

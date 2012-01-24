@@ -26,7 +26,7 @@
 #define TEXTUREMANAGER_H
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #include "Singleton.h"
 
@@ -54,15 +54,15 @@ public:
 	Texture * getTextureByName(const std::string&);
 	
 	/**
-	 * Puts the texture into the vector.
-	 * @param texture Pointer to the texture that will be put into the vector.
+	 * Puts the texture into the map.
+	 * @param texture Pointer to the texture.
 	 */
-	void pushBack(Texture*);
+	void insert(Texture*);
 
 private:
 	
 	/* Textures vector */
-	std::vector< Texture* > __textureList;
+	std::unordered_map< std::string, Texture* > __texturesMap;
 };
 
 #endif // TEXTUREMANAGER_H

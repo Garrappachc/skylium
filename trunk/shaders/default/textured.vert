@@ -1,5 +1,3 @@
-#version 330
-
 /* Textured shading */
 
 out vec3 N;

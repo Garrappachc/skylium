@@ -5,7 +5,6 @@
       |_|\___/_\_\\__|\_,_|_| \___|_|  |_\__,_|_||_\__,_\__, \___|_|(_)__| .__/ .__/
                                                         |___/            |_|  |_|   
       
-
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -34,30 +33,29 @@
 
 using namespace std;
 
-TextureManager::TextureManager() :
-		__textureList(0) {
+TextureManager::TextureManager() {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "TextureManager constructed.";
 }
 
 TextureManager::~TextureManager() {
-	while (!__textureList.empty())
-		delete __textureList.back(), __textureList.pop_back();
+	for (auto it = __texturesMap.begin(); it != __texturesMap.end(); ++it)
+		delete it -> second;
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "TextureManager destructed.";
 }
 
 Texture *
 TextureManager::getTextureByName(const string &_name) {
-	for (unsigned i = 0; i < __textureList.size(); i++)
-		if (__textureList[i]->name == _name) return __textureList[i];
-	
-	return NULL;
+	auto it = __texturesMap.find(_name);
+	if (it == __texturesMap.end())
+		return NULL;
+	return it -> second;
 }
 
 void
-TextureManager::pushBack(Texture *_tex) {
+TextureManager::insert(Texture *_tex) {
 	if (_tex == NULL)
 		return;
-	__textureList.push_back(_tex);
+	__texturesMap.insert(make_pair(_tex -> name, _tex));
 }

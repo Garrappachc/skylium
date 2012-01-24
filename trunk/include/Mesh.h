@@ -123,7 +123,7 @@ private:
 	GLuint __verticesVboID;
 	
 	/* Vertices' index */
-	std::vector< GLushort > __indices;
+	std::vector< GLuint > __indices;
 	
 	/* Indices' room in VBO */
 	GLuint __indicesVboID;

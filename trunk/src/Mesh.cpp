@@ -84,7 +84,7 @@ Mesh::show() {
 	glBindVertexArray(__vaoID);
 	checkGLErrors(AT);
 	
-	glDrawElements(__mode, __indices.size(), GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+	glDrawElements(__mode, __indices.size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 	checkGLErrors(AT);
 	
 	glBindVertexArray(0);
@@ -131,9 +131,9 @@ Mesh::loadIntoVbo() {
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(24)); // normal
 	
 	// indices array to the buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * __indices.size(), NULL, __usage);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * __indices.size(), NULL, __usage);
 	checkGLErrors(AT);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * __indices.size(), &__indices[0]);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLuint) * __indices.size(), &__indices[0]);
 	checkGLErrors(AT);
 	int bufferSize_i;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_i);

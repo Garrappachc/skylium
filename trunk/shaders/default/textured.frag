@@ -1,5 +1,3 @@
-#version 330
-
 in vec3 N;
 in vec3 v;
 
@@ -22,5 +20,5 @@ void main() {
 	
 	// write Total Color:
 	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient) + Iamb + Idiff + Ispec)
-			* texture(textureUnit, sVaryingTexCoords.st); // colorMap is texture
+			* texture(textureUnit, sVaryingTexCoords.st);
 }
