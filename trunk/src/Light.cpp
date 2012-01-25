@@ -136,4 +136,7 @@ Light::makeLight(unsigned _count) const {
 			__lightSrc[2],
 			1.0f
 		));
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].constantAttenuation", 1.0f);
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].linearAttenuation", 0.0f);
+	__shaders.updateData("sLightSource[" + T2String(_count) + "].quadraticAttenuation", 0.0f);
 }
