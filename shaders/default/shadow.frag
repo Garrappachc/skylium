@@ -1,23 +1,31 @@
-in vec3 N;
-in vec3 v;
+in vec3 sVaryingNormal;
+in vec3 sVaryingLightDir;
+in vec3 sEyeVector;
+in float sAttenuation;
 
-void main () {  
-	vec3 L = normalize((sLightSource[0].position * sModelViewMatrix).xyz - v);
-	vec3 E = normalize(-v);
-	vec3 R = normalize(-reflect(L,N));
-
-	//calculate Ambient Term:  
-	vec4 Iamb = sFrontMaterial.ambient * sLightSource[0].ambient;
-
-	//calculate Diffuse Term:  
-	vec4 Idiff = sFrontMaterial.diffuse * sLightSource[0].diffuse * max(dot(N,L), 0.0);
-	Idiff = clamp(Idiff, 0.0, 1.0);     
-   
-	// calculate Specular Term:
-	vec4 Ispec = (sFrontMaterial.specular * sLightSource[0].specular)
-			* pow(max(dot(R,E),0.0),0.3 * sFrontMaterial.shininess);
-	Ispec = clamp(Ispec, 0.0, 1.0); 
+void main () {
+	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient)
+			* sFrontMaterial.ambient) + (sLightSource[0].ambient * sFrontMaterial.ambient) * sAttenuation;
 	
-	// write Total Color:
-	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient) + Iamb + Idiff + Ispec) * sDefColor;
+	vec3 N = normalize(sVaryingNormal);
+	vec3 L = normalize(sVaryingLightDir);
+	
+	float lambertTerm = dot(N,L);
+	
+	if(lambertTerm > 0.0) {
+		sFragColor += sLightSource[0].diffuse *
+				sFrontMaterial.diffuse *
+				lambertTerm * sAttenuation;
+		
+		vec3 E = normalize(sEyeVector);
+		vec3 R = reflect(-L, N);
+		
+		float specular = pow( max(dot(R, E), 0.0),
+				sFrontMaterial.shininess );
+		
+		sFragColor += sLightSource[0].specular *
+		sFrontMaterial.specular * specular * sAttenuation;
+	}
+
+	sFragColor *= sDefColor;
 }

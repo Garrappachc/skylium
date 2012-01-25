@@ -48,6 +48,11 @@ enum {
 	NORMAL_MAP = 4
 };
 
+enum {
+	INVERT_X = 1,
+	INVERT_Y = 2
+};
+
 typedef std::map< Index, long, IndexComp > indicesMap;
 
 class Object {
@@ -125,7 +130,7 @@ public:
 	 * @param objFile .obj file localization.
 	 * @return False if something went wrong.
 	 */
-	bool loadFromObj(const std::string&);
+	bool loadFromObj(const std::string&, unsigned = 0);
 	
 	/**
 	 * Loads the whole object into the VBO.
@@ -188,7 +193,7 @@ private:
 	 * object's instance.
 	 * @param fileName Name of the .obj file.
 	 */
-	void __parseObj(const std::string&);
+	void __parseObj(const std::string&, unsigned);
 	
 	/**
 	 * Helpful function to shorten a bit parsing the obj file.

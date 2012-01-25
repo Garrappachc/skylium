@@ -209,7 +209,7 @@ Object::setColor(int _R, int _G, int _B, GLfloat _A) {
 }
 
 bool
-Object::loadFromObj(const string &_objFile) {
+Object::loadFromObj(const string &_objFile, unsigned _invert) {
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
 		cout << LOG_INFO << "Loading object (" << name << ")... ";
 	
@@ -219,7 +219,7 @@ Object::loadFromObj(const string &_objFile) {
 		return false;
 	}
 	
-	__parseObj(_objFile);
+	__parseObj(_objFile, _invert);
 	__bindAppropriateShader();
 	
 	loadIntoVBO();
@@ -264,7 +264,7 @@ Object::addChild(Object* _childPtr) {
 }
 
 void
-Object::__parseObj(const string &_fileName) {
+Object::__parseObj(const string &_fileName, unsigned _invert) {
 	Timer objTime;
 	auto now = objTime.update(MICROSECONDS);
 	unsigned int lastSlash = _fileName.rfind('/'); // we need the localization
@@ -364,7 +364,10 @@ Object::__parseObj(const string &_fileName) {
 			tempPos.push_back(Position(x, y, z));
 		} else if (buffer.substr(0, 2) == "vt") {
 			line >> temp >> x >> y;
-			x = 1-x;
+			if (!(_invert & INVERT_X))
+				x = 1 - x;
+			if (_invert & INVERT_Y)
+				y = 1 - y;
 			tempTex.push_back(TexCoords(x, y));
 			if (!textureChecked) {
 				howToParse |= GET_TEXTURE;

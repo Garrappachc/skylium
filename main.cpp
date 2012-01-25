@@ -37,7 +37,7 @@ main() {
 	monkey -> move(0, 7, 0);
 	monkey -> scale(3, 3, 3);
 	monkey -> rotate(0, -45, 35);
-	monkey -> setColor(126, 54, 25);
+	monkey -> setColor(80, 24, 25);
 	
 	/* Camera of (0, 4, -20) position, looking at (0, 7, 20) */
 	Camera* fppCamera = sScene -> createCamera(0, 10, -20, FPP);
@@ -50,6 +50,8 @@ main() {
 	int light = sScene -> createLight(5, 15, -10);
 	/* Set ambient light */
 	sScene -> setAmbientLight(light, 0.8, 0.8, 0.8, 1.0);
+	sScene -> setSpecularLight(light, 0.8, 0.8, 0.8, 1.0);
+	sScene -> setDiffuseLight(light, 0.8, 0.8, 0.8, 1.0);
 	
 	/* Timer for animation */
 	Timer *Tanimation = new Timer();
