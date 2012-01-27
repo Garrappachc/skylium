@@ -89,7 +89,7 @@ Material::loadAlpha(GLfloat _alpha) {
 }
 
 void
-Material::loadShininess(GLint _shininess) {
+Material::loadShininess(GLfloat _shininess) {
 	__mShininess = _shininess;
 }
 
@@ -99,7 +99,7 @@ Material::setTextures() {
 		return;
 	
 	for (unsigned i = 0; i < __textures.size(); ++i)
-		__textures[i] -> setTexture(GLTEXTURES[i]);
+		__textures[i] -> setTexture(i);
 }
 
 void

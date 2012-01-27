@@ -46,7 +46,6 @@ using namespace std;
 static const double PI = 3.1415265359;
 static const double PIdiv180 = PI/180.0;
 
-
 enum {
 	GET_TEXTURE	= 1,
 	GET_NORMALS	= 2
@@ -558,8 +557,10 @@ Object::__parseMtl(const string &_fileName) {
 			param[3] = 1.0;
 			current -> loadMaterial(param, MATERIAL_SPECULAR);
 		} else if (buffer.substr(0, 2) == "Ns") {
-			GLint param;
+			GLfloat param;
 			line >> temp >> param;
+			param /= 128;
+			param = 128 - param;
 			current -> loadShininess(param);
 		} else if (buffer.substr(0, 6) == "map_Kd") {
 			string texfile;
@@ -596,6 +597,24 @@ Object::__parseMtl(const string &_fileName) {
 			newTex = new Texture("texture/" + texfile, MODE_NORMAL_MAP);
 			current -> appendTexture(newTex);
 			__content |= NORMAL_MAP;
+		} else if (buffer.substr(0, 6) == "map_kS") {
+			string texfile;
+			line >> temp >> texfile;
+			if (texfile == "")
+				continue;
+			Texture* newTex = TextureManager::GetSingleton().getTextureByName(Texture::getName(texfile));
+			if (newTex != NULL) {
+				current -> appendTexture(newTex);
+				continue;
+			}
+			if (!__fileExists("texture/" + texfile)) {
+				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
+					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
+				exit(1);
+			}
+			newTex = new Texture("texture/" + texfile, MODE_SPECULAR_MAP);
+			current -> appendTexture(newTex);
+			__content |= SPECULAR_MAP;
 		}
 	}
 	

@@ -1,6 +1,5 @@
 out vec3 sVaryingLightDir;
 out vec3 sEyeVector;
-out float sAttenuation;
 
 void main() {
 	sVaryingTexCoords = sTexCoords;
@@ -19,25 +18,17 @@ void main() {
 	vec3 t = normalize(sNormalMatrix * tangent);
 	vec3 b = cross(n, t);
 	
-	vec4 pos4 = sModelViewMatrix * sVertex;
-	vec3 pos3 = pos4.xyz / pos4.w;
+	vec3 tempVertex = vec3(sModelViewMatrix * sVertex);
+	vec3 tmpVec = sLightSource[0].position.xyz - tempVertex;
 	
-	mat3 rotmat = mat3(t, b, n);
+	sVaryingLightDir.x = dot(tmpVec, t);
+	sVaryingLightDir.y = dot(tmpVec, b);
+	sVaryingLightDir.z = dot(tmpVec, n);
 	
-	vec3 lightVec = sLightSource[0].position.xyz - pos3;
-	sVaryingLightDir = rotmat * lightVec;
-
-	vec3 vVertex = pos4.xyz;
-	vec3 tmpVec = -vVertex;
+	tmpVec = -tempVertex;
 	sEyeVector.x = dot(tmpVec, t);
 	sEyeVector.y = dot(tmpVec, b);
 	sEyeVector.z = dot(tmpVec, n);
-	
-	float d = length(sVaryingLightDir);
-	
-	sAttenuation = 1.0 / ( sLightSource[0].constantAttenuation + 
-	(sLightSource[0].linearAttenuation*d) + 
-	(sLightSource[0].quadraticAttenuation*d*d) );
 	
 	gl_Position = sModelViewProjectionMatrix * sVertex;
 }

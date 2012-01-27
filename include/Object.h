@@ -45,7 +45,8 @@ struct IndexComp;
 enum {
 	TEXTURE = 1,
 	NORMALS = 2,
-	NORMAL_MAP = 4
+	NORMAL_MAP = 4,
+	SPECULAR_MAP = 8
 };
 
 enum {

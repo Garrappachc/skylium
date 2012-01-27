@@ -33,7 +33,8 @@ class ShaderDataHandler;
 
 enum Mode {
 	MODE_TEXTURE,
-	MODE_NORMAL_MAP
+	MODE_NORMAL_MAP,
+	MODE_SPECULAR_MAP
 };
 
 class Texture {
@@ -56,7 +57,7 @@ public:
 	/**
 	 * Binds the texture and sets the pipeline parameters.
 	 */
-	void setTexture(GLenum);
+	void setTexture(unsigned);
 	
 	/**
 	 * Parses the file name and gives back the texture name.
