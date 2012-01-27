@@ -1,31 +1,40 @@
 in vec3 sVaryingLightDir;
 in vec3 sEyeVector;
-in float sAttenuation;
 
 void main () {
-	vec3 normal = normalize(texture2D(normalMap, sVaryingTexCoords.st).xyz * 2.0 - 1.0);
-	sFragColor = ((sFrontMaterial.emission + sFrontMaterial.ambient * sLightModel.ambient)
-			* sFrontMaterial.ambient) + (sLightSource[0].ambient * sFrontMaterial.ambient) * sAttenuation;
-	
-	vec3 N = normalize(normal);
-	vec3 L = normalize(sVaryingLightDir);
-	
-	float lambertTerm = dot(N,L);
-	
-	if(lambertTerm > 0.0) {
-		sFragColor += sLightSource[0].diffuse *
-				sFrontMaterial.diffuse *
-				lambertTerm * sAttenuation;
-		
-		vec3 E = normalize(sEyeVector);
-		vec3 R = reflect(-L, N);
-		
-		float specular = pow(max(dot(R, E), 0.0),
-				sFrontMaterial.shininess );
-		
-		sFragColor += sLightSource[0].specular *
-				sFrontMaterial.specular * specular * sAttenuation;
-	}
+	float distSqr = dot(sVaryingLightDir, sVaryingLightDir);
+	float att = clamp(sqrt(distSqr), 0.0, 1.0);
+	vec3 lVec = sVaryingLightDir * inversesqrt(distSqr);
 
-	sFragColor *= texture2D(textureUnit, sVaryingTexCoords.st);
+	vec3 vVec = normalize(sEyeVector);
+	
+	vec4 base = texture2D(textureUnit, sVaryingTexCoords.st);
+	if (base == (1.0, 1.0, 1.0, 1.0))
+		base.a = 0.0;
+	
+	vec3 bump = normalize(texture2D(normalMap, sVaryingTexCoords.st).xyz * 2.0 - 1.0);
+
+	vec4 vAmbient = sLightSource[0].ambient * sFrontMaterial.ambient;
+
+	float diffuse = max(dot(lVec, bump), 0.0 );
+	
+	vec4 vDiffuse = sLightSource[0].diffuse * sFrontMaterial.diffuse * 
+			diffuse;
+					
+	vec4 specularAttrib = texture2D(specularMap, sVaryingTexCoords.st);
+	if (specularAttrib == vec4(1.0, 1.0, 1.0, 1.0))
+			specularAttrib = sFrontMaterial.specular;
+			
+	float reflectivity = 0.10 * specularAttrib.r +
+			0.29 * specularAttrib.g +
+			0.01 * specularAttrib.b;
+
+	float specular = pow(clamp(dot(reflect(-lVec, bump), vVec), 0.0, 1.0), 
+	                 sFrontMaterial.shininess) * reflectivity;
+	                 
+	vec4 vSpecular = sLightSource[0].specular * specular;
+	
+	sFragColor = (vAmbient * base + 
+			vDiffuse * base + 
+			vSpecular) * att;
 }

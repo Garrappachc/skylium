@@ -81,15 +81,17 @@ Texture::~Texture() {
 }
 
 void
-Texture::setTexture(GLenum number) {
-	glActiveTexture(number);
+Texture::setTexture(unsigned _number) {
+	glActiveTexture(GL_TEXTURE0 + _number);
 	glBindTexture(__type, __texture);
 	checkGLErrors(AT);
 
 	if (__mode == MODE_TEXTURE)
-		__shaders.updateSampler2D("textureUnit", 0);
-	else
-		__shaders.updateSampler2D("normalMap", 0);
+		__shaders.updateSampler2D("textureUnit", _number);
+	else if (__mode == MODE_NORMAL_MAP)
+		__shaders.updateSampler2D("normalMap", _number);
+	else // MODE_SPECULAR_MAP
+		__shaders.updateSampler2D("specularMap", _number);
 }
 
 string

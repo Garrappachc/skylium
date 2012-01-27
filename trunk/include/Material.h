@@ -38,13 +38,6 @@ enum {
 	MATERIAL_SPECULAR	= 4
 };
 
-static const GLenum GLTEXTURES[] = {
-	GL_TEXTURE0,
-	GL_TEXTURE1,
-	GL_TEXTURE2,
-	GL_TEXTURE3
-};
-
 class Material {
 	
 public:
@@ -85,7 +78,7 @@ public:
 	 * Sets shininess.
 	 * @param shininess Shininess value.
 	 */
-	void loadShininess(GLint);
+	void loadShininess(GLfloat);
 	
 	/**
 	 * Checks whether the particular material has any texture or not.
