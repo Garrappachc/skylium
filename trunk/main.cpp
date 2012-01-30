@@ -31,7 +31,7 @@ main() {
 		exit(1);
 	crate -> scale(4, 4, 4);
 	
-	Object *monkey = sScene -> createObject("monkey"); // monkey
+	Object* monkey = sScene -> createObject("monkey"); // monkey
 	if (!monkey -> loadFromObj("objects/monkey.obj"))
 		exit(1);
 	monkey -> move(0, 7, 0);

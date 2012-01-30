@@ -9,6 +9,7 @@ LIB_B = $(LIBNAME).so.1
 LIB_C = $(LIBNAME).so
 
 CXX = g++
+#CXX = clang++
 CXXFLAGS += -O2 -g -Wall -pipe -std=c++0x
 CXXLFLAGS = -fPIC -shared
 

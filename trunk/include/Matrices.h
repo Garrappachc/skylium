@@ -47,7 +47,7 @@ public:
 		memset(__data, 0, N * N * sizeof(T));
 	}
 	
-	// Let the GCC make the copy ctor
+	// Let GCC make the copy ctor
 	sMatrix(const sMatrix< T, N >&) = default;
 	
 	// and the operator =
@@ -75,10 +75,12 @@ public:
 	// not like in minor in maths in general - we count from 0.
 	// i - row, j - column
 	T& at(int _i, int _j) {
+		assert((_j < N) && (_i < N));
 		return __data[_j * N + _i];
 	}
 	
 	const T& at(int _i, int _j) const {
+		assert((_j < N) && (_i < N));
 		return __data[_j * N + _i];
 	}
 	
@@ -198,9 +200,7 @@ public:
 				at(i, j) = at(j, i);
 				at(j, i) = temp;
 			}
-			
 		}
-		
 	}
 	
 };
@@ -242,10 +242,12 @@ public:
 	}
 	
 	T& at(int _i, int _j) {
+		assert((_j < 4) && (_i < 4));
 		return __data[_j * 4 + _i];
 	}
 	
 	const T& at(int _i, int _j) const {
+		assert((_j < 4) && (_i < 4));
 		return __data[_j * 4 + _i];
 	}
 	

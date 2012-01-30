@@ -9,7 +9,7 @@ void main () {
 	vec3 vVec = normalize(sEyeVector);
 	
 	vec4 base = texture2D(textureUnit, sVaryingTexCoords.st);
-	if (base == (1.0, 1.0, 1.0, 1.0))
+	if (base.rgb == (1.0, 1.0, 1.0))
 		base.a = 0.0;
 	
 	vec3 bump = normalize(texture2D(normalMap, sVaryingTexCoords.st).xyz * 2.0 - 1.0);
