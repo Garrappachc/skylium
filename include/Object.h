@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include "Vectors.h"
 #include "Material.h"
@@ -40,7 +40,7 @@ struct Position;
 struct TexCoords;
 struct Normal;
 struct Index;
-struct IndexComp;
+struct HashMyIndex;
 
 enum {
 	TEXTURE = 1,
@@ -54,7 +54,8 @@ enum {
 	INVERT_Y = 2
 };
 
-typedef std::map< Index, long, IndexComp > indicesMap;
+typedef std::unordered_map< Index, long, HashMyIndex > indicesMap;
+typedef std::unordered_map< std::string, Mesh* > meshesMap;
 
 class Object {
 	
@@ -66,11 +67,6 @@ public:
 	 * Default ctor, gets the name.
 	 */
 	Object(const std::string& = "");
-	
-	/**
-	 * Copy ctor.
-	 */
-	Object(const Object&, const std::string& = "");
 	
 	/**
 	 * Destroys children, meshes and materials.
@@ -139,11 +135,11 @@ public:
 	virtual void loadIntoVBO();
 	
 	/**
-	 * Locates the material by the name.
-	 * @param name Material's name to be found.
-	 * @return Pointer to the material or 0, if not found.
+	 * Gives as the particular mesh.
+	 * @param name Mesh's name.
+	 * @return Mesh.
 	 */
-	Material * getMaterialByName(const std::string&);
+	Mesh * getMeshByName(const std::string& _name) { return __meshes[_name]; }
 	
 	/**
 	 * Adds the pointer to the children's vector.
@@ -230,9 +226,9 @@ private:
 	
 	std::vector< Object* >::const_iterator __childrenIterator;
 	
-	std::vector< Mesh* > __meshes;
+	meshesMap __meshes;
 	
-	std::vector< Mesh* >::const_iterator __meshesIterator;
+	meshesMap::const_iterator __meshesIterator;
 	
 	std::vector< Material* > __materials;
 	

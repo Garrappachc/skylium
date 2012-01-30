@@ -184,6 +184,8 @@ private:
 	
 	void __destroyContextAndWindow();
 	
+	long __getAvailableSystemMemory();
+	
 	/**
 	 * @param fileName Name of the file.
 	 * @return False if file could not be found, otherwise true.
@@ -226,6 +228,9 @@ private:
 	
 	/* Global Timer */
 	Timer * __timer;
+	
+	/* Available memory */
+	long __memory;
 	
 	/* Vector with available extensions */
 	std::vector< std::string* > __extensions;

@@ -31,6 +31,7 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 #include <GL/gl.h>
+#include <unistd.h>
 
 #include "../include/Skylium.h"
 
@@ -65,7 +66,10 @@ Skylium::Skylium() :
 		__windowHeight(__GLXContext.winHeight),
 		__shaderList(0),
 		__hud(NULL),
-		__timer(NULL) {
+		__timer(NULL),
+		__memory(__getAvailableSystemMemory()) {
+			
+	cout << "System memory: " << __memory << " B.\n";
 			
 	__loadConfig("skylium.cfg");
 	
@@ -254,7 +258,7 @@ Skylium::__catchEvents() {
 }
 
 void
-Skylium::__loadConfig(const string &_fileName) {
+Skylium::__loadConfig(const string& _fileName) {
 	
 	if (!__fileExists(_fileName)) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
@@ -387,6 +391,7 @@ Skylium::__earlyInitGLXFnPointers() {
 
 void
 Skylium::__getExtensionList() {
+#if (OPENGL_VERSION_MAJOR == 3) || (OPENGL_VERSION_MAJOR == 4)
 	int n;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
 	checkGLErrors(AT);
@@ -399,6 +404,31 @@ Skylium::__getExtensionList() {
 			cout << LOG_INFO << "Found an extension: " << temp;
 	}
 	checkGLErrors(AT);
+	
+#elif (OPENGL_VERSION_MAJOR == 2)
+	const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
+	checkGLErrors(AT);
+	string tempExt(pszExtensions);
+	string temp = "";
+	for (unsigned i = 0; i < tempExt.length(); i++) {
+		if (tempExt[i] == ' ') {
+			__extensions.push_back(new string(temp));
+			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+				cout << LOG_INFO << "Found an extension: " << temp;
+			cout.flush();
+			temp = "";
+		} else {
+			temp += tempExt[i];
+		}
+	}
+	             
+	if (temp != "") {
+		__extensions.push_back(new string(temp));
+		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
+			cout << LOG_INFO << "Found an extension: " << temp;
+	}
+#endif
+
 	
 	auto comparator = [](string *a, string *b) -> bool {
 		return (*a) < (*b);
@@ -589,6 +619,13 @@ Skylium::__destroyContextAndWindow() {
 	
 	XCloseDisplay(__GLXContext.display);
 	__GLXContext.display = 0;
+}
+
+long
+Skylium::__getAvailableSystemMemory() {
+	long pages = sysconf(_SC_PHYS_PAGES);
+	long page_size = sysconf(_SC_PAGE_SIZE);
+	return pages * page_size;
 }
 
 bool

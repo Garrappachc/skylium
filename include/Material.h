@@ -119,7 +119,7 @@ private:
 	GLfloat			__mShininess;
 	
 	/* Textures */
-	std::vector< Texture* >				__textures;
+	std::vector< Texture* >	__textures;
 	
 	ShaderDataHandler&	__shaders;
 

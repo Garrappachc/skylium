@@ -24,6 +24,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 #include <sys/stat.h>
 
@@ -40,6 +41,8 @@
 #include "../include/defines.h"
 #include "../include/config.h"
 #include "../include/utils.h"
+
+#define get16bits(d) (*((const uint16_t *) (d)))
 
 using namespace std;
 
@@ -62,17 +65,57 @@ struct Index {
 			v(_v), t(_t), n(_n) {}
 };
 
-struct IndexComp {
-	bool operator ()(const Index &_a, const Index &_b) const {
-		if (_a.v < _b.v) return true;
-		else if (_a.v == _b.v ) {
-			if (_a.t < _b.t) return true;
-			else if (_a.t == _b.t)
-				return _a.n < _b.n;
-			return false;
+bool operator ==(const Index& _a, const Index& _b) {
+	return (_a.v == _b.v) && (_a.t == _b.t) && (_a.n == _b.n);
+}
+
+struct HashMyIndex {
+	/* This is our hashing function.
+	 * See http://www.azillionmonkeys.com/qed/hash.html */
+	size_t operator ()(const Index& _idx) const {
+		char* x = (char*)&_idx;
+		uint32_t len = sizeof(Index);
+		uint32_t hash = len, tmp;
+		int rem = len & 3;
+		
+		len >>= 2;
+		
+		for (; len > 0; len--) {
+			hash += get16bits(x);
+			tmp = (get16bits(x + 2) << 11) ^ hash;
+			hash = (hash << 16) ^ tmp;
+			x += 2 * sizeof(uint16_t);
+			hash += hash >> 1;
 		}
-		return false;
+		
+		switch(rem) {
+		case 3:
+			hash += get16bits(x);
+			hash ^= hash << 16;
+			hash ^= x[sizeof(uint16_t)] << 18;
+			hash += hash >> 11;
+			break;
+		case 2:
+			hash += get16bits(x);
+			hash ^= hash << 11;
+			hash += hash >> 17;
+			break;
+		case 1:
+			hash += *x;
+			hash ^= hash << 10;
+			hash += hash >> 1;
+		}
+		
+		hash ^= hash << 3;
+		hash += hash >> 5;
+		hash ^= hash << 4;
+		hash += hash >> 17;
+		hash ^= hash << 25;
+		hash += hash >> 6;
+		
+		return hash;
 	}
+	
 };
 
 
@@ -95,39 +138,11 @@ Object::Object(const string &_name) :
 		cout << LOG_INFO << "Object (\"" << _name << "\") constructed.";
 }
 
-Object::Object(const Object &_orig, const string &_name) :
-		name(_name),
-		__defColor(_orig.__defColor),
-		__mov(_orig.__mov),
-		__rot(_orig.__rot),
-		__scale(_orig.__scale),
-		__shader(_orig.__shader),
-		__children(0),
-		__childrenIterator(),
-		__meshes(0),
-		__meshesIterator(),
-		__materials(0),
-		__content(0),
-		__matrices(MatricesManager::GetSingleton()),
-		__shaders(ShaderDataHandler::GetSingleton()) {
-	for (unsigned i = 0; i < _orig.__meshes.size(); i++) {
-		Mesh *tempMtl = new Mesh(*_orig.__meshes[i]);
-		__meshes.push_back(tempMtl);
-		__materials.push_back(tempMtl -> getMaterialPtr());
-		
-	}
-	
-	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
-		cout << LOG_INFO << "Object (\"" << name << "\") constructed as a copy.";
-	
-}
-
-
 Object::~Object() {
 	while (!__children.empty())
 		delete __children.back(), __children.pop_back();
-	while (!__meshes.empty())
-		delete __meshes.back(), __meshes.pop_back();
+	for (auto it = __meshes.begin(); it != __meshes.end(); ++it)
+		delete it -> second;
 	while (!__materials.empty())
 		delete __materials.back(), __materials.pop_back();
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
@@ -148,11 +163,11 @@ Object::show() {
 		
 		__meshesIterator = __meshes.begin();
 		while (__meshesIterator != __meshes.end()) {
-			(*__meshesIterator) -> setAllParams();
+			__meshesIterator -> second -> setAllParams();
 			
 			__shaders.sendDataToShader(*__shader);
 			
-			(*__meshesIterator) -> show();
+			__meshesIterator -> second -> show();
 			++__meshesIterator;
 		}
 
@@ -243,18 +258,9 @@ Object::loadIntoVBO() {
 	
 	__meshesIterator = __meshes.begin();
 	while (__meshesIterator != __meshes.end()) {
-		(*__meshesIterator) -> loadIntoVbo();
+		__meshesIterator -> second -> loadIntoVbo();
 		__meshesIterator++;
 	}
-}
-
-Material *
-Object::getMaterialByName(const string &_name) {
-	for (unsigned i = 0; i < __materials.size(); i++) {
-		if (__materials[i] -> name == _name)
-			return __materials[i];
-	}
-	return (Material*)0;
 }
 
 void
@@ -323,7 +329,7 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 				}
 			}
 			if (current && !current -> empty()) {
-				__meshes.push_back(current);
+				__meshes.insert(make_pair(gName, current));
 				current = new Mesh(gName);
 			} else if (current && current -> empty())
 				current -> name = gName;
@@ -336,11 +342,11 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!current)
 				current = new Mesh();
-			if (!current -> empty()) {
+			/*if (!current -> empty()) {
 				string gName = current -> name;
 				__meshes.push_back(current);
 				current = new Mesh(gName);
-			}
+			}*/
 			string mtlName;
 			line >> temp >> mtlName;
 			for (unsigned int i = 0; i < __materials.size(); i++) {
@@ -391,7 +397,7 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 				);
 	}
 	objFile.close();
-	__meshes.push_back(current);
+	__meshes.insert(make_pair(current -> name, current));
 	
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
 		cout << LOG_INFO << "Detected: ";
@@ -535,36 +541,39 @@ Object::__parseMtl(const string &_fileName) {
 		
 		istringstream line(buffer);
 		
-		if (buffer.substr(0, 6) == "newmtl") {
+		string paramName;
+		line >> paramName;
+		
+		if (paramName == "newmtl") {
 			string newMtlName;
-			line >> temp >> newMtlName;
+			line >>  newMtlName;
 			Material *newMtl = new Material(newMtlName);
 			__materials.push_back(newMtl); // Object zarządza materiałami
 			current = newMtl;
-		} else if (buffer.substr(0, 2) == "Ka") {
+		} else if (paramName == "Ka") {
 			sColor param;
-			line >> temp >> param[0] >> param[1] >> param[2];
+			line >> param[0] >> param[1] >> param[2];
 			param[3] = 1.0;
 			current -> loadMaterial(param, MATERIAL_AMBIENT);
-		} else if (buffer.substr(0, 2) == "Kd") {
+		} else if (paramName == "Kd") {
 			sColor param;
-			line >> temp >> param[0] >> param[1] >> param[2];
+			line >> param[0] >> param[1] >> param[2];
 			param[3] = 1.0;
 			current -> loadMaterial(param, MATERIAL_DIFFUSE);
-		} else if (buffer.substr(0, 2) == "Ks") {
+		} else if (paramName == "Ks") {
 			sColor param;
-			line >> temp >> param[0] >> param[1] >> param[2];
+			line >> param[0] >> param[1] >> param[2];
 			param[3] = 1.0;
 			current -> loadMaterial(param, MATERIAL_SPECULAR);
-		} else if (buffer.substr(0, 2) == "Ns") {
+		} else if (paramName == "Ns") {
 			GLfloat param;
-			line >> temp >> param;
+			line >> param;
 			param /= 128;
 			param = 128 - param;
 			current -> loadShininess(param);
-		} else if (buffer.substr(0, 6) == "map_Kd") {
+		} else if (paramName == "map_Kd") {
 			string texfile;
-			line >> temp >> texfile;
+			line >> texfile;
 			if (texfile == "")
 				continue;
 			Texture* newTex = TextureManager::GetSingleton().getTextureByName(Texture::getName(texfile));
@@ -579,9 +588,9 @@ Object::__parseMtl(const string &_fileName) {
 			}
 			newTex = new Texture("texture/" + texfile);
 			current -> appendTexture(newTex);
-		} else if (buffer.substr(0, 8) == "map_bump") {
+		} else if (paramName == "map_bump") {
 			string texfile;
-			line >> temp >> texfile;
+			line >> texfile;
 			if (texfile == "")
 				continue;
 			Texture* newTex = TextureManager::GetSingleton().getTextureByName(Texture::getName(texfile));
@@ -597,9 +606,9 @@ Object::__parseMtl(const string &_fileName) {
 			newTex = new Texture("texture/" + texfile, MODE_NORMAL_MAP);
 			current -> appendTexture(newTex);
 			__content |= NORMAL_MAP;
-		} else if (buffer.substr(0, 6) == "map_kS") {
+		} else if (paramName == "map_kS") {
 			string texfile;
-			line >> temp >> texfile;
+			line >> texfile;
 			if (texfile == "")
 				continue;
 			Texture* newTex = TextureManager::GetSingleton().getTextureByName(Texture::getName(texfile));
