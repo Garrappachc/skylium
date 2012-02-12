@@ -36,6 +36,7 @@
 #include "Timer.h"
 #include "MatricesManager.h"
 #include "ShaderDataHandler.h"
+#include "GPUMemory.h"
 
 #include "keysdef.h"
 
@@ -140,6 +141,7 @@ public:
 	Timer*& GlobalTimer;
 	MatricesManager*& Matrices;
 	ShaderDataHandler*& Shaders;
+	GPUMemory*& VBOManagement;
 	
 	Shader* identityShader;
 	Shader* shadingShader;
@@ -174,6 +176,11 @@ private:
 	 */
 	void __getExtensionList();
 	
+	/**
+	 * Checks if client's GPU supports needed extensions.
+	 */
+	void __checkSupportedExtensions();
+	
 	/* Init functions */
 	bool __openXServerConnection();
 	bool __getGLXVersion();
@@ -203,6 +210,9 @@ private:
 	
 	/* ShaderDataHandler instance */
 	ShaderDataHandler * __shaderDataHandling;
+	
+	/* GPUMemory instance */
+	GPUMemory * __vboManagement;
 	
 	/* Keeps the rendering context */
 	sContextStruct __GLXContext;

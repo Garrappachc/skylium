@@ -1,10 +1,10 @@
 /*
-     _  _         _ ___       _                       
-    | || |_  _ __| |   \ __ _| |_ __ _   __ _ __ _ __ 
-    | __ | || / _` | |) / _` |  _/ _` |_/ _| '_ \ '_ \
-    |_||_|\_,_\__,_|___/\__,_|\__\__,_(_)__| .__/ .__/
-                                           |_|  |_|   
-                                           
+    ___       __  __          ___  _     _        _                  
+   | _ )_  _ / _|/ _|___ _ _ / _ \| |__ (_)___ __| |_   __ _ __ _ __ 
+   | _ \ || |  _|  _/ -_) '_| (_) | '_ \| / -_) _|  _|_/ _| '_ \ '_ \
+   |___/\_,_|_| |_| \___|_|  \___/|_.__// \___\__|\__(_)__| .__/ .__/
+                                      |__/                |_|  |_|   
+   
     Copyright (C) 2011  Michał Garapich garrappachc@gmail.com
 
     This program is free software: you can redistribute it and/or modify
@@ -22,14 +22,12 @@
 */
 
 
-#include "../include/HudData.h"
-
-#include "../include/FontBase.h"
+#include "../include/BufferObject.h"
 
 using namespace std;
 
-HudData::HudData(const sVector2D &_position, const sColor &_color, const string &_text, const FontBase *_font) :
-		position(_position),
-		color(_color),
-		text(_text),
-		font(_font) {}
+BufferObject::BufferObject() :
+		vaoID(0),
+		vboID({{0, GL_ELEMENT_ARRAY_BUFFER, 0, 0, false}, {0, GL_ARRAY_BUFFER, 0, 0, false}}),
+		__gpu(GPUMemory::GetSingleton()) {}
+

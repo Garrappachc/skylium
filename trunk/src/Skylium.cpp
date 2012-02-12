@@ -50,6 +50,7 @@ Skylium::Skylium() :
 		GlobalTimer(__timer),
 		Matrices(__matricesManagement),
 		Shaders(__shaderDataHandling),
+		VBOManagement(__vboManagement),
 		identityShader(NULL),
 		shadingShader(NULL),
 		texturedShadingShader(NULL),
@@ -78,6 +79,7 @@ Skylium::Skylium() :
 	__textureManagement = new TextureManager();
 	__matricesManagement = new MatricesManager();
 	__shaderDataHandling = new ShaderDataHandler();
+	__vboManagement = new GPUMemory();
 	__hud = new Hud();
 	
 	__timer = new Timer();
@@ -93,6 +95,7 @@ Skylium::~Skylium() {
 	delete __hud;
 	delete __matricesManagement;
 	delete __shaderDataHandling;
+	delete __vboManagement;
 	
 	delete __timer;
 	
@@ -135,6 +138,8 @@ Skylium::init(const string &_windowName) {
 		return false;
 	
 	__getExtensionList();
+	
+	__checkSupportedExtensions();
 	
 	if (!sGlobalConfig::MOUSE_VISIBLE)
 		__hideMousePointer();
@@ -238,8 +243,8 @@ Skylium::__catchEvents() {
 				if (__isMouseMotionEnabled) {
 					int x = xev.xmotion.x;
 					int y = xev.xmotion.y;
-					const GLdouble moveX = (__lastMousePositionX - x);
-					const GLdouble moveY = (__lastMousePositionY - y);
+					const GLfloat moveX = (__lastMousePositionX - x);
+					const GLfloat moveY = (__lastMousePositionY - y);
 					__sceneManagement->getActiveScene()->getActiveCamera()->rotateCamera(moveX, moveY, 0.0);
 					__lastMousePositionX = x;
 					__lastMousePositionY = y;
@@ -435,6 +440,26 @@ Skylium::__getExtensionList() {
 	};
 	
 	sort(__extensions.begin(), __extensions.end(), comparator);
+}
+
+void
+Skylium::__checkSupportedExtensions() {
+	static const string extensions[] = {
+		"GL_ARB_vertex_buffer_object",
+		"GL_ARB_vertex_array_object",
+		"GL_ARB_fragment_program",
+		"GL_ARB_fragment_shader",
+		"GL_ARB_vertex_shader",
+		"GL_ARB_vertex_program"
+	};
+	
+	for (const string& ext: extensions) {
+		if (!isSupported(ext)) {
+			if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
+				cout << LOG_ERROR << "Extension " << ext << " is not supported on your system! Exiting.\n";
+			exit(1);
+		}
+	}
 }
 
 bool

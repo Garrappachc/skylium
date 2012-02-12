@@ -28,7 +28,5 @@ void main () {
 	}
 
 	sFragColor *= texture2D(textureUnit, sVaryingTexCoords.st);
-
-	if (sDefColor.a == 0.0)
-		sFragColor.a = 0.0;
+	//sFragColor *= sDefColor;
 }

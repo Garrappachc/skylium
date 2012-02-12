@@ -92,6 +92,23 @@ Texture::setTexture(unsigned _number) {
 		__shaders.updateSampler2D("normalMap", _number);
 	else // MODE_SPECULAR_MAP
 		__shaders.updateSampler2D("specularMap", _number);
+	
+#ifdef __DEBUG__
+	cout << "\n  Texture " << _number << " (\"" << name << "\") set.";
+	cout.flush();
+#endif // __DEBUG__
+}
+
+void
+Texture::unsetTexture(unsigned _number) {
+	glActiveTexture(GL_TEXTURE0 + _number);
+	glBindTexture(__type, 0);
+	checkGLErrors(AT);
+	
+#ifdef __DEBUG__
+	cout << "\n  Texture " << _number << " (\"" << name << "\") unset.";
+	cout.flush();
+#endif // __DEBUG__
 }
 
 string

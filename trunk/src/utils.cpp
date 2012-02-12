@@ -45,7 +45,7 @@ void explode(const std::string &_text, char _delim, std::vector< std::string > &
 void checkGLErrors(const string &_at) {
 #ifdef __DEBUG__
 	bool iserror = false;
-	GLenum err = glGetError(); // pobieramy błędy
+	GLenum err = glGetError(); // fetch errors
 	while (err != GL_NO_ERROR) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS) {
 			cout << "\n\e[33m(WW)\e[0m " << "OpenGL error!" 

@@ -24,449 +24,203 @@
 #define VECTORS_H
 
 #include <cstring>
+#include <cmath>
+#include <initializer_list>
 
-#include <math.h>
+#include <assert.h>
 
-#include <GL/gl.h>
-
-// interface for vectors
 template < typename T >
-class sVec {
+class sVectorBase {
 public:
-	virtual const unsigned size() const = 0;
-	virtual const T & operator [](const int&) const = 0;
-	virtual T& operator [](const int&) = 0;
+	virtual const size_t size() const		= 0;
+	virtual const T& operator [](int) const	= 0;
+	virtual T& operator [](int) 			= 0;
+};
+
+
+
+template < typename T, int N >
+class sVectorReferences {};
+
+template < typename T >
+class sVectorReferences< T, 2 > {
+public:
+	T&	x;
+	T&	y;
+	
+	inline sVectorReferences(T* _t) : x(_t[0]), y(_t[1]) {}
+	
 };
 
 template < typename T >
-class sVec2D : public sVec< T > {
+class sVectorReferences< T, 3 > {
+public:
+	T&	x;
+	T&	y;
+	T&	z;
 	
+	inline sVectorReferences(T* _t) : x(_t[0]), y(_t[1]), z(_t[2]) {}
+};
+
+template < typename T >
+class sVectorReferences< T, 4 > {
+public:
+	T&	r;
+	T&	g;
+	T&	b;
+	T&	a;
+	
+	inline sVectorReferences(T* _t) : r(_t[0]), g(_t[1]), b(_t[2]), a(_t[3]) {}
+};
+
+
+
+
+
+
+template < typename T, int N >
+class sVector : public sVectorReferences< T, N >, public sVectorBase< T > {
 private:
-	T	__data[2];
+	T	__data[N];
 	
 public:
-	T	&x;
-	T	&y;
+	/**
+	 * Default ctor, sets all values to 0.
+	 */
+	inline sVector() : sVectorReferences< T, N >(__data) {
+		memset(__data, 0, N * sizeof(T));
+	}
+	
+	/**
+	 * Initializer_list ctor.
+	 */
+	inline sVector(std::initializer_list< T > _i) : sVectorReferences< T, N >(__data) {
+		assert(_i.size() == N);
+		
+		unsigned index = 0;
+		for (auto it = _i.begin(); it != _i.end(); ++it) {
+			__data[index] = (*it);
+			++index;
+		}
+	}
+	
+	inline const size_t size() const { return N; }
 
-	T	&u;
-	T	&v;
-	
-	sVec2D() :
-			x(__data[0]),
-			y(__data[1]),
-			u(__data[0]),
-			v(__data[1]) {
-		memset(__data, 0, 2*sizeof(T));
-	}
-	
-	sVec2D(const T &_v1, const T &_v2) :
-			__data({_v1, _v2}),
-			x(__data[0]),
-			y(__data[1]),
-			u(__data[0]),
-			v(__data[1]) {}
-	
-	sVec2D(const T *_orig) :
-			x(__data[0]),
-			y(__data[1]),
-			u(__data[0]),
-			v(__data[1]) {
-		memcpy(__data, _orig, sizeof(T)*2);
-	}
-	
-	const unsigned size() const { return 2; }
-	
-	operator T*() {
-		return __data;
-	}
-	
-	operator const T*() const {
-		return __data;
-	}
-	
-	T& operator [](const int &_pos) {
-		return __data[_pos];
-	}
-	
-	const T& operator [](const int &_pos) const {
-		return __data[_pos];
-	}
-	
-	bool operator ==(const sVec2D &_orig) const {
-		return (__data[0] == _orig[0] && __data[1] == _orig[1]);
-	}
-	
-	bool operator !=(const sVec2D &_orig) const {
-		return (__data[0] != _orig[0] || __data[1] != _orig[1]);
-	}
-	
-	sVec2D< T >& operator =(const sVec2D< T >& _orig) {
-		__data[0] = _orig[0];
-		__data[1] = _orig[1];
-		return *this;
-	}
-	
-	sVec2D< T >& operator +=(const sVec2D< T >& _orig) {
-		__data[0] += _orig[0];
-		__data[1] += _orig[1];
-		return *this;
-	}
-	
-	sVec2D< T >& operator -=(const sVec2D< T >& _orig) {
-		__data[0] -= _orig[0];
-		__data[1] -= _orig[1];
-		return *this;
-	}
-	
-	sVec2D< T >& operator *=(const sVec2D< T >& _orig) {
-		__data[0] *= _orig[0];
-		__data[1] *= _orig[1];
-		return *this;
-	}
-	
-	sVec2D< T >& operator /=(const sVec2D< T >& _orig) {
-		__data[0] /= _orig[0];
-		__data[1] /= _orig[1];
-		return *this;
-	}
-	
-	sVec2D< T >& operator *=(const T& _orig) {
-		__data[0] *= _orig;
-		__data[1] *= _orig;
-		return *this;
-	}
-	
-	void normalize() {
-		float len = sqrt((__data[0]*__data[0]) + (__data[1]*__data[1]));
-		if (len == 0)
-			return;
-		__data[0] /= len;
-		__data[1] /= len;
-	}
-	
-	friend sVec2D< T > operator +(const sVec2D< T >& _a, const sVec2D< T >& _b) {
-		return sVec2D< T >(_a[0] + _b[0], _a[1] + _b[1]);
-	}
-	
-	friend sVec2D< T > operator -(const sVec2D< T >& _a, const sVec2D< T >& _b) {
-		return sVec2D< T >(_a[0] - _b[0], _a[1] - _b[1]);
-	}
-	
-	friend sVec2D< T > operator *(const sVec2D< T >& _a, const sVec2D< T >& _b) {
-		return sVec2D< T >(_a[0] * _b[0], _a[1] * _b[1]);
-	}
-	
-	friend sVec2D< T > operator /(const sVec2D< T >& _a, const sVec2D< T >& _b) {
-		return sVec2D< T >(_a[0] / _b[0], _a[1] / _b[1]);
-	}
-	
-	friend sVec2D< T > operator *(const sVec2D< T >& _a, const T& _b) {
-		return sVec2D< T >(_a[0] * _b, _a[1] * _b);
-	}
-};
+		
+			/*     OPERATORS     */
 
-typedef sVec2D< GLfloat > sXY;
-
-
-template < typename T >
-class sVec3D : public sVec< T > {
+	inline const T& operator [](int _n) const { return __data[_n]; }
+	inline T& operator [](int _n) { return __data[_n]; }
 	
-private:
-	T	__data[3];
+	inline operator const T*() const { return __data; }
+	inline operator T*() { return __data; }
 	
-public:
-	T	&x;
-	T	&y;
-	T	&z;
-	
-	sVec3D() :
-			x(__data[0]),
-			y(__data[1]),
-			z(__data[2]) {
-		memset(__data, 0, 3*sizeof(T));
+	inline bool operator ==(const sVector< T, N >& _orig) const {
+		for (short i = 0; i < N; ++i)
+			if (_orig[i] != __data[i])
+				return false;
+		return true;
 	}
 	
-	sVec3D(const T &_v1, const T &_v2, const T &_v3) :
-			__data({_v1, _v2, _v3}),
-			x(__data[0]),
-			y(__data[1]),
-			z(__data[2]) {}
-	
-	sVec3D(const T *_orig) :
-			x(__data[0]),
-			y(__data[1]),
-			z(__data[2]) {
-		memcpy(__data, _orig, sizeof(T)*3);
+	inline bool operator !=(const sVector< T, N >& _orig) const {
+		for (short i = 0; i < N; ++i)
+			if (_orig[i] != __data[i])
+				return true;
+		return false;
 	}
 	
-	sVec3D(const sVec3D< T > &_orig) :
-			__data({_orig.__data[0], _orig.__data[1], _orig.__data[2]}),
-			x(__data[0]),
-			y(__data[1]),
-			z(__data[2]) {}
-			
-	const unsigned size() const { return 3; }
 	
-	operator T*() {
-		return __data;
-	}
 	
-	operator const T*() const {
-		return __data;
-	}
-	
-	T& operator [](const int &_pos) {
-		return __data[_pos];
-	}
-	
-	const T& operator [](const int &_pos) const {
-		return __data[_pos];
-	}
-	
-	bool operator ==(const sVec3D &_orig) const {
-		return (__data[0] == _orig[0] && __data[1] == _orig[1] && __data[2] == _orig[2]);
-	}
-	
-	bool operator !=(const sVec3D &_orig) const {
-		return (__data[0] != _orig[0] || __data[1] != _orig[1] || __data[2] != _orig[2]);
-	}
-	
-	sVec3D< T > operator -() {
-		return sVec3D< T >(-__data[0], -__data[1], -__data[2]);
-	}
-	
-	sVec3D< T >& operator =(const sVec3D< T >& _orig) {
-		__data[0] = _orig[0];
-		__data[1] = _orig[1];
-		__data[2] = _orig[2];
+	inline sVector< T, N >& operator =(const sVector< T, N >& _orig) {
+		memcpy(__data, _orig, N * sizeof(T));
 		return *this;
 	}
 	
-	sVec3D< T >& operator +=(const sVec3D< T >& _orig) {
-		__data[0] += _orig[0];
-		__data[1] += _orig[1];
-		__data[2] += _orig[2];
+	inline sVector< T, N >& operator +=(const sVector< T, N >& _orig) {
+		for (short i = 0; i < N; ++i)
+			__data[i] += _orig[i];
 		return *this;
 	}
 	
-	sVec3D< T >& operator -=(const sVec3D< T >& _orig) {
-		__data[0] -= _orig[0];
-		__data[1] -= _orig[1];
-		__data[2] -= _orig[2];
+	inline sVector< T, N >& operator -=(const sVector< T, N >& _orig) {
+		for (short i = 0; i < N; ++i)
+			__data[i] -= _orig[i];
 		return *this;
 	}
 	
-	sVec3D< T >& operator *=(const sVec3D< T >& _orig) {
-		__data[0] *= _orig[0];
-		__data[1] *= _orig[1];
-		__data[2] *= _orig[2];
+	
+	inline sVector< T, N >& operator *=(const T& _orig) {
+		for (T& t: __data)
+			t *= _orig;
 		return *this;
 	}
 	
-	sVec3D< T >& operator /=(const sVec3D< T >& _orig) {
-		__data[0] /= _orig[0];
-		__data[1] /= _orig[1];
-		__data[2] /= _orig[2];
+	inline sVector< T, N >& operator /=(const T& _orig) {
+		for (T& t: __data)
+			t /= _orig;
 		return *this;
 	}
 	
-	sVec3D< T >& operator *=(const T& _orig) {
-		__data[0] *= _orig;
-		__data[1] *= _orig;
-		__data[2] *= _orig;
-		return *this;
+	inline friend sVector< T, N > operator +(const sVector< T, N >& _a, const sVector< T, N >& _b) {
+		sVector< T, N > result;
+		for (short i = 0; i < N; ++i)
+			result[i] = _a[i] + _b[i];
+		
+		return result;
 	}
 	
-	void normalize() {
-		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]));
-		if (len == 0)
-			return;
-		__data[0] /= len;
-		__data[1] /= len;
-		__data[2] /= len;
+	inline friend sVector< T, N > operator -(const sVector< T, N >& _a, const sVector< T, N >& _b) {
+		sVector< T, N > result;
+		for (short i = 0; i < N; ++i)
+			result[i] = _a[i] - _b[i];
+		
+		return result;
 	}
 	
-	friend sVec3D< T > operator +(const sVec3D< T >& _a, const sVec3D< T >& _b) {
-		return sVec3D< T >(_a[0] + _b[0], _a[1] + _b[1], _a[2] + _b[2]);
+	inline friend sVector< T, N > operator *(const sVector< T, N >& _a, const T& _b) {
+		sVector< T, N > result;
+		for (short i = 0; i < N; ++i)
+			result[i] = _a[i] * _b;
+		
+		return result;
 	}
 	
-	friend sVec3D< T > operator -(const sVec3D< T >& _a, const sVec3D< T >& _b) {
-		return sVec3D< T >(_a[0] - _b[0], _a[1] - _b[1], _a[2] - _b[2]);
-	}
+			/*     FUNCTIONS     */
 	
-	friend sVec3D< T > operator *(const sVec3D< T >& _a, const sVec3D< T >& _b) {
-		return sVec3D< T >(_a[0] * _b[0], _a[1] * _b[1], _a[2] * _b[2]);
-	}
-	
-	friend sVec3D< T > operator /(const sVec3D< T >& _a, const sVec3D< T >& _b) {
-		return sVec2D< T >(_a[0] / _b[0], _a[1] / _b[1], _a[2] / _b[2]);
-	}
-	
-	friend sVec3D< T > operator *(const sVec3D< T >& _a, const T& _b) {
-		return sVec3D< T >(_a[0] * _b, _a[1] * _b, _a[2] * _b);
+	inline void normalize() {
+		float len = 0;
+		
+		for (T& t: __data)
+			len += (t * t);
+		
+		len = sqrt(len);
+		
+		for (T& t: __data)
+			t /= len;
 	}
 };
 
 template < typename T >
-sVec3D< T > normalOfPlane(const sVec3D< T >& _a, const sVec3D< T >& _b) {
-	return sVec3D< T >((_a[1] * _b[2]) - (_a[2] * _b[1]),
+inline sVector< T, 3 > normalOfPlane(const sVector< T, 3 >& _a, const sVector< T, 3 >& _b) {
+	return sVector< T, 3 >( {
+			(_a[1] * _b[2]) - (_a[2] * _b[1]),
 			(_a[2] * _b[0]) - (_a[0] * _b[2]),
 			(_a[0] * _b[1]) - (_a[1] * _b[0])
-		);
+		} );
 }
 
-typedef sVec3D< GLdouble > sVector;
-typedef sVec3D< GLfloat > sPosition;
-
-
-
 template < typename T >
-class sVec4D : public sVec< T > {
-	
-private:
-	T	__data[4];
-	
-public:
-	T	&r;
-	T	&g;
-	T	&b;
-	T	&a;
-	
-	sVec4D() :
-			r(__data[0]),
-			g(__data[1]),
-			b(__data[2]),
-			a(__data[3]) {
-		memset(__data, 0, 4*sizeof(T));
-	}
-	
-	sVec4D(const T &_v1, const T &_v2, const T &_v3, const T &_v4) :
-			__data({_v1, _v2, _v3, _v4}),
-			r(__data[0]),
-			g(__data[1]),
-			b(__data[2]),
-			a(__data[3]) {}
-	
-	sVec4D(const T *_orig) :
-			r(__data[0]),
-			g(__data[1]),
-			b(__data[2]),
-			a(__data[3]) {
-		memcpy(__data, _orig, sizeof(T)*4);
-	}
-	
-	sVec4D(const sVec4D< T > &_orig) :
-			__data({_orig.__data[0], _orig.__data[1], _orig.__data[2], _orig.__data[3]}),
-			r(__data[0]),
-			g(__data[1]),
-			b(__data[2]),
-			a(__data[3]) {}
-	
-	const unsigned size() const { return 4; }
-	
-	operator T*() {
-		return __data;
-	}
-	
-	operator const T*() const {
-		return __data;
-	}
-	
-	const T & operator [](const int &_pos) const {
-		return __data[_pos];
-	}
-	
-	T & operator [](const int &_pos) {
-		return __data[_pos];
-	}
-	
-	bool operator ==(const sVec4D &_orig) const {
-		return (__data[0] == _orig[0] && __data[1] == _orig[1] && __data[2] == _orig[2] && __data[3] == _orig[3]);
-	}
-	bool operator !=(const sVec4D &_orig) const {
-		return !(__data[0] == _orig[0] && __data[1] == _orig[1] && __data[2] == _orig[2] && __data[3] == _orig[3]);
-	}
-	
-	T& operator =(const sVec4D &_orig) {
-		__data[0] = _orig[0];
-		__data[1] = _orig[1];
-		__data[2] = _orig[2];
-		__data[3] = _orig[3];
-		return *__data;
-	}
-	
-	friend sVec4D operator +(const sVec4D &_a, const sVec4D &_b) {
-		sVec4D< T > x = _a;
-		x += _b;
-		return x;
-	}
-	
-	friend sVec4D operator -(const sVec4D &_a, const sVec4D &_b) {
-		sVec4D< T > x = _a;
-		x -= _b;
-		return x;
-	}
-	
-	friend sVec4D operator *(const sVec4D &_a, const sVec4D &_b) {
-		sVec4D< T > x = _a;
-		x *= _b;
-		return x;
-	}
-	
-	friend sVec4D operator /(const sVec4D &_a, const sVec4D &_b) {
-		sVec4D< T >x = _a;
-		x /= _b;
-		return x;
-	}
-	
-	T& operator +=(const sVec4D& _orig) {
-		__data[0] += _orig[0];
-		__data[1] += _orig[1];
-		__data[2] += _orig[2];
-		__data[3] += _orig[3];
-		return *__data;
-	}
-	T& operator -=(const sVec4D& _orig) {
-		__data[0] -= _orig[0];
-		__data[1] -= _orig[1];
-		__data[2] -= _orig[2];
-		__data[3] -= _orig[3];
-		return *__data;
-	}
-	
-	T& operator *=(const sVec4D& _orig) {
-		__data[0] *= _orig[0];
-		__data[1] *= _orig[1];
-		__data[2] *= _orig[2];
-		__data[3] *= _orig[3];
-		return *__data;
-	}
-	
-	T& operator /=(const sVec4D& _orig) {
-		__data[0] /= _orig[0];
-		__data[1] /= _orig[1];
-		__data[2] /= _orig[2];
-		__data[3] /= _orig[3];
-		return *__data;
-	}
-	
-	void normalize() {
-		float len = sqrt((__data[0] * __data[0]) + (__data[1] * __data[1]) + (__data[2] * __data[2]) + (__data[3] * __data[3]));
-		if (len == 0)
-			return;
-		__data[0] /= len;
-		__data[1] /= len;
-		__data[2] /= len;
-		__data[3] /= len;
-	}
-};
+inline T dotProduct(const sVectorBase< T >& _a, const sVectorBase< T >& _b) {
+	static_assert(_a.size() == _b.size(), "Size of both vectors must be the same!");
+	T result = 0;
+	for (short i = 0; i < _a.size(); ++i)
+		result += (_a[i] * _b[i]);
+	return result;
+}
 
-
-
-
-
-typedef	sVec4D< GLfloat >	sColor;
-
-
+typedef sVector< float, 2 > sVector2D;
+typedef sVector< float, 3 > sVector3D;
+typedef sVector< float, 4 > sVector4D;
+typedef sVector< float, 4 > sColor;
 
 #endif /* VECTORS_H */

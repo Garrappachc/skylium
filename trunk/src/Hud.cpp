@@ -45,8 +45,8 @@ Hud::Hud() :
 			}),
 		__visible(false),
 		__toDisplay(0),
-		__background(1.0f, 0.0f, 0.0f, 0.6f),
-		__border(1.0f, 0.0f, 0.0f, 0.8f),
+		__background({1.0f, 0.0f, 0.0f, 0.6f}),
+		__border({1.0f, 0.0f, 0.0f, 0.8f}),
 		__hudShader(NULL),
 		__matrices(MatricesManager::GetSingleton()) {
 			

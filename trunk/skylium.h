@@ -25,8 +25,10 @@
 #define SKYLIUM_MAIN
 
 /* Classes includes */
+#include <skylium/BufferObject.h>
 #include <skylium/Camera.h>
 #include <skylium/FontBase.h>
+#include <skylium/GPUMemory.h>
 #include <skylium/Hud.h>
 #include <skylium/HudData.h>
 #include <skylium/Light.h>
@@ -39,7 +41,6 @@
 #include <skylium/SceneManager.h>
 #include <skylium/Shader.h>
 #include <skylium/ShaderDataHandler.h>
-#include <skylium/Singleton.h>
 #include <skylium/Skylium.h>
 #include <skylium/Texture.h>
 #include <skylium/TextureManager.h>
@@ -55,10 +56,10 @@
 #include <skylium/utils.h>
 
 
-#define SCOLORS_WHITE	1.0, 1.0, 1.0, 1.0
-#define SCOLORS_BLUE	0.0, 0.0, 0.1, 1.0
-#define SCOLORS_RED		1.0, 0.0, 0.0, 1.0
-#define SCOLORS_GREEN	0.0, 1.0, 0.0, 1.0
-#define SCOLORS_YELLOW	1.0, 1.0, 0.0, 1.0
+#define SCOLORS_WHITE	{ 1.0, 1.0, 1.0, 1.0 }
+#define SCOLORS_BLUE	{ 0.0, 0.0, 0.1, 1.0 }
+#define SCOLORS_RED		{ 1.0, 0.0, 0.0, 1.0 }
+#define SCOLORS_GREEN	{ 0.0, 1.0, 0.0, 1.0 }
+#define SCOLORS_YELLOW	{ 1.0, 1.0, 0.0, 1.0 }
 
 #endif

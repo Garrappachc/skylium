@@ -41,108 +41,103 @@ using namespace std;
 
 Mesh::Mesh(const string &_name) :
 		name(_name),
-		__vaoID(0),
 		__vertices(0),
-		__verticesVboID(0),
 		__indices(0),
-		__indicesVboID(0),
-		__material(NULL),
+		__materials(1),
 		__smooth(false),
-		__usage(GL_STATIC_DRAW),
-		__mode(GL_TRIANGLES) {
+		__usage(STATIC_DRAW),
+		__mode(GL_TRIANGLES),
+		__gpu(GPUMemory::GetSingleton()) {
 	__initGLExtensionsPointers();
+	
+	__materials[0].begin = 0;
+	
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Mesh (\"" << name << "\") constructed.";
 
 }
 
 Mesh::~Mesh() {
-	if (__verticesVboID != 0)
-		glDeleteBuffers(1, &__verticesVboID);
-	if (__indicesVboID != 0)
-		glDeleteBuffers(1, &__indicesVboID);
-	if (__vaoID != 0)
-		glDeleteVertexArrays(1, &__vaoID);
+	__buffer.deleteBuffers();
 	checkGLErrors(AT);
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
 }
 
 void
-Mesh::setAllParams() {
-	if (__material && __material -> hasAnyTexture()) // do we have any texture?
-		__material -> setTextures(); // we set texture parameters 
-	
-	// set the material
-	if (__material)
-		__material -> setMaterial();
-}
-
-void
 Mesh::show() {
 	// there we go!
-	glBindVertexArray(__vaoID);
+	glBindVertexArray(__buffer.vaoID);
 	checkGLErrors(AT);
 	
-	glDrawElements(__mode, __indices.size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-	checkGLErrors(AT);
+	for (MeshRange& m: __materials) {
+		if (m.begin == m.end)
+			continue;
+		
+#ifdef __DEBUG__
+		cout << "\n  Material = " << m.material;
+		cout.flush();
+#endif // __DEBUG__
+		
+		if (m.material)
+			m.material -> setMaterial();
+
+#ifdef __DEBUG__
+		cout << "\n  Drawing elements from " << m.begin <<
+			" to " << m.end + m.begin << "...";
+		cout.flush();
+#endif // __DEBUG__
+		
+		glDrawRangeElements(
+				__mode,
+				m.begin,
+				__buffer.vboID[ELEMENTS_ARRAY].dataCount,
+				m.end,
+				GL_UNSIGNED_INT,
+				BUFFER_OFFSET(0)
+			);
+		checkGLErrors(AT);
+
+#ifdef __DEBUG__
+		cout << "\n  Elements drawn.";
+		cout.flush();
+#endif // __DEBUG__
+		
+		//if (m.material)
+		//	m.material -> unsetTextures();
+	
+	}
 	
 	glBindVertexArray(0);
 }
 
 void
 Mesh::loadIntoVbo() {
-	checkGLErrors(AT);
-	// generate VAO
-	glGenVertexArrays(1, &__vaoID);
-	checkGLErrors(AT);
+	__buffer.vboID[ELEMENTS_ARRAY].dataCount = __indices.size();
+	__buffer.vboID[ELEMENTS_ARRAY].dataSize = sizeof(IndicesType) * __indices.size();
 	
-	// generates the VBO ID for indices
-	glGenBuffers(1, &__indicesVboID);
-	checkGLErrors(AT);
+	__buffer.vboID[DATA_ARRAY].dataCount = __vertices.size();
+	__buffer.vboID[DATA_ARRAY].dataSize = sizeof(Vertex) * __vertices.size();
 	
-	// generates the VBO ID for vertices
-	glGenBuffers(1, &__verticesVboID);
-	checkGLErrors(AT);
+	__buffer.prepareRoom();
+	__buffer.sendData(ELEMENTS_ARRAY, &__indices[0]);
+	__buffer.sendData(DATA_ARRAY, &__vertices[0]);
 	
-	glBindVertexArray(__vaoID);
-	checkGLErrors(AT);
+	if ((sGlobalConfig::DEBUGGING & D_BUFFER) == D_BUFFER) {
+		cout << LOG_INFO << "Mesh (" << name << "): in the VBO. Size: " << __buffer.getBufferSize() << " B.";
+		cout.flush();
+	}
 	
-	// sets the active pointer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, __indicesVboID);
-	checkGLErrors(AT);
+	__buffer.bind(ELEMENTS_ARRAY);
+	__buffer.bind(DATA_ARRAY);
 	
-	glBindBuffer(GL_ARRAY_BUFFER, __verticesVboID);
-	checkGLErrors(AT);
-	
-	// reservate the room in the buffer
-	// We could send the vertices right now, but it seems to be less effective
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * __vertices.size(), NULL, __usage);
-	checkGLErrors(AT);
-	// send the vertices' array to the buffer
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * __vertices.size(), &__vertices[0]);
-	checkGLErrors(AT);
-	int bufferSize_v;
-	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_v);
+	glBindVertexArray(__buffer.vaoID);
 	checkGLErrors(AT);
 	
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(0)); // vertex
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(16)); // texture
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(24)); // normal
-	
-	// indices array to the buffer
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * __indices.size(), NULL, __usage);
 	checkGLErrors(AT);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLuint) * __indices.size(), &__indices[0]);
-	checkGLErrors(AT);
-	int bufferSize_i;
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize_i);
-	checkGLErrors(AT);
-	
-	if ((sGlobalConfig::DEBUGGING & D_BUFFER) == D_BUFFER) {
-		cout << LOG_INFO << "Mesh (" << name << "): in the VBO. Size: " << bufferSize_v + bufferSize_i << " B.";
-		cout.flush();
-	}
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -150,12 +145,15 @@ Mesh::loadIntoVbo() {
 	checkGLErrors(AT);
 	
 	glBindVertexArray(0);
-	
 }
 
 void
 Mesh::useMtl(Material *_mtl) {
-	__material = _mtl;
+	if (!__indices.empty()) {
+		__materials[__materials.size() - 1].end = __indices.size() - __materials[__materials.size() - 1].begin - 1;
+		__materials.push_back(MeshRange(__indices.size()));
+	}
+	__materials[__materials.size() - 1].material = _mtl;
 }
 
 void
@@ -182,19 +180,44 @@ Mesh::addThreeIdxs(int _idx) {
 }
 
 void
+Mesh::closeMesh(Material* _mat) {
+	if ((__materials[__materials.size() - 1].material == NULL) && (_mat != NULL))
+		__materials[__materials.size() - 1].material = _mat;
+	__materials[__materials.size() - 1].end = __indices.size();
+	
+	loadIntoVbo();
+}
+
+void
+Mesh::flush() {
+	__indices.clear();
+	__vertices.clear();
+}
+
+void
+Mesh::raise() {
+	__indices.resize(__buffer.vboID[ELEMENTS_ARRAY].dataCount);
+	memcpy(
+			&__indices[0],
+			__buffer.mapBuffer(ELEMENTS_ARRAY, READ),
+			__buffer.vboID[ELEMENTS_ARRAY].dataSize
+		);
+	__buffer.unmapBuffer(ELEMENTS_ARRAY);
+	
+	__vertices.resize(__buffer.vboID[DATA_ARRAY].dataCount);
+	memcpy(
+		&__vertices[0],
+	   __buffer.mapBuffer(DATA_ARRAY, READ),
+		  __buffer.vboID[DATA_ARRAY].dataSize
+	);
+	__buffer.unmapBuffer(DATA_ARRAY);
+}
+
+void
 Mesh::__initGLExtensionsPointers() {
-	checkGLErrors(AT);
-	glGenVertexArrays = getProcAddr< decltype(glGenVertexArrays) >("glGenVertexArrays");
 	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
 	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
-	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");
-	glDeleteVertexArrays = getProcAddr< decltype(glDeleteVertexArrays) >("glDeleteVertexArrays");
-	glGenBuffers = getProcAddr< decltype(glGenBuffers) >("glGenBuffersARB");
-	glBufferData = getProcAddr< decltype(glBufferData) >("glBufferDataARB");
-	glBufferSubData = getProcAddr< decltype(glBufferSubData) >("glBufferSubDataARB");
-	glGetBufferParameteriv = getProcAddr< decltype(glGetBufferParameteriv) >("glGetBufferParameterivARB");
 	glVertexAttribPointer = getProcAddr< decltype(glVertexAttribPointer) >("glVertexAttribPointer");
 	glEnableVertexAttribArray = getProcAddr< decltype(glEnableVertexAttribArray) >("glEnableVertexAttribArray");
 	glDisableVertexAttribArray = getProcAddr< decltype(glDisableVertexAttribArray) >("glDisableVertexAttribArray");
-	checkGLErrors(AT);
 }

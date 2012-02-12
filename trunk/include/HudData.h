@@ -36,13 +36,13 @@ class HudData {
 	
 public:
 	
-	sXY				position;
+	sVector2D				position;
 	sColor			color;
 	std::string		text;
 	const FontBase *	font;
 	
 	
-	HudData(const sXY&, const sColor&, const std::string&, const FontBase*);
+	HudData(const sVector2D&, const sColor&, const std::string&, const FontBase*);
 	
 };
 

@@ -24,6 +24,8 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include <GL/gl.h>
+
 #include "Vectors.h"
 
 class Scene;
@@ -43,7 +45,7 @@ public:
 	 * Ctor that gets the light's source in sVector format.
 	 * @param pos Position of the light's source.
 	 */
-	Light(const sPosition&);
+	Light(const sVector3D&);
 
 	/**
 	 * Ctor that gets light source in (x, y, z) format.
@@ -70,7 +72,13 @@ public:
 	 * Sets light source's position.
 	 * @param pos Position in (x, y, z).
 	 */
-	void setSrcPos(const sPosition&);
+	void setSrcPos(const sVector3D&);
+	
+	/**
+	 * Adds the movement vector to the source vector.
+	 * @param mov Movement vector.
+	 */
+	void move(const sVector3D&);
 	
 	/**
 	 * Light on/off
@@ -98,7 +106,7 @@ private:
 	sColor __specularLight;
 
 	/* Light source's position */
-	sPosition __lightSrc;
+	sVector3D __lightSrc;
 	
 	ShaderDataHandler& __shaders;
 

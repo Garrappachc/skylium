@@ -63,7 +63,7 @@ public:
 	 * @param z Z coord.
 	 * @param type Camera type. FPP, TPP, SPHERICAL
 	 */
-	Camera(GLdouble, GLdouble, GLdouble, const cType& = FPP);
+	Camera(GLfloat, GLfloat, GLfloat, const cType& = FPP);
 	
 	/**
 	 * Destructor just sends some output.
@@ -94,7 +94,7 @@ public:
 	 * @param movY Y axis.
 	 * @param movZ Z axis.
 	 */
-	void moveCamera(GLdouble, GLdouble, GLdouble);
+	void moveCamera(GLfloat, GLfloat, GLfloat);
 
 	/**
 	 * Rotates the camera - mouse support.
@@ -102,7 +102,7 @@ public:
 	 * @param y Y rotation.
 	 * @param z Z rotation.
 	 */
-	void rotateCamera(GLdouble, GLdouble, GLdouble);
+	void rotateCamera(GLfloat, GLfloat, GLfloat);
 
 	/**
 	 * Sets the "lookAt" point.
@@ -110,28 +110,28 @@ public:
 	 * @param y Y coord.
 	 * @param z Z coord.
 	 */
-	void lookAt(GLdouble, GLdouble, GLdouble);
+	void lookAt(GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Sets camera range in SPHERICAL mode.
 	 * @param range Range.
 	 */
-	void setRange(GLdouble _range) { __range = _range; }
+	void setRange(GLfloat _range) { __range = _range; }
 	
 	/**
 	 * @return The __eye's coords.
 	 */
-	sVector getEye();
+	sVector3D getEye();
 	
 	/**
 	 * @return The __center's coords.
 	 */
-	sVector getCenter();
+	sVector3D getCenter();
 	
 	/**
 	 * @return Range.
 	 */
-	GLdouble getRange() { return __range; }
+	GLfloat getRange() { return __range; }
 
 
 private:
@@ -140,26 +140,26 @@ private:
 	cType __type;
 	
 	/*** setProjection ***/
-	GLdouble __fovy;
-	GLdouble __zNear;
-	GLdouble __zFar;
+	GLfloat __fovy;
+	GLfloat __zNear;
+	GLfloat __zFar;
 
 	/*** setView ***/
 	
 	/* Camera's position */
-	sVector __eye;
+	sVector3D __eye;
 
 	/* LookAt position/vector */
-	sVector __center;
+	sVector3D __center;
 
 	/* Up vector, (0, 1, 0) by  default */
-	sVector __up;
+	sVector3D __up;
 	
 	/* Angle of the camera */
-	sVector __angle;
+	sVector3D __angle;
 	
 	/* Range of the SPHERICAL camera type */
-	GLdouble __range;
+	GLfloat __range;
 	
 	/* Window dimensions */
 	int __windowHeight;

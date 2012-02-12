@@ -56,6 +56,9 @@ enum {
 
 typedef std::unordered_map< Index, long, HashMyIndex > indicesMap;
 typedef std::unordered_map< std::string, Mesh* > meshesMap;
+typedef std::unordered_map< std::string, Material* > materialsMap;
+
+typedef std::vector< GLfloat > s3DVector;
 
 class Object {
 	
@@ -84,7 +87,7 @@ public:
 	 * @param y factor;
 	 * @param z factor.
 	 */
-	void move(GLdouble, GLdouble, GLdouble);
+	void move(GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Scales the object.
@@ -92,7 +95,7 @@ public:
 	 * @param y;
 	 * @param z.
 	 */
-	void scale(GLdouble, GLdouble, GLdouble);
+	void scale(GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Rotates the object.
@@ -100,7 +103,7 @@ public:
 	 * @param rotY Y angle;
 	 * @param rotZ Z angle.
 	 */
-	void rotate(GLdouble, GLdouble, GLdouble);
+	void rotate(GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Sets the object general colour.
@@ -135,11 +138,13 @@ public:
 	virtual void loadIntoVBO();
 	
 	/**
-	 * Gives as the particular mesh.
+	 * Gives us the particular mesh.
 	 * @param name Mesh's name.
 	 * @return Mesh.
 	 */
-	Mesh * getMeshByName(const std::string& _name) { return __meshes[_name]; }
+	inline Mesh * getMeshByName(const std::string& _name) { return __meshes[_name]; }
+	
+	inline Material * getMaterialByName(const std::string& _name) { return __materials[_name]; }
 	
 	/**
 	 * Adds the pointer to the children's vector.
@@ -173,9 +178,9 @@ protected:
 	/* Vectors that the ModelView Matrix will be
 	 * multiplied by in MatricesManager::translate, ::rotate
 	 * and ::scale. */
-	sVector __mov;
-	sVector __rot;
-	sVector __scale;
+	sVector3D __mov;
+	sVector3D __rot;
+	sVector3D __scale;
 	
 	/* A pointer to object's shader */
 	Shader * __shader;
@@ -224,13 +229,9 @@ private:
 	/* Vector of children's pointers. */
 	std::vector< Object* > __children;
 	
-	std::vector< Object* >::const_iterator __childrenIterator;
-	
 	meshesMap __meshes;
 	
-	meshesMap::const_iterator __meshesIterator;
-	
-	std::vector< Material* > __materials;
+	materialsMap __materials;
 	
 	short unsigned __content;
 	

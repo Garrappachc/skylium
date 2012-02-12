@@ -54,32 +54,32 @@ public:
 	sMatrix< T, N> & operator =(const sMatrix< T, N >&) = default;
 	
 	// pointer
-	operator T*() {
+	inline operator T*() {
 		return __data;
 	}
 	
-	operator const T*() const {
+	inline operator const T*() const {
 		return __data;
 	}
 	
-	T& operator [](int _pos) {
+	inline T& operator [](int _pos) {
 		assert(_pos < N * N);
 		return __data[_pos];
 	}
 	
-	const T& operator [](int _pos) const {
+	inline const T& operator [](int _pos) const {
 		assert(_pos < N * N);
 		return __data[_pos];
 	}
 	
 	// not like in minor in maths in general - we count from 0.
 	// i - row, j - column
-	T& at(int _i, int _j) {
+	inline T& at(int _i, int _j) {
 		assert((_j < N) && (_i < N));
 		return __data[_j * N + _i];
 	}
 	
-	const T& at(int _i, int _j) const {
+	inline const T& at(int _i, int _j) const {
 		assert((_j < N) && (_i < N));
 		return __data[_j * N + _i];
 	}
@@ -90,7 +90,7 @@ public:
 			__data[i * N + i] = 1;
 	}
 	
-	T determinant() {
+	inline T determinant() {
 		if (N == 1)
 			return __data[0];
 		if (N == 2)
@@ -102,17 +102,17 @@ public:
 	}
 	
 	/* Counting form 0 - not like in minors in general */
-	sMatrix< T, N - 1 > getMinor(int _i, int _j) {
+	inline sMatrix< T, N - 1 > getMinor(int _i, int _j) {
 		sMatrix< T, N - 1 > result;
 		int idx = 0;
 		
 		for (int i = 0; i < N; ++i) {
-			if (i == _i)
+			if (i == _j)
 				continue;
 			for (int j = 0; j < N; ++j) {
-				if (j == _j)
+				if (j == _i)
 					continue;
-				result[idx++] = at(i, j);
+				result[idx++] = at(j, i);
 			}
 		}
 		
@@ -131,7 +131,7 @@ public:
 		return _result;
 	}
 	
-	friend sMatrix< T, N > operator *(const sMatrix< T, N >& _a, const sMatrix< T, N >& _b) {
+	inline friend sMatrix< T, N > operator *(const sMatrix< T, N >& _a, const sMatrix< T, N >& _b) {
 		sMatrix< T, N > result;
 		for (int i = 0; i < N; ++i)
 			for (int j = 0; j < N; ++j) 
@@ -141,7 +141,7 @@ public:
 		return result;	
 	}
 	
-	sMatrix< T, N >& operator *=(const sMatrix< T, N >& _b) {
+	inline sMatrix< T, N >& operator *=(const sMatrix< T, N >& _b) {
 		*this = *this * _b;
 		return *this;
 	}
@@ -153,7 +153,7 @@ public:
 	 * @param offset Which row to start from. Default 0.
 	 */
 	template < typename D >
-	void setColumn(int _c, const sVec< D >& _vector, unsigned _offset = 0) {
+	void setColumn(int _c, const sVectorBase< D >& _vector, unsigned _offset = 0) {
 		assert(_c < N);
 		int v = 0;
 		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
@@ -167,7 +167,7 @@ public:
 	 * @param offset Which column to start from. Default 0.
 	 */
 	template < typename D >
-	void setRow(int _r, const sVec< D >& _vector, unsigned _offset = 0) {
+	void setRow(int _r, const sVectorBase< D >& _vector, unsigned _offset = 0) {
 		assert(_r < N);
 		int v = 0;
 		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
@@ -178,7 +178,7 @@ public:
 	 * Calculates the matrix inversion.
 	 * @return Inverted matrix.
 	 */
-	sMatrix< T, N > inversion() {
+	inline sMatrix< T, N > inversion() {
 		sMatrix< T, N > result;
 		double det = (T)1.0 / determinant();
 		for (int j = 0; j < N; ++j) {
@@ -193,7 +193,7 @@ public:
 		return result;
 	}
 	
-	void transpose() {
+	inline void transpose() {
 		for (int i = 0; i < N; ++i) {
 			for (int j = i; j < N; ++j) {
 				T temp = at(i, j);
@@ -223,30 +223,30 @@ public:
 	
 	sMatrix< T, 4 > & operator =(const sMatrix< T, 4 >&) = default;
 	
-	operator T*() {
+	inline operator T*() {
 		return __data;
 	}
 	
-	operator const T*() const {
+	inline operator const T*() const {
 		return __data;
 	}
 	
-	T& operator [](int _pos) {
+	inline T& operator [](int _pos) {
 		assert(_pos < 16);
 		return __data[_pos];
 	}
 	
-	const T& operator [](int _pos) const {
+	inline const T& operator [](int _pos) const {
 		assert(_pos < 16);
 		return __data[_pos];
 	}
 	
-	T& at(int _i, int _j) {
+	inline T& at(int _i, int _j) {
 		assert((_j < 4) && (_i < 4));
 		return __data[_j * 4 + _i];
 	}
 	
-	const T& at(int _i, int _j) const {
+	inline const T& at(int _i, int _j) const {
 		assert((_j < 4) && (_i < 4));
 		return __data[_j * 4 + _i];
 	}
@@ -257,7 +257,7 @@ public:
 			__data[i * 4 + i] = 1;
 	}
 	
-	T determinant() {
+	inline T determinant() {
 		int det = 0, i = 0;
 		for (int j = 0; j < 4; ++j) {
 			if ((i + j) % 2 == 0) 
@@ -270,17 +270,17 @@ public:
 	}
 	
 	/* Counting form 0 - not like in minors in general */
-	sMatrix< T, 3 > getMinor(int _i, int _j) {
+	inline sMatrix< T, 3 > getMinor(int _i, int _j) {
 		sMatrix< T, 3 > result;
 		int idx = 0;
 		
 		for (int i = 0; i < 4; ++i) {
-			if (i == _i)
+			if (i == _j)
 				continue;
 			for (int j = 0; j < 4; ++j) {
-				if (j == _j)
+				if (j == _i)
 					continue;
-				result[idx++] = at(i, j);
+				result[idx++] = at(j, i);
 			}
 		}
 		
@@ -296,7 +296,7 @@ public:
 		return _result;
 	}
 	
-	friend sMatrix< T, 4 > operator *(const sMatrix< T, 4 >& _a, const sMatrix< T, 4 >& _b) {
+	inline friend sMatrix< T, 4 > operator *(const sMatrix< T, 4 >& _a, const sMatrix< T, 4 >& _b) {
 		sMatrix< T, 4 > result;
 		for (int i = 0; i < 4; ++i)
 			for (int j = 0; j < 4; ++j) 
@@ -307,7 +307,7 @@ public:
 		return result;	
 	}
 	
-	sMatrix< T, 4 >& operator *=(const sMatrix< T, 4 >& _b) {
+	inline sMatrix< T, 4 >& operator *=(const sMatrix< T, 4 >& _b) {
 		*this = *this * _b;
 		return *this;
 	}
@@ -319,7 +319,7 @@ public:
 	 * @param offset Which row to start from. Default 0.
 	 */
 	template < typename D >
-	void setColumn(int _c, const sVec< D >& _vector, unsigned _offset = 0) {
+	void setColumn(int _c, const sVectorBase< D >& _vector, unsigned _offset = 0) {
 		assert(_c < 4);
 		int v = 0;
 		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
@@ -333,7 +333,7 @@ public:
 	 * @param offset Which column to start from. Default 0.
 	 */
 	template < typename D >
-	void setRow(int _r, const sVec< D >& _vector, unsigned _offset = 0) {
+	void setRow(int _r, const sVectorBase< D >& _vector, unsigned _offset = 0) {
 		assert(_r < 4);
 		int v = 0;
 		for (unsigned i = _offset; i < _vector.size(); ++i, ++v)
@@ -344,7 +344,7 @@ public:
 	 * Calculates the matrix inversion.
 	 * @return Inverted matrix.
 	 */
-	sMatrix< T, 4 > inversion() {
+	inline sMatrix< T, 4 > inversion() {
 		sMatrix< T, 4 > result;
 		double det = (T)1.0 / determinant();
 		for (int j = 0; j < 4; ++j) {

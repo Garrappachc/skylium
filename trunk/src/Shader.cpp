@@ -294,10 +294,18 @@ Shader::toggle() {
 		glUseProgram(__shaderProgram);
 		checkGLErrors(AT);
 		__isRunning = true;
+#ifdef __DEBUG__
+		cout << "\nShader on.";
+		cout.flush();
+#endif // __DEBUG__
 	} else {
 		glUseProgram(0);
 		checkGLErrors(AT);
 		__isRunning = false;
+#ifdef __DEBUG__
+		cout << "\nShader off.";
+		cout.flush();
+#endif // __DEBUG__
 	}
 }
 
@@ -322,7 +330,7 @@ Shader::isBound(Object *_dest) {
 }
 
 void
-Shader::setUniformFloat(const string& _name, const sVec< GLfloat >& _params) const {
+Shader::setUniformFloat(const string& _name, const sVectorBase< GLfloat >& _params) const {
 	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	
