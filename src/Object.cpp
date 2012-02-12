@@ -121,15 +121,13 @@ struct HashMyIndex {
 
 Object::Object(const string &_name) :
 		name(_name),
-		__defColor(1, 1, 1, 1),
-		__mov(0, 0, 0),
-		__rot(0, 0, 0),
-		__scale(1, 1, 1),
+		__defColor({1, 1, 1, 1}),
+		__mov({0, 0, 0}),
+		__rot({0, 0, 0}),
+		__scale({1, 1, 1}),
 		__shader(NULL),
 		__children(0),
-		__childrenIterator(),
 		__meshes(0),
-		__meshesIterator(),
 		__materials(0),
 		__content(0),
 		__matrices(MatricesManager::GetSingleton()),
@@ -141,10 +139,13 @@ Object::Object(const string &_name) :
 Object::~Object() {
 	while (!__children.empty())
 		delete __children.back(), __children.pop_back();
+	
 	for (auto it = __meshes.begin(); it != __meshes.end(); ++it)
 		delete it -> second;
-	while (!__materials.empty())
-		delete __materials.back(), __materials.pop_back();
+	
+	for (auto it = __materials.begin(); it != __materials.end(); ++it)
+		delete it -> second;
+	
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
 		cout << LOG_INFO << "Object (\"" << name << "\") destructed.";
 }
@@ -158,26 +159,26 @@ Object::show() {
 		__matrices.rotate(__rot.y, Y);
 		__matrices.rotate(__rot.z, Z);
 		
-		__shader -> toggle();
 		__shaders.updateData("sDefColor", __defColor);
 		
-		__meshesIterator = __meshes.begin();
-		while (__meshesIterator != __meshes.end()) {
-			__meshesIterator -> second -> setAllParams();
+		__shader -> toggle();
+		__shaders.openStream(__shader);
+		
+#ifdef __DEBUG__
+		cout << "\n  Rendering object...";
+		cout.flush();
+#endif // __DEBUG__
+		
+		for (auto it = __meshes.begin(); it != __meshes.end(); ++it) {			
 			
-			__shaders.sendDataToShader(*__shader);
-			
-			__meshesIterator -> second -> show();
-			++__meshesIterator;
+			it -> second -> show();
 		}
 
+		__shaders.closeStream();
 		__shader -> toggle();
 		
-		if (!__children.empty()) {
-			__childrenIterator = __children.begin();
-			while (__childrenIterator != __children.end())
-				(*__childrenIterator) -> show(), ++__childrenIterator;
-		}
+		for (Object*& child: __children)
+			child -> show();
 		
 		__wasShown = true;
 		
@@ -185,18 +186,18 @@ Object::show() {
 }
 
 void
-Object::move(GLdouble _x, GLdouble _y, GLdouble _z) {
-	__mov += sVector(_x, _y, _z);
+Object::move(GLfloat _x, GLfloat _y, GLfloat _z) {
+	__mov += sVector3D( {_x, _y, _z} );
 }
 
 void
-Object::scale(GLdouble _x, GLdouble _y, GLdouble _z) {
-	__scale += sVector(_x, _y, _z);
+Object::scale(GLfloat _x, GLfloat _y, GLfloat _z) {
+	__scale += sVector3D( {_x, _y, _z} );
 }
 
 void
-Object::rotate(GLdouble _x, GLdouble _y, GLdouble _z) {
-	__rot += sVector(_x, _y, _z);
+Object::rotate(GLfloat _x, GLfloat _y, GLfloat _z) {
+	__rot += sVector3D( {_x, _y, _z} );
 }
 
 bool
@@ -204,7 +205,7 @@ Object::setColor(GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1)
 		return false;
 	
-	__defColor = sColor(_R, _G, _B, _A);
+	__defColor = sColor( {_R, _G, _B, _A} );
 	return true;
 }
 
@@ -213,12 +214,12 @@ Object::setColor(int _R, int _G, int _B, GLfloat _A) {
 	if (_R < 0 || _R > 255 || _G < 0 || _G > 255 || _B < 0 || _B > 255 || _A < 0 || _A > 1)
 		return false;
 	
-	__defColor = sColor(
+	__defColor = sColor( {
 			static_cast< GLfloat >(_R) / 255,
 			static_cast< GLfloat >(_G) / 255,
 			static_cast< GLfloat >(_B) / 255,
 			_A
-		);
+		} );
 	return true;
 }
 
@@ -236,31 +237,13 @@ Object::loadFromObj(const string &_objFile, unsigned _invert) {
 	__parseObj(_objFile, _invert);
 	__bindAppropriateShader();
 	
-	loadIntoVBO();
-	
 	return true;
 }
 
 void
 Object::loadIntoVBO() {
-	/* Check whether client's GPU support VBO & VAO */
-	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_buffer_object")) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Your GPU does not support VBO! Skylium will exit now.\n";
-		exit(1);
-	}
-	
-	if (!Skylium::GetSingleton().isSupported("GL_ARB_vertex_array_object")) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Your GPU does not support VAO! Skylium will exit now.\n";
-		exit(1);
-	}
-	
-	__meshesIterator = __meshes.begin();
-	while (__meshesIterator != __meshes.end()) {
-		__meshesIterator -> second -> loadIntoVbo();
-		__meshesIterator++;
-	}
+	for (auto it = __meshes.begin(); it != __meshes.end(); ++it)
+		it -> second -> loadIntoVbo();
 }
 
 void
@@ -293,6 +276,8 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 	string buffer, temp;
 	long p = 0;
 	GLfloat x, y, z;
+	
+	Material* lastMtl = (Material*)NULL;
 	
 	Mesh *current = NULL;
 	
@@ -328,8 +313,14 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 					line >> temp;
 				}
 			}
+			
+			// to prevent from creating two meshes with the same name
+			while (__meshes.find(gName) != __meshes.end())
+				gName += "_";
+			
 			if (current && !current -> empty()) {
-				__meshes.insert(make_pair(gName, current));
+				current -> closeMesh(lastMtl);
+				__meshes.insert(make_pair(current -> name, current));
 				current = new Mesh(gName);
 			} else if (current && current -> empty())
 				current -> name = gName;
@@ -342,19 +333,10 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 		} else if (buffer.substr(0, 6) == "usemtl") {
 			if (!current)
 				current = new Mesh();
-			/*if (!current -> empty()) {
-				string gName = current -> name;
-				__meshes.push_back(current);
-				current = new Mesh(gName);
-			}*/
 			string mtlName;
 			line >> temp >> mtlName;
-			for (unsigned int i = 0; i < __materials.size(); i++) {
-				if (__materials[i] -> name == mtlName) {
-					current -> useMtl(__materials[i]);
-					break;
-				}
-			}
+			lastMtl = getMaterialByName(mtlName);
+			current -> useMtl(lastMtl);
 		} else if (buffer[0] == 's') {
 			if (!current)
 				current = new Mesh();
@@ -397,6 +379,8 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 				);
 	}
 	objFile.close();
+	
+	current -> closeMesh(lastMtl);
 	__meshes.insert(make_pair(current -> name, current));
 	
 	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
@@ -548,7 +532,7 @@ Object::__parseMtl(const string &_fileName) {
 			string newMtlName;
 			line >>  newMtlName;
 			Material *newMtl = new Material(newMtlName);
-			__materials.push_back(newMtl); // Object zarządza materiałami
+			__materials.insert(make_pair(newMtlName, newMtl));
 			current = newMtl;
 		} else if (paramName == "Ka") {
 			sColor param;

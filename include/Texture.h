@@ -58,6 +58,7 @@ public:
 	 * Binds the texture and sets the pipeline parameters.
 	 */
 	void setTexture(unsigned);
+	void unsetTexture(unsigned);
 	
 	/**
 	 * Parses the file name and gives back the texture name.

@@ -95,7 +95,7 @@ public:
 	 * @param name Name of variable in the shader.
 	 * @param params Vector of N float to be sent.
 	 */
-	void setUniformFloat(const std::string&, const sVec< GLfloat >&) const;
+	void setUniformFloat(const std::string&, const sVectorBase< GLfloat >&) const;
 	void setUniformFloat(const std::string&, GLfloat) const;
 	void setUniformInt(const std::string&, GLint) const;	
 	/**

@@ -24,6 +24,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include <GL/gl.h>
+
 #include <string>
 #include <vector>
 
@@ -98,6 +100,11 @@ public:
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml
 	 */
 	void setMaterial();
+	
+	/**
+	 * Calls glBindTexture(NULL) for each texture.
+	 */
+	void unsetTextures();
 	
 	/**
 	 * Adds to __textures vector pointer to a texture.

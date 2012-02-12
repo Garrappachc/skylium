@@ -30,11 +30,21 @@
 
 #include "Vertex.h"
 #include "Material.h"
+#include "GPUMemory.h"
+#include "BufferObject.h"
 
-#define GL_ARRAY_BUFFER 0x8892
-#define GL_BUFFER_SIZE 0x8764
-#define GL_ELEMENT_ARRAY_BUFFER 0x8893
-#define GL_STATIC_DRAW 0x88E4
+struct MeshRange {
+	
+	size_t		begin;
+	size_t		end;
+	Material*		material;
+	
+	MeshRange() : begin(0), end(0), material(NULL) {}
+	MeshRange(size_t _b) : begin(_b), end(_b), material(NULL) {}
+	
+};
+
+typedef GLuint IndicesType;
 
 class Mesh {
 	
@@ -52,11 +62,6 @@ public:
 	virtual ~Mesh();
 	
 	/**
-	 * Sets shader data.
-	 */
-	void setAllParams();
-	
-	/**
 	 * Renders the mesh.
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glShadeModel.xml
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
@@ -72,11 +77,6 @@ public:
 	 * Sets active material to this given.
 	 */
 	void useMtl(Material*);
-	
-	/**
-	 * Returns pointer to the active material.
-	 */
-	Material * getMaterialPtr() { return __material; }
 	
 	/**
 	 * If true, the smooth shading is set on.
@@ -102,11 +102,23 @@ public:
 	void addThreeIdxs(int);
 	
 	/**
-	 * Returns size of vertices' vector in bytes.
+	 * Indicates that the mesh creating has just finished.
 	 */
-	size_t getSizeOfVertices() { return sizeof(Vertex) * __vertices.size(); }
+	void closeMesh(Material*);
+	
+	/**
+	 * Removes all data from mesh's vectors.
+	 */
+	void flush();
+	
+	/**
+	 * Maps the VBO and gets all data back.
+	 */
+	void raise();
 	
 	bool empty() { return __vertices.empty() && __indices.empty(); }
+	
+	bool hasAnyMaterials() { return __materials.size() > 1; }
 	
 	std::string name;
 	
@@ -114,42 +126,31 @@ private:
 	
 	void __initGLExtensionsPointers();
 	
-	GLuint __vaoID;
+	BufferObject __buffer;
 	
 	/* Vertices' vector */
 	std::vector< Vertex > __vertices;
 	
-	/* Vertices' room in VBO */
-	GLuint __verticesVboID;
-	
 	/* Vertices' index */
-	std::vector< GLuint > __indices;
+	std::vector< IndicesType > __indices;
 	
-	/* Indices' room in VBO */
-	GLuint __indicesVboID;
-	
-	/* Material that has to be used */
-	Material * __material;
+	/* Materials that will be used */
+	std::vector < MeshRange > __materials;
 	
 	/* If true, then glShadeModel(GL_SMOOTH) */
 	bool __smooth;
 	
 	/* http://www.opengl.org/sdk/docs/man/xhtml/glBufferData.xml */
-	GLenum __usage;
+	vboUsage __usage;
 	
 	/* http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml */
 	GLenum __mode;
 	
+	GPUMemory& __gpu;
+	
 	/* GL's extensions' pointers */
-	void	(*glGenVertexArrays) (GLsizei, GLuint*);
-	void	(*glGenBuffers) (GLsizei, GLuint*);
 	void	(*glBindVertexArray) (GLuint);
 	void	(*glBindBuffer) (GLenum, GLuint);
-	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
-	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
-	void	(*glDeleteVertexArrays) (GLsizei, const GLuint*);
-	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
-	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
 	void	(*glVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid*);
 	void	(*glEnableVertexAttribArray) (GLuint);
 	void	(*glDisableVertexAttribArray) (GLuint);

@@ -45,13 +45,13 @@ MatricesManager::MatricesManager() {
 }
 
 void
-MatricesManager::sLookAt(const sVector& _eye, const sVector& _center, const sVector& _up) {
+MatricesManager::sLookAt(const sVector3D& _eye, const sVector3D& _center, const sVector3D& _up) {
 	/* http://pyopengl.sourceforge.net/documentation/manual/gluLookAt.3G.html */
-	sVector f = _center - _eye;
+	sVector3D f = _center - _eye;
 	f.normalize();
-	sVector s = normalOfPlane(f, _up);
+	sVector3D s = normalOfPlane(f, _up);
 	s.normalize();
-	sVector u = normalOfPlane(s, f);
+	sVector3D u = normalOfPlane(s, f);
 	f *= -1;
 	
 	__modelViewMatrix.loadIdentity();
@@ -72,14 +72,14 @@ MatricesManager::sLookAt(const sVector& _eye, const sVector& _center, const sVec
 }
 
 void
-MatricesManager::sPerspective(GLdouble _fovy, GLdouble _aspect, GLdouble _zNear, GLdouble _zFar) {
+MatricesManager::sPerspective(GLfloat _fovy, GLfloat _aspect, GLfloat _zNear, GLfloat _zFar) {
 	/* http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml */
 	if (_zNear == 0)
 		return;
 	
 	__projectionMatrix.loadIdentity();
 	
-	GLdouble f = 1 / (tan((_fovy * PIdiv180) / 2)); // ctg(_fovy/2)
+	GLfloat f = 1 / (tan((_fovy * PIdiv180) / 2)); // ctg(_fovy/2)
 	
 	__projectionMatrix[0] = f / _aspect;
 	__projectionMatrix[5] = f;
@@ -89,9 +89,9 @@ MatricesManager::sPerspective(GLdouble _fovy, GLdouble _aspect, GLdouble _zNear,
 }
 
 void
-MatricesManager::sOrtho(GLdouble _left, GLdouble _right,
-		GLdouble _bottom, GLdouble _top,
-		GLdouble _nearVal, GLdouble _farVal) {
+MatricesManager::sOrtho(GLfloat _left, GLfloat _right,
+		GLfloat _bottom, GLfloat _top,
+		GLfloat _nearVal, GLfloat _farVal) {
 	
 	__projectionMatrix.loadIdentity();
 	
@@ -105,7 +105,7 @@ MatricesManager::sOrtho(GLdouble _left, GLdouble _right,
 }
 
 void
-MatricesManager::translate(const sVector& _trans) {
+MatricesManager::translate(const sVector3D& _trans) {
 	sMat16 temp;
 	temp.loadIdentity();
 	temp.setColumn(3, _trans);
@@ -114,7 +114,7 @@ MatricesManager::translate(const sVector& _trans) {
 }
 
 void
-MatricesManager::scale(const sVector& _scale) {
+MatricesManager::scale(const sVector3D& _scale) {
 	sMat16 temp;
 	temp[0] = _scale.x;
 	temp[5] = _scale.y;
@@ -125,7 +125,7 @@ MatricesManager::scale(const sVector& _scale) {
 }
 
 void
-MatricesManager::rotate(GLdouble _angle, Axis _axis) {
+MatricesManager::rotate(GLfloat _angle, Axis _axis) {
 	sMat16 temp;
 	temp.loadIdentity();
 	
@@ -136,16 +136,16 @@ MatricesManager::rotate(GLdouble _angle, Axis _axis) {
 	
 	double anti_c = 1 - c;
 	
-	sVector rot;
+	sVector3D rot;
 	switch (_axis) {
 		case X:
-			rot = sVector(1.0, 0.0, 0.0);
+			rot = sVector3D({1.0, 0.0, 0.0});
 			break;
 		case Y:
-			rot = sVector(0.0, 1.0, 0.0);
+			rot = sVector3D({0.0, 1.0, 0.0});
 			break;
 		case Z:
-			rot = sVector(0.0, 0.0, 1.0);
+			rot = sVector3D({0.0, 0.0, 1.0});
 			break;
 	}
 	

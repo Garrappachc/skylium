@@ -80,7 +80,7 @@ public:
 	 * @param z Z coord.
 	 * @return Pointer to the newly created camera.
 	 */
-	Camera * createCamera(GLdouble, GLdouble, GLdouble, const cType& = FPP);
+	Camera * createCamera(GLfloat, GLfloat, GLfloat, const cType& = FPP);
 	
 	/**
 	 * Sets the active camera pointer to the camera given as an argument.
@@ -109,68 +109,13 @@ public:
 	 * @param z Z coord.
 	 * @return Index of the new light.
 	 */
-	short createLight(GLfloat = 0, GLfloat = 0, GLfloat = 0);
+	Light * createLight(GLfloat = 0, GLfloat = 0, GLfloat = 0);
 	
 	/**
-	 * Sets ambient light's parameters.
-	 * @param id Light's ID (from 0 to 7).
-	 * @param R <i>Red</i> colour of the light.
-	 * @param G <i>Green</i> colour of the light.
-	 * @param B <i>Blue</i> colour of the light.
-	 * @param A Intensity of the light. 
-	 * @return False if there is no light found with this ID.
-	 */
-	bool setAmbientLight(int, GLfloat, GLfloat, GLfloat, GLfloat);
-	
-	/**
-	 * Sets diffuse light's parameters.
-	 * @param id Light's ID (from 0 to 7).
-	 * @param R <i>Red</i> colour of the light.
-	 * @param G <i>Green</i> colour of the light.
-	 * @param B <i>Blue</i> colour of the light.
-	 * @param A Intensity of the light. 
-	 * @return False if there is no light found with this ID.
-	 */
-	bool setDiffuseLight(int, GLfloat, GLfloat, GLfloat, GLfloat);
-	
-	/**
-	 * Sets specular light's parameters.
-	 * @param id Light's ID (from 0 to 7).
-	 * @param R <i>Red</i> colour of the light.
-	 * @param G <i>Green</i> colour of the light.
-	 * @param B <i>Blue</i> colour of the light.
-	 * @param A Intensity of the light. 
-	 * @return False if there is no light found with this ID.
-	 */
-	bool setSpecularLight(int, GLfloat, GLfloat, GLfloat, GLfloat);
-	
-	/**
-	 * Sets light's source position.
-	 * @param id Light's ID (from 0 to 7).
-	 * @param X <i>X</i>.
-	 * @param Y <i>Y</i>.
-	 * @param Z <i>Z</i>.
-	 * @return False if there is no light found with this ID.
-	 */
-	bool setLightPosition(int, GLfloat, GLfloat, GLfloat);
-	
-	/**
-	 * Moves the light by the vector given.
-	 * @param id Light's ID (from 0 to 7).
-	 * @param X X move;
-	 * @param Y Y move;
-	 * @param Z Z move.
-	 * @return False if there is no light found with this ID.
-	 */
-	bool moveLight(int, GLfloat, GLfloat, GLfloat);
-	
-	/**
-	 * Removes light from the scene. The rest of lights keep their
-	 * IDs unchanged.
+	 * Removes light from the scene.
 	 * @param id Light's ID. By default it is the last known light.
-	 * @return False if there is no light with this ID.
 	 */
-	bool removeLight(int = -1);
+	void removeLight(Light*);
 	
 	/* Scene's name */
 	std::string name;

@@ -41,25 +41,25 @@ using namespace std;
 Camera::Camera(const cType &_type) :
 		__type(_type),
 		__fovy(45.0),
-		__zNear(1.0),
+		__zNear(0.0001),
 		__zFar(1000.0),
-		__eye(0, 0, 0),
-		__center(0, 0, 0),
-		__up(0, 1, 0),
+		__eye({0, 0, 0}),
+		__center({0, 0, 0}),
+		__up({0, 1, 0}),
 		__range(20),
 		__matrices(MatricesManager::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Camera constructed.";
 }
 
-Camera::Camera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_type) :
+Camera::Camera(GLfloat _x, GLfloat _y, GLfloat _z, const cType &_type) :
 		__type(_type),
 		__fovy(45.0),
-		__zNear(1.0),
+		__zNear(0.0001),
 		__zFar(1000.0),
-		__eye(_x, _y, _z),
-		__center(0, 0, 0),
-		__up(0, 1, 0),
+		__eye({_x, _y, _z}),
+		__center({0, 0, 0}),
+		__up({0, 1, 0}),
 		__range(20),
 		__matrices(MatricesManager::GetSingleton()) {
 	if (__type == SPHERICAL)
@@ -79,7 +79,7 @@ Camera::setProjection() {
 	__windowWidth = Skylium::GetSingletonPtr() -> getContextPtr() -> winWidth;
 	__windowHeight = Skylium::GetSingletonPtr() -> getContextPtr() -> winHeight;
 	
-	GLdouble aspect = (GLdouble) __windowWidth / __windowHeight;
+	GLfloat aspect = (GLfloat) __windowWidth / __windowHeight;
 	glViewport(0, 0, __windowWidth, __windowHeight);
 	checkGLErrors(AT);
 	
@@ -98,7 +98,7 @@ Camera::setView() {
 }
 
 void
-Camera::moveCamera(GLdouble movX, GLdouble movY, GLdouble movZ) {
+Camera::moveCamera(GLfloat movX, GLfloat movY, GLfloat movZ) {
 	if (__type == FPP) {
 		__eye.x += (__center.x * movZ);
 		__eye.z += (__center.z * movZ);
@@ -115,11 +115,11 @@ Camera::moveCamera(GLdouble movX, GLdouble movY, GLdouble movZ) {
 }
 
 void
-Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
+Camera::rotateCamera(GLfloat _x, GLfloat _y, GLfloat) {
 	if (__type == FPP) {
 		/* Update the angle */
-		__angle.x -= (GLdouble)(_x / 100);
-		__angle.y += (GLdouble)(_y / 200);
+		__angle.x -= (GLfloat)(_x / 100);
+		__angle.y += (GLfloat)(_y / 200);
 	
 		if (__angle.y > 90 * PIdiv180) __angle.y = 90 * PIdiv180;
 		else if (__angle.y < -90 * PIdiv180) __angle.y = -90 * PIdiv180;
@@ -133,8 +133,8 @@ Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
 	
 		__center.normalize();
 	} else if (__type == SPHERICAL) {
-		__angle.x += (GLdouble)(_x / 200);
-		__angle.y -= (GLdouble)(_y / 200);
+		__angle.x += (GLfloat)(_x / 200);
+		__angle.y -= (GLfloat)(_y / 200);
 		
 		__eye.x = -1 * cos(__angle.y) * sin(__angle.x - 90);
 		__eye.y = sin(__angle.y);
@@ -145,8 +145,8 @@ Camera::rotateCamera(GLdouble _x, GLdouble _y, GLdouble) {
 }
 
 void
-Camera::lookAt(GLdouble x, GLdouble y, GLdouble z) {
-	__center = sVector(x, y, z);
+Camera::lookAt(GLfloat x, GLfloat y, GLfloat z) {
+	__center = sVector3D({x, y, z});
 	if (__type == FPP)
 		__center.normalize();
 
@@ -154,7 +154,7 @@ Camera::lookAt(GLdouble x, GLdouble y, GLdouble z) {
 		cout << LOG_INFO << "LookAt: (" << __center.x << ", " << __center.y << ", " << __center.z << ")";
 }
 
-sVector
+sVector3D
 Camera::getEye() {
 	if (__type == FPP)
 		return __eye;
@@ -162,7 +162,7 @@ Camera::getEye() {
 		return __eye + __center;
 }
 
-sVector
+sVector3D
 Camera::getCenter() {
 	if (__type == FPP)
 		return __center + __eye;

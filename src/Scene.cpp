@@ -34,26 +34,15 @@
 
 using namespace std;
 
-unsigned lights[] = {
-	GL_LIGHT0,
-	GL_LIGHT1,
-	GL_LIGHT2,
-	GL_LIGHT3,
-	GL_LIGHT4,
-	GL_LIGHT5,
-	GL_LIGHT6,
-	GL_LIGHT7
-};
-
 Scene::Scene(const string &_name) :
 		name(_name),
 		__objectList(0),
 		__objectIterator(),
 		__cameraList(0),
 		__activeCamera(NULL),
-		__lightList(8, (Light*)NULL),
+		__lightList(0),
 		__lightIterator(),
-		__lightModelAmbient(0.2, 0.2, 0.2, 1.0),
+		__lightModelAmbient({0.2, 0.2, 0.2, 1.0}),
 		__shaders(ShaderDataHandler::GetSingleton()) {
 	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
 		cout << LOG_INFO << "Scene (\"" << _name << "\") constructed.";
@@ -108,7 +97,7 @@ Scene::getObjectByName(const string &_name) {
 }
 
 Camera *
-Scene::createCamera(GLdouble _x, GLdouble _y, GLdouble _z, const cType &_cType) {
+Scene::createCamera(GLfloat _x, GLfloat _y, GLfloat _z, const cType &_cType) {
 	Camera *newCamera = new Camera(_x, _y, _z, _cType);
 	if (!__activeCamera) {
 		__activeCamera = newCamera;
@@ -134,114 +123,22 @@ Scene::setActiveCamera(Camera *_camera, bool _checking) {
 	}
 }
 
-short
+Light *
 Scene::createLight(GLfloat _x, GLfloat _y, GLfloat _z) {
-	unsigned i;
-	for (i = 0; i < __lightList.size(); i++) {
-		if (__lightList[i] == NULL)
-			break;
-	}
-	
-	if (i > 7)
-		return -1;
-	
-	__lightList[i] = new Light(_x, _y, _z);
-	return i;
+	Light* newLight = new Light(sVector3D({_x, _y, _z}));
+	__lightList.push_back(newLight);
+	return newLight;
 }
 
-bool
-Scene::setAmbientLight(int _id, GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
-	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Colour not supported! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
-		return false;
-	}
-	__lightList[_id] -> setAmbient(sColor(_R, _G, _B, _A));
-	return true;
-}
-
-bool
-Scene::setDiffuseLight(int _id, GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
-	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Colour not supported! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
-		return false;
-	}
-	__lightList[_id] -> setDiffuse(sColor(_R, _G, _B, _A));
-	return true;
-}
-
-bool
-Scene::setSpecularLight(int _id, GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
-	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Colour not supported! (" << _R << ", " << _G << ", " << _B << ", " << _A << ")";
-		return false;
-	}
-	__lightList[_id] -> setSpecular(sColor(_R, _G, _B, _A));
-	return true;
-}
-
-bool
-Scene::setLightPosition(int _id, GLfloat _x, GLfloat _y, GLfloat _z) {
-	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	
-	__lightList[_id] -> setSrcPos(sPosition(_x, _y, _z));
-	return true;
-}
-
-bool
-Scene::moveLight(int _id, GLfloat _x, GLfloat _y, GLfloat _z) {
-	if (_id >= static_cast< int >(__lightList.size()) || _id < 0 || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	__lightList[_id] -> __lightSrc += sVec3D< GLfloat >(_x, _y, _z);
-	return true;
-}
-
-bool
-Scene::removeLight(int _id) {
-	if (_id >= static_cast< int >(__lightList.size()) || __lightList[_id] == 0) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": light with given ID (" << _id << ") not found!";
-		return false;
-	}
-	if (_id == -1) {
-		int i;
-		for (i = static_cast< int >(__lightList.size()) - 1; i >= 0; i--) {
-			if (__lightList[i] != NULL)
-				break;
+void
+Scene::removeLight(Light* _light) {
+	for (auto it = __lightList.begin(); it != __lightList.end(); ++it) {
+		if ((*it) == _light) {
+			__lightList.erase(it);
+			delete (*it);
+			return;
 		}
-		if (i != -1) {
-			delete __lightList[i];
-			__lightList[i] = NULL;
-		}
-	} else {
-		delete __lightList[_id];
-		__lightList[_id] = NULL;
 	}
-	return true;
 }
 
 void
@@ -260,15 +157,13 @@ Scene::__setObjects() {
 void
 Scene::__setLights() {
 	unsigned i = 0;
-	__lightIterator = __lightList.begin();
-	while (__lightIterator != __lightList.end()) {
-		if (*__lightIterator != 0) {
-			(*__lightIterator) -> makeLight(i);
-		}
+	for (Light*& l: __lightList) {
+		l -> makeLight(i);
 		++i;
-		__lightIterator++;
 	}
-	
+	/*
+	 * TODO: Tell shader how many lights we have.
+	 */
 }
 
 void

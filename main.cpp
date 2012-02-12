@@ -47,11 +47,9 @@ main() {
 	sphereCamera -> lookAt(0, 3.2, 0);
 	
 	/* Light on (7, 3, 0) position */
-	int light = sScene -> createLight(5, 15, -10);
+	Light* light = sScene -> createLight(5, 15, -10);
 	/* Set ambient light */
-	sScene -> setAmbientLight(light, 0.8, 0.8, 0.8, 1.0);
-	sScene -> setSpecularLight(light, 0.8, 0.8, 0.8, 1.0);
-	sScene -> setDiffuseLight(light, 0.8, 0.8, 0.8, 1.0);
+	light -> setAmbient(sColor( {0.8, 0.8, 0.8, 1.0} ));
 	
 	/* Timer for animation */
 	Timer *Tanimation = new Timer();
@@ -64,21 +62,21 @@ main() {
 	FontBase *sFont = new FontBase("-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1");
 	
 	/* Make the "data package" for Hud. */
-	HudData fpsCounter(sXY(-0.75, 0.9), sColor(SCOLORS_WHITE), "", sFont);
+	HudData fpsCounter(sVector2D( {-0.75, 0.9} ), sColor(SCOLORS_WHITE), "", sFont);
 	s_main -> TheHud -> attachData(&fpsCounter);
 	
-	HudData cameraInfo(sXY(-0.75, 0.8), sColor(SCOLORS_WHITE), "Camera: FPP", sFont);
+	HudData cameraInfo(sVector2D( {-0.75, 0.8} ), sColor(SCOLORS_WHITE), "Camera: FPP", sFont);
 	s_main -> TheHud -> attachData(&cameraInfo);
 	
-	HudData cameraLookAt(sXY(0.0, 0.9), sColor(SCOLORS_WHITE), "LookAt: ", sFont);
+	HudData cameraLookAt(sVector2D( {0.0, 0.9} ), sColor(SCOLORS_WHITE), "LookAt: ", sFont);
 	s_main -> TheHud -> attachData(&cameraLookAt);
-	sVector camLookAt;
+	sVector3D camLookAt;
 	
-	HudData cameraEye(sXY(0.0, 0.8), sColor(SCOLORS_WHITE), "Center: ", sFont);
+	HudData cameraEye(sVector2D( {0.0, 0.8} ), sColor(SCOLORS_WHITE), "Center: ", sFont);
 	s_main -> TheHud -> attachData(&cameraEye);
-	sVector camEye;
+	sVector3D camEye;
 	
-	s_main -> TheHud -> setColor(sColor(0.21f, 0.21f, 0.21f, 0.5f), sColor(1.0f, 1.0f, 1.0f, 0.8f));
+	s_main -> TheHud -> setColor(sColor( {0.21f, 0.21f, 0.21f, 0.5f} ), sColor({ 1.0f, 1.0f, 1.0f, 0.8f} ));
 	
 	/* FPS counting */
 	short fps = 0;

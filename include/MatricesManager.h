@@ -27,6 +27,8 @@
 
 #include <stack>
 
+#include <GL/gl.h>
+
 #include "Singleton.h"
 #include "Matrices.h"
 #include "Vectors.h"
@@ -54,7 +56,7 @@ public:
 	 * @param center The reference point position.
 	 * @param up The UP Vector.
 	 */
-	void sLookAt(const sVector&, const sVector&, const sVector&);
+	void sLookAt(const sVector3D&, const sVector3D&, const sVector3D&);
 	
 	/**
 	 * Sets a perspective projection matrix.
@@ -63,7 +65,7 @@ public:
 	 * @param zNear Specifies the distance from the viewer to the near clipping plane (>0).
 	 * @param zFar Specifies the distance from the viewer to the far clipping plane (>0).
 	 */
-	void sPerspective(GLdouble, GLdouble, GLdouble, GLdouble);
+	void sPerspective(GLfloat, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Generates a pararell projection.
@@ -74,7 +76,7 @@ public:
 	 * @param nearVal Specify the distances to the nearer depth clipping planes.
 	 * @param farVal Specify the distances to the farther depth clipping planes.
 	 */
-	void sOrtho(GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble);
+	void sOrtho(GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
 	
 	/**
 	 * Generates the Normal Matrix.
@@ -88,7 +90,7 @@ public:
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glTranslate.xml
 	 * @param trans Translation vector.
 	 */
-	void translate(const sVector&);
+	void translate(const sVector3D&);
 	
 	/**
 	 * Scale along the x, y and z axes. The current ModelView Matrix is being
@@ -96,7 +98,7 @@ public:
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glScale.xml
 	 * @param scale Scale vector.
 	 */
-	void scale(const sVector&);
+	void scale(const sVector3D&);
 	
 	/**
 	 * Procudes a rotation of {x,y,z}-angle along {x,y,z}-axis. The current
@@ -104,7 +106,7 @@ public:
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glRotate.xml
 	 * @param rotation Rotation vector.
 	 */
-	void rotate(GLdouble, Axis);
+	void rotate(GLfloat, Axis);
 	
 	/**
 	 * Pushes the current matrix on the stack.

@@ -38,10 +38,10 @@ using namespace std;
 
 Material::Material(const string &_name) :
 		name(_name),
-		__mAmbient(0.2, 0.2, 0.2, 1.0),
-		__mDiffuse(0.8, 0.8, 0.8, 1.0),
-		__mSpecular(0.0, 0.0, 0.0, 1.0),
-		__mEmission(0.0, 0.0, 0.0, 1.0),
+		__mAmbient({0.2, 0.2, 0.2, 1.0}),
+		__mDiffuse({0.8, 0.8, 0.8, 1.0}),
+		__mSpecular({0.0, 0.0, 0.0, 1.0}),
+		__mEmission({0.0, 0.0, 0.0, 1.0}),
 		__mAlpha(1.0),
 		__mShininess(0),
 		__textures(0),
@@ -97,18 +97,42 @@ void
 Material::setTextures() {
 	if (__textures.empty())
 		return;
-	
-	for (unsigned i = 0; i < __textures.size(); ++i)
-		__textures[i] -> setTexture(i);
 }
 
 void
 Material::setMaterial() {
+#ifdef __DEBUG__	
+	cout << "\n  Setting material...";
+	cout.flush();
+#endif // __DEBUG__
+	
 	__shaders.updateData("sFrontMaterial.ambient", __mAmbient);
 	__shaders.updateData("sFrontMaterial.diffuse", __mDiffuse);
 	__shaders.updateData("sFrontMaterial.specular", __mSpecular);
 	__shaders.updateData("sFrontMaterial.shininess", __mShininess);
 	__shaders.updateData("sFrontMaterial.emission", __mEmission);
+	
+	for (unsigned i = 0; i < __textures.size(); ++i)
+		__textures[i] -> setTexture(i);
+	
+#ifdef __DEBUG__
+	cout << "\n  Material set.";
+	cout.flush();
+#endif // __DEBUG__
+}
+
+void
+Material::unsetTextures() {
+	if (__textures.empty())
+		return;
+	
+	for (unsigned i = 0; i < __textures.size(); ++i)
+		__textures[i] -> unsetTexture(i);
+	
+#ifdef __DEBUG__
+	cout << "\n  Material unset.";
+	cout.flush();
+#endif // __DEBUG__
 }
 
 void

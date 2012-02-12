@@ -25,8 +25,11 @@
 #ifndef SHADERDATAHANDLER_H
 #define SHADERDATAHANDLER_H
 
+#include <iostream>
 #include <map>
 #include <string>
+
+#include <GL/gl.h>
 
 #include "Singleton.h"
 
@@ -47,31 +50,50 @@ public:
 	 * 				in ShaderDataHandler class.
 	 * @param value Value of the uniform variable.
 	 */
-	void updateData(const std::string&, const sVec2D< GLfloat >&);
-	void updateData(const std::string&, const sVec3D< GLfloat >&);
-	void updateData(const std::string&, const sVec4D< GLfloat >&);
+	void updateData(const std::string&, const sVector2D&);
+	void updateData(const std::string&, const sVector3D&);
+	void updateData(const std::string&, const sVector4D&);
 	void updateData(const std::string&, GLfloat);
 	void updateSampler2D(const std::string&, GLint);
+	
+	/**
+	 * Opens the stream.
+	 * @param shader Active shader.
+	 */
+	void openStream(const Shader*);
+	
+	/**
+	 * Closes the stream.
+	 */
+#ifndef __DEBUG__
+	void closeStream() { __isStreamOpen = false; }
+#else
+	void closeStream();
+#endif // __DEBUG__
+	
+public:
 	
 	/**
 	 * Sends all stored data to the shader.
 	 * @param shader Active shader.
 	 */
-	void sendDataToShader(const Shader&);
+	void __sendDataToShader(const Shader*);
 	
-public:
+	std::map< std::string, sVector2D > __2Dvectors;
 	
-	std::map< std::string, sVec2D< GLfloat > > __2Dvectors;
+ 	std::map< std::string, sVector3D > __3Dvectors;
 	
-	std::map< std::string, sVec3D< GLfloat > > __3Dvectors;
-	
-	std::map< std::string, sVec4D< GLfloat > > __4Dvectors;
+	std::map< std::string, sVector4D > __4Dvectors;
 	
 	std::map< std::string, GLfloat > __values;
 	
 	std::map< std::string, GLint > __textures;
 	
 	MatricesManager& __matrices;
+	
+	bool __isStreamOpen;
+	
+	const Shader* __activeShader;
 	
 };
 
