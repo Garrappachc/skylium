@@ -60,30 +60,13 @@ SceneManager::createScene(const string &_name) {
 void
 SceneManager::displayActiveScene() {
 	
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glClearColor(1.0, 1.0, 1.0, 1.0);
-	checkGLErrors(AT);
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	checkGLErrors(AT);
-	
-	glEnable(GL_DEPTH_TEST);
-	checkGLErrors(AT);
-	
-	glEnable(GL_POLYGON_SMOOTH);
-	checkGLErrors(AT);
-	
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	
+	__setRenderingOptions();
 	
 	if (__activeScene) {
 		__activeScene -> show();	
 	}
 	
-	glDisable(GL_BLEND);
-	checkGLErrors(AT);
+	__unsetRenderingOptions();
 }
 
 bool
@@ -103,4 +86,33 @@ SceneManager::setActive(const Scene *_toSet) {
 	if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
 		cout << LOG_WARN << "There is no such scene in the vector! Remember to create new scenes via SceneManager::createScene().";
 	return false;
+}
+
+void
+SceneManager::__setRenderingOptions() {
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	checkGLErrors(AT);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	checkGLErrors(AT);
+	
+	glEnable(GL_DEPTH_TEST);
+	checkGLErrors(AT);
+	
+	glEnable(GL_POLYGON_SMOOTH);
+	checkGLErrors(AT);
+	
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	
+}
+
+void
+SceneManager::__unsetRenderingOptions() {
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	
+	checkGLErrors(AT);
 }

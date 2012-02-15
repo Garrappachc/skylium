@@ -294,18 +294,10 @@ Shader::toggle() {
 		glUseProgram(__shaderProgram);
 		checkGLErrors(AT);
 		__isRunning = true;
-#ifdef __DEBUG__
-		cout << "\nShader on.";
-		cout.flush();
-#endif // __DEBUG__
 	} else {
 		glUseProgram(0);
 		checkGLErrors(AT);
 		__isRunning = false;
-#ifdef __DEBUG__
-		cout << "\nShader off.";
-		cout.flush();
-#endif // __DEBUG__
 	}
 }
 
@@ -347,38 +339,25 @@ Shader::setUniformFloat(const string& _name, const sVectorBase< GLfloat >& _para
 
 void
 Shader::setUniformFloat(const string& _name, GLfloat _param) const {
-	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
-	checkGLErrors(AT);
-	
-	glUniform1f(location, _param);
+	glUniform1f(glGetUniformLocation(__shaderProgram, _name.c_str()), _param);
 	checkGLErrors(AT);
 }
 
 void
 Shader::setUniformInt(const string& _name, GLint _value) const {
-	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
-	checkGLErrors(AT);
-	
-	glUniform1i(location, _value);
+	glUniform1i(glGetUniformLocation(__shaderProgram, _name.c_str()), _value);
 	checkGLErrors(AT);
 }
 
 void
 Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) const {
-	checkGLErrors(AT);
-	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
-	checkGLErrors(AT);
-	
-	glUniformMatrix4fv(location, 1, GL_FALSE, _matrix);
+	glUniformMatrix4fv(glGetUniformLocation(__shaderProgram, _name.c_str()), 1, GL_FALSE, _matrix);
 	checkGLErrors(AT);
 }
 
 void
 Shader::setMatrixFloat(const string& _name, const sMat9& _matrix) const {
-	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
-	checkGLErrors(AT);
-	
-	glUniformMatrix3fv(location, 1, GL_FALSE, _matrix);
+	glUniformMatrix3fv(glGetUniformLocation(__shaderProgram, _name.c_str()), 1, GL_FALSE, _matrix);
 	checkGLErrors(AT);
 }
 

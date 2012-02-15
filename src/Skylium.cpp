@@ -108,7 +108,7 @@ Skylium::~Skylium() {
 		delete __extensions.back(), __extensions.pop_back();
 	
 	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Skylium destructed.";
+		cout << LOG_INFO << "Skylium destructed." << endl;
 }
 
 bool

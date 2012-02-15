@@ -120,6 +120,8 @@ public:
 	
 	bool hasAnyMaterials() { return __materials.size() > 1; }
 	
+	void rendering(bool _s = true) { __isShown = _s; }
+	
 	std::string name;
 	
 private:
@@ -147,6 +149,8 @@ private:
 	GLenum __mode;
 	
 	GPUMemory& __gpu;
+	
+	bool __isShown;
 	
 	/* GL's extensions' pointers */
 	void	(*glBindVertexArray) (GLuint);

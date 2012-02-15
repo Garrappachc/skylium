@@ -65,11 +65,8 @@ public:
 	/**
 	 * Closes the stream.
 	 */
-#ifndef __DEBUG__
 	void closeStream() { __isStreamOpen = false; }
-#else
-	void closeStream();
-#endif // __DEBUG__
+
 	
 public:
 	
