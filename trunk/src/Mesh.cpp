@@ -47,7 +47,8 @@ Mesh::Mesh(const string &_name) :
 		__smooth(false),
 		__usage(STATIC_DRAW),
 		__mode(GL_TRIANGLES),
-		__gpu(GPUMemory::GetSingleton()) {
+		__gpu(GPUMemory::GetSingleton()),
+		__isShown(true) {
 	__initGLExtensionsPointers();
 	
 	__materials[0].begin = 0;
@@ -66,6 +67,8 @@ Mesh::~Mesh() {
 
 void
 Mesh::show() {
+	if (!__isShown)
+		return;
 	// there we go!
 	glBindVertexArray(__buffer.vaoID);
 	checkGLErrors(AT);
@@ -74,37 +77,19 @@ Mesh::show() {
 		if (m.begin == m.end)
 			continue;
 		
-#ifdef __DEBUG__
-		cout << "\n  Material = " << m.material;
-		cout.flush();
-#endif // __DEBUG__
-		
 		if (m.material)
 			m.material -> setMaterial();
-
-#ifdef __DEBUG__
-		cout << "\n  Drawing elements from " << m.begin <<
-			" to " << m.end + m.begin << "...";
-		cout.flush();
-#endif // __DEBUG__
 		
-		glDrawRangeElements(
+		glDrawElements(
 				__mode,
-				m.begin,
-				__buffer.vboID[ELEMENTS_ARRAY].dataCount,
 				m.end,
 				GL_UNSIGNED_INT,
-				BUFFER_OFFSET(0)
+				BUFFER_OFFSET(sizeof(IndicesType) * m.begin)
 			);
 		checkGLErrors(AT);
-
-#ifdef __DEBUG__
-		cout << "\n  Elements drawn.";
-		cout.flush();
-#endif // __DEBUG__
 		
-		//if (m.material)
-		//	m.material -> unsetTextures();
+		if (m.material)
+			m.material -> unsetTextures();
 	
 	}
 	
@@ -150,7 +135,7 @@ Mesh::loadIntoVbo() {
 void
 Mesh::useMtl(Material *_mtl) {
 	if (!__indices.empty()) {
-		__materials[__materials.size() - 1].end = __indices.size() - __materials[__materials.size() - 1].begin - 1;
+		__materials[__materials.size() - 1].end = __indices.size() - __materials[__materials.size() - 1].begin;
 		__materials.push_back(MeshRange(__indices.size()));
 	}
 	__materials[__materials.size() - 1].material = _mtl;
@@ -183,7 +168,7 @@ void
 Mesh::closeMesh(Material* _mat) {
 	if ((__materials[__materials.size() - 1].material == NULL) && (_mat != NULL))
 		__materials[__materials.size() - 1].material = _mat;
-	__materials[__materials.size() - 1].end = __indices.size();
+	__materials[__materials.size() - 1].end = __indices.size() - __materials[__materials.size() - 1].begin;
 	
 	loadIntoVbo();
 }

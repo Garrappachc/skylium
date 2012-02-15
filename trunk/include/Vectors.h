@@ -195,6 +195,9 @@ public:
 		
 		len = sqrt(len);
 		
+		if (len == 0)
+			return;
+		
 		for (T& t: __data)
 			t /= len;
 	}

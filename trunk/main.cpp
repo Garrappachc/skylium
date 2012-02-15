@@ -152,9 +152,6 @@ main() {
 	
 	/* Skylium handles the rest. */
 	delete s_main;
-	
-	
-	cout << endl;
 
 	return 0;
 	

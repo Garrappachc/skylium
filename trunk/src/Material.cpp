@@ -101,10 +101,6 @@ Material::setTextures() {
 
 void
 Material::setMaterial() {
-#ifdef __DEBUG__	
-	cout << "\n  Setting material...";
-	cout.flush();
-#endif // __DEBUG__
 	
 	__shaders.updateData("sFrontMaterial.ambient", __mAmbient);
 	__shaders.updateData("sFrontMaterial.diffuse", __mDiffuse);
@@ -114,11 +110,6 @@ Material::setMaterial() {
 	
 	for (unsigned i = 0; i < __textures.size(); ++i)
 		__textures[i] -> setTexture(i);
-	
-#ifdef __DEBUG__
-	cout << "\n  Material set.";
-	cout.flush();
-#endif // __DEBUG__
 }
 
 void
@@ -128,11 +119,6 @@ Material::unsetTextures() {
 	
 	for (unsigned i = 0; i < __textures.size(); ++i)
 		__textures[i] -> unsetTexture(i);
-	
-#ifdef __DEBUG__
-	cout << "\n  Material unset.";
-	cout.flush();
-#endif // __DEBUG__
 }
 
 void

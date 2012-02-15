@@ -44,20 +44,12 @@ void
 ShaderDataHandler::updateData(const string& _uniformName, const sVector2D& _value) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformFloat(_uniformName, _value);
-#ifdef __DEBUG__
-		cout << "\n  Data (" << _uniformName << ") sent via stream.";
-		cout.flush();
-#endif // __DEBUG__
 	} else {
 		auto result = __2Dvectors.find(_uniformName);
 		if (result == __2Dvectors.end())
 			__2Dvectors.insert(make_pair(_uniformName, _value));
 		else
 			result -> second = _value;
-#ifdef __DEBUG__
-		cout << "\nData (" << _uniformName << ") stored.";
-		cout.flush();
-#endif // __DEBUG__
 	}
 }
 
@@ -65,20 +57,12 @@ void
 ShaderDataHandler::updateData(const string& _uniformName, const sVector3D& _value) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformFloat(_uniformName, _value);
-#ifdef __DEBUG__
-		cout << "\n  Data (" << _uniformName << ") sent via stream.";
-		cout.flush();
-#endif // __DEBUG__
 	} else {
 		auto result = __3Dvectors.find(_uniformName);
 		if (result == __3Dvectors.end())
 			__3Dvectors.insert(make_pair(_uniformName, _value));
 		else
 			result -> second = _value;
-#ifdef __DEBUG__
-		cout << "\nData (" << _uniformName << ") stored.";
-		cout.flush();
-#endif // __DEBUG__
 	}
 }
 
@@ -86,20 +70,12 @@ void
 ShaderDataHandler::updateData(const string& _uniformName, const sVector4D& _value) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformFloat(_uniformName, _value);
-#ifdef __DEBUG__
-		cout << "\n  Data (" << _uniformName << ") sent via stream.";
-		cout.flush();
-#endif // __DEBUG__
 	} else {
 		auto result = __4Dvectors.find(_uniformName);
 		if (result == __4Dvectors.end())
 			__4Dvectors.insert(make_pair(_uniformName, _value));
 		else
 			result -> second = _value;
-#ifdef __DEBUG__
-		cout << "\nData (" << _uniformName << ") stored.";
-		cout.flush();
-#endif // __DEBUG__
 	}
 }
 
@@ -107,20 +83,12 @@ void
 ShaderDataHandler::updateData(const string& _uniformName, GLfloat _value) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformFloat(_uniformName, _value);
-#ifdef __DEBUG__
-		cout << "\n  Data (" << _uniformName << ") sent via stream.";
-		cout.flush();
-#endif // __DEBUG__
 	} else {
 		auto result = __values.find(_uniformName);
 		if (result == __values.end())
 			__values.insert(make_pair(_uniformName, _value));
 		else
 			result -> second = _value;
-#ifdef __DEBUG__
-		cout << "\nData (" << _uniformName << ") stored.";
-		cout.flush();
-#endif // __DEBUG__
 	}
 }
 
@@ -128,20 +96,12 @@ void
 ShaderDataHandler::updateSampler2D(const string& _uniformName, GLint _sampler) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformInt(_uniformName, _sampler);
-#ifdef __DEBUG__
-		cout << "\n  Data (" << _uniformName << ") sent via stream.";
-		cout.flush();
-#endif // __DEBUG__
 	} else {
 		auto result = __textures.find(_uniformName);
 		if (result == __textures.end())
 			__textures.insert(make_pair(_uniformName, _sampler));
 		else
 			result -> second = _sampler;
-#ifdef __DEBUG__
-		cout << "\nData (" << _uniformName << ") stored.";
-		cout.flush();
-#endif // __DEBUG__
 	}
 }
 
@@ -150,21 +110,7 @@ ShaderDataHandler::openStream(const Shader* _shader) {
 	__isStreamOpen = true;
 	__sendDataToShader(_shader);
 	__activeShader = _shader;
-	
-#ifdef __DEBUG__
-	cout << "\nStream open.";
-	cout.flush();
-#endif // __DEBUG__
 }
-
-#ifdef __DEBUG__
-void
-ShaderDataHandler::closeStream() {
-	__isStreamOpen = false;
-	cout << "\nStream closed.";
-	cout.flush();
-}
-#endif // __DEBUG__
 
 void
 ShaderDataHandler::__sendDataToShader(const Shader* _shader) {

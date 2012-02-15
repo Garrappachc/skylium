@@ -164,11 +164,6 @@ Object::show() {
 		__shader -> toggle();
 		__shaders.openStream(__shader);
 		
-#ifdef __DEBUG__
-		cout << "\n  Rendering object...";
-		cout.flush();
-#endif // __DEBUG__
-		
 		for (auto it = __meshes.begin(); it != __meshes.end(); ++it) {			
 			
 			it -> second -> show();

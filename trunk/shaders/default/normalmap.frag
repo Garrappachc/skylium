@@ -10,6 +10,8 @@ void main () {
 	
 	vec4 base = texture2D(textureUnit, sVaryingTexCoords.st);
 	//vec4 base = sDefColor;
+	if (base.a < 0.5)
+		discard;
 	
 	vec3 bump = normalize(texture2D(normalMap, sVaryingTexCoords.st).xyz * 2.0 - 1.0);
 

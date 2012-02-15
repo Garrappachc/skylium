@@ -71,6 +71,10 @@ public:
 	
 private:
 	
+	void __setRenderingOptions();
+	
+	void __unsetRenderingOptions();
+	
 	/* All scenes */
 	std::vector< Scene* > __sceneList;
 	
