@@ -26,7 +26,7 @@
 
 #include <string>
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 class TextureManager;
 class ShaderDataHandler;
@@ -83,10 +83,10 @@ private:
 	 * @param texturePtr Pointer to OpenGL texture.
 	 * @return Texture.
 	 */
-	GLuint __loadTexture(const std::string&);
+	gl::Uint __loadTexture(const std::string&);
 	
 	/* Pointer to GL's texture */
-	GLuint __texture;
+	gl::Uint __texture;
 	
 	/* Texture type - 
 		GL_TEXTURE_1D,
@@ -94,7 +94,7 @@ private:
 		GL_TEXTURE_3D,
 		GL_TEXTURE_CUBE_MAP.
  		GL_TEXTURE_2D by default */
-	GLenum __type;
+	gl::Enum __type;
 	
 	/* Texture wrapping - GL_CLAMP,
 		GL_CLAMP_TO_BORDER,
@@ -103,13 +103,13 @@ private:
 		GL_REPEAT,
 		GL_CLAMP.
 		GL_CLAMP_TO_BORDER by default */
-	GLenum __wrapping;
+	gl::Enum __wrapping;
 	
 	/* Location of the texture file - may be useful */
 	std::string __file;
 	
 	/* Channels, default 4 (RGBA) */
-	GLint __channels;
+	gl::Int __channels;
 	
 	Mode __mode;
 	

@@ -40,8 +40,7 @@ MatricesManager::MatricesManager() {
 	__projectionMatrix.loadIdentity();
 	__normalMatrix.loadIdentity();
 	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "MatricesManager constructed.";
+	log(CONSTRUCTOR, "MatricesManager constructed.");
 }
 
 void
@@ -72,14 +71,14 @@ MatricesManager::sLookAt(const sVector3D& _eye, const sVector3D& _center, const 
 }
 
 void
-MatricesManager::sPerspective(GLfloat _fovy, GLfloat _aspect, GLfloat _zNear, GLfloat _zFar) {
+MatricesManager::sPerspective(gl::Float _fovy, gl::Float _aspect, gl::Float _zNear, gl::Float _zFar) {
 	/* http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml */
 	if (_zNear == 0)
 		return;
 	
 	__projectionMatrix.loadIdentity();
 	
-	GLfloat f = 1 / (tan((_fovy * PIdiv180) / 2)); // ctg(_fovy/2)
+	gl::Float f = 1 / (tan((_fovy * PIdiv180) / 2)); // ctg(_fovy/2)
 	
 	__projectionMatrix[0] = f / _aspect;
 	__projectionMatrix[5] = f;
@@ -89,9 +88,9 @@ MatricesManager::sPerspective(GLfloat _fovy, GLfloat _aspect, GLfloat _zNear, GL
 }
 
 void
-MatricesManager::sOrtho(GLfloat _left, GLfloat _right,
-		GLfloat _bottom, GLfloat _top,
-		GLfloat _nearVal, GLfloat _farVal) {
+MatricesManager::sOrtho(gl::Float _left, gl::Float _right,
+		gl::Float _bottom, gl::Float _top,
+		gl::Float _nearVal, gl::Float _farVal) {
 	
 	__projectionMatrix.loadIdentity();
 	
@@ -125,7 +124,7 @@ MatricesManager::scale(const sVector3D& _scale) {
 }
 
 void
-MatricesManager::rotate(GLfloat _angle, Axis _axis) {
+MatricesManager::rotate(gl::Float _angle, Axis _axis) {
 	sMat16 temp;
 	temp.loadIdentity();
 	

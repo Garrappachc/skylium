@@ -48,11 +48,10 @@ Camera::Camera(const cType &_type) :
 		__up({0, 1, 0}),
 		__range(20),
 		__matrices(MatricesManager::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Camera constructed.";
+	log(CONSTRUCTOR, "Camera constructed.");
 }
 
-Camera::Camera(GLfloat _x, GLfloat _y, GLfloat _z, const cType &_type) :
+Camera::Camera(gl::Float _x, gl::Float _y, gl::Float _z, const cType &_type) :
 		__type(_type),
 		__fovy(45.0),
 		__zNear(0.0001),
@@ -65,13 +64,11 @@ Camera::Camera(GLfloat _x, GLfloat _y, GLfloat _z, const cType &_type) :
 	if (__type == SPHERICAL)
 		__eye.normalize();
 	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Camera (" << __eye.x << ", " << __eye.y << ", " << __eye.z << ") constructed.";
+	log(CONSTRUCTOR, "Camera (%f, %f, %f) constructed.", __eye.x, __eye.y, __eye.z);
 }
 
 Camera::~Camera() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Camera destructed.";
+	log(DESTRUCTOR, "Camera destructed.");
 }
 
 void
@@ -79,8 +76,8 @@ Camera::setProjection() {
 	__windowWidth = Skylium::GetSingletonPtr() -> getContextPtr() -> winWidth;
 	__windowHeight = Skylium::GetSingletonPtr() -> getContextPtr() -> winHeight;
 	
-	GLfloat aspect = (GLfloat) __windowWidth / __windowHeight;
-	glViewport(0, 0, __windowWidth, __windowHeight);
+	gl::Float aspect = (gl::Float) __windowWidth / __windowHeight;
+	gl::Viewport(0, 0, __windowWidth, __windowHeight);
 	checkGLErrors(AT);
 	
 	__matrices.sPerspective(__fovy, aspect, __zNear, __zFar);
@@ -98,7 +95,7 @@ Camera::setView() {
 }
 
 void
-Camera::moveCamera(GLfloat movX, GLfloat movY, GLfloat movZ) {
+Camera::moveCamera(gl::Float movX, gl::Float movY, gl::Float movZ) {
 	if (__type == FPP) {
 		__eye.x += (__center.x * movZ);
 		__eye.z += (__center.z * movZ);
@@ -115,11 +112,11 @@ Camera::moveCamera(GLfloat movX, GLfloat movY, GLfloat movZ) {
 }
 
 void
-Camera::rotateCamera(GLfloat _x, GLfloat _y, GLfloat) {
+Camera::rotateCamera(gl::Float _x, gl::Float _y, gl::Float) {
 	if (__type == FPP) {
 		/* Update the angle */
-		__angle.x -= (GLfloat)(_x / 100);
-		__angle.y += (GLfloat)(_y / 200);
+		__angle.x -= (gl::Float)(_x / 100);
+		__angle.y += (gl::Float)(_y / 200);
 	
 		if (__angle.y > 90 * PIdiv180) __angle.y = 90 * PIdiv180;
 		else if (__angle.y < -90 * PIdiv180) __angle.y = -90 * PIdiv180;
@@ -133,8 +130,8 @@ Camera::rotateCamera(GLfloat _x, GLfloat _y, GLfloat) {
 	
 		__center.normalize();
 	} else if (__type == SPHERICAL) {
-		__angle.x += (GLfloat)(_x / 200);
-		__angle.y -= (GLfloat)(_y / 200);
+		__angle.x += (gl::Float)(_x / 200);
+		__angle.y -= (gl::Float)(_y / 200);
 		
 		__eye.x = -1 * cos(__angle.y) * sin(__angle.x - 90);
 		__eye.y = sin(__angle.y);
@@ -145,13 +142,12 @@ Camera::rotateCamera(GLfloat _x, GLfloat _y, GLfloat) {
 }
 
 void
-Camera::lookAt(GLfloat x, GLfloat y, GLfloat z) {
+Camera::lookAt(gl::Float x, gl::Float y, gl::Float z) {
 	__center = sVector3D({x, y, z});
 	if (__type == FPP)
 		__center.normalize();
 
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "LookAt: (" << __center.x << ", " << __center.y << ", " << __center.z << ")";
+	log(PARAM, "LookAt: (%f, %f, %f)", __center.x, __center.y, __center.z);
 }
 
 sVector3D

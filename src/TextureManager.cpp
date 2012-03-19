@@ -34,15 +34,13 @@
 using namespace std;
 
 TextureManager::TextureManager() {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "TextureManager constructed.";
+	log(CONSTRUCTOR, "TextureManager constructed.");
 }
 
 TextureManager::~TextureManager() {
 	for (auto it = __texturesMap.begin(); it != __texturesMap.end(); ++it)
 		delete it -> second;
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "TextureManager destructed.";
+	log(DESTRUCTOR, "TextureManager destructed.");
 }
 
 Texture *

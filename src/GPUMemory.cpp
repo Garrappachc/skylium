@@ -34,30 +34,27 @@
 using namespace std;
 
 GPUMemory::GPUMemory() : __vboUsage(0) {
-	__initGLExtensionsPointers();
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "GPUMemory constructed.";
+	log(CONSTRUCTOR, "GPUMemory constructed.");
 }
 
 GPUMemory::~GPUMemory() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "GPUMemory destructed.";
+	log(DESTRUCTOR, "GPUMemory destructed.");
 }
 
 void
 GPUMemory::prepareRoom(BufferObject& _buffer, vboUsage _usage) {
-	glGenVertexArrays(1, &_buffer.vaoID);
+	gl::GenVertexArrays(1, &_buffer.vaoID);
 	checkGLErrors(AT);
-	glGenBuffers(1, &_buffer.vboID[ELEMENTS_ARRAY].vboID);
+	gl::GenBuffers(1, &_buffer.vboID[ELEMENTS_ARRAY].vboID);
 	checkGLErrors(AT);
-	glGenBuffers(1, &_buffer.vboID[DATA_ARRAY].vboID);
+	gl::GenBuffers(1, &_buffer.vboID[DATA_ARRAY].vboID);
 	checkGLErrors(AT);
 	
-	glBindVertexArray(_buffer.vaoID);
+	gl::BindVertexArray(_buffer.vaoID);
 	checkGLErrors(AT);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer.vboID[ELEMENTS_ARRAY].vboID);
+	gl::BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer.vboID[ELEMENTS_ARRAY].vboID);
 	checkGLErrors(AT);
-	glBindBuffer(GL_ARRAY_BUFFER, _buffer.vboID[DATA_ARRAY].vboID);
+	gl::BindBuffer(GL_ARRAY_BUFFER, _buffer.vboID[DATA_ARRAY].vboID);
 	checkGLErrors(AT);
 	
 	GLenum usage;
@@ -67,12 +64,12 @@ GPUMemory::prepareRoom(BufferObject& _buffer, vboUsage _usage) {
 			break;
 	}
 	
-	glBufferData(
+	gl::BufferData(
 			GL_ELEMENT_ARRAY_BUFFER,
 			_buffer.vboID[ELEMENTS_ARRAY].dataSize,
 			NULL, usage
 		);
-	glBufferData(
+	gl::BufferData(
 			GL_ARRAY_BUFFER,
 			_buffer.vboID[DATA_ARRAY].dataSize,
 			NULL, usage
@@ -81,9 +78,9 @@ GPUMemory::prepareRoom(BufferObject& _buffer, vboUsage _usage) {
 	checkGLErrors(AT);
 	
 	// restore previous VAO state
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	gl::BindBuffer(GL_ARRAY_BUFFER, 0);
+	gl::BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	gl::BindVertexArray(0);
 	checkGLErrors(AT);
 	
 	__buffers.push_back(&_buffer);
@@ -91,15 +88,15 @@ GPUMemory::prepareRoom(BufferObject& _buffer, vboUsage _usage) {
 
 void
 GPUMemory::sendData(const BufferObject& _buffer, short unsigned _target, void* _data) {
-	glBindVertexArray(_buffer.vaoID);
+	gl::BindVertexArray(_buffer.vaoID);
 	checkGLErrors(AT);
 	
 	if (!_buffer.vboID[_target].bound) {
-		glBindBuffer(_buffer.vboID[_target].target, _buffer.vboID[_target].vboID);
+		gl::BindBuffer(_buffer.vboID[_target].target, _buffer.vboID[_target].vboID);
 		checkGLErrors(AT);
 	}
 	
-	glBufferSubData(_buffer.vboID[_target].target, 0,
+	gl::BufferSubData(_buffer.vboID[_target].target, 0,
 			_buffer.vboID[_target].dataSize,
 			_data
 		);
@@ -107,11 +104,11 @@ GPUMemory::sendData(const BufferObject& _buffer, short unsigned _target, void* _
 
 	// restore previous VAO state
 	if (!_buffer.vboID[_target].bound) {
-		glBindBuffer(_buffer.vboID[_target].target, 0);
+		gl::BindBuffer(_buffer.vboID[_target].target, 0);
 		checkGLErrors(AT);
 	}
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 	
 	__vboUsage += _buffer.vboID[_target].dataSize;
 }
@@ -120,43 +117,43 @@ unsigned
 GPUMemory::getBufferSize(const BufferObject& _buffer) {
 	int elemsSize, dataSize;
 	
-	glBindVertexArray(_buffer.vaoID);
+	gl::BindVertexArray(_buffer.vaoID);
 	checkGLErrors(AT);
 	
 	if (!_buffer.vboID[ELEMENTS_ARRAY].bound)
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer.vboID[ELEMENTS_ARRAY].vboID);
-	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &elemsSize);
+		gl::BindBuffer(GL_ELEMENT_ARRAY_BUFFER, _buffer.vboID[ELEMENTS_ARRAY].vboID);
+	gl::GetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &elemsSize);
 	checkGLErrors(AT);
 	
 	if (!_buffer.vboID[DATA_ARRAY].bound)
-		glBindBuffer(GL_ARRAY_BUFFER, _buffer.vboID[DATA_ARRAY].vboID);
-	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &dataSize);
+		gl::BindBuffer(GL_ARRAY_BUFFER, _buffer.vboID[DATA_ARRAY].vboID);
+	gl::GetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &dataSize);
 	checkGLErrors(AT);
 	
 	if (!_buffer.vboID[ELEMENTS_ARRAY].bound)
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		gl::BindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	if (!_buffer.vboID[DATA_ARRAY].bound)
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		gl::BindBuffer(GL_ARRAY_BUFFER, 0);
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 	
 	return elemsSize + dataSize;
 }
 
 void
 GPUMemory::deleteBuffers(BufferObject& _buffer) {
-	glDeleteBuffers(1, &_buffer.vboID[ELEMENTS_ARRAY].vboID);
+	gl::DeleteBuffers(1, &_buffer.vboID[ELEMENTS_ARRAY].vboID);
 	checkGLErrors(AT);
 	_buffer.vboID[ELEMENTS_ARRAY].bound = false;
 	_buffer.vboID[ELEMENTS_ARRAY].vboID = 0;
 	
-	glDeleteBuffers(1, &_buffer.vboID[DATA_ARRAY].vboID);
+	gl::DeleteBuffers(1, &_buffer.vboID[DATA_ARRAY].vboID);
 	checkGLErrors(AT);
 	_buffer.vboID[DATA_ARRAY].bound = false;
 	_buffer.vboID[DATA_ARRAY].vboID = 0;
 	
-	glDeleteVertexArrays(1, &_buffer.vaoID);
+	gl::DeleteVertexArrays(1, &_buffer.vaoID);
 	checkGLErrors(AT);
 	_buffer.vaoID = 0;
 	
@@ -176,15 +173,15 @@ GPUMemory::mapBuffer(BufferObject& _buffer, short unsigned _target, unsigned _ac
 	else
 		return NULL;
 	
-	glBindVertexArray(_buffer.vaoID);
+	gl::BindVertexArray(_buffer.vaoID);
 	checkGLErrors(AT);
 	
 	if (!_buffer.vboID[_target].bound) {
-		glBindBuffer(_buffer.vboID[_target].target, _buffer.vboID[_target].vboID);
+		gl::BindBuffer(_buffer.vboID[_target].target, _buffer.vboID[_target].vboID);
 		checkGLErrors(AT);
 	}
 	
-	void* data = glMapBuffer(_buffer.vboID[_target].target, access);
+	void* data = gl::MapBuffer(_buffer.vboID[_target].target, access);
 	checkGLErrors(AT);
 	
 	return data;
@@ -192,57 +189,41 @@ GPUMemory::mapBuffer(BufferObject& _buffer, short unsigned _target, unsigned _ac
 
 bool
 GPUMemory::unmapBuffer(BufferObject& _buffer, short unsigned _target) {
-	GLboolean result = glUnmapBuffer(_buffer.vboID[_target].target);
+	GLboolean result = gl::UnmapBuffer(_buffer.vboID[_target].target);
 	checkGLErrors(AT);
 	
 	if (!_buffer.vboID[_target].bound) {
-		glBindBuffer(_buffer.vboID[_target].target, 0);
+		gl::BindBuffer(_buffer.vboID[_target].target, 0);
 		checkGLErrors(AT);
 	}
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 	
 	return result;
 }
 
 void
 GPUMemory::bind(BufferObject& _buffer, short unsigned _target) {
-	glBindVertexArray(_buffer.vaoID);
+	gl::BindVertexArray(_buffer.vaoID);
 	checkGLErrors(AT);
 	
-	glBindBuffer(_buffer.vboID[_target].target, _buffer.vboID[_target].vboID);
+	gl::BindBuffer(_buffer.vboID[_target].target, _buffer.vboID[_target].vboID);
 	checkGLErrors(AT);
 	
 	_buffer.vboID[_target].bound = true;
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 }
 
 void
 GPUMemory::unbind(BufferObject& _buffer, short unsigned _target) {
-	glBindVertexArray(_buffer.vaoID);
+	gl::BindVertexArray(_buffer.vaoID);
 	checkGLErrors(AT);
 	
-	glBindBuffer(_buffer.vboID[_target].target,0);
+	gl::BindBuffer(_buffer.vboID[_target].target,0);
 	checkGLErrors(AT);
 	
 	_buffer.vboID[_target].bound = false;
 	
-	glBindVertexArray(0);
-}
-
-void
-GPUMemory::__initGLExtensionsPointers() {
-	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
-	glGenBuffers = getProcAddr< decltype(glGenBuffers) >("glGenBuffersARB");
-	glBufferData = getProcAddr< decltype(glBufferData) >("glBufferDataARB");
-	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");
-	glBufferSubData = getProcAddr< decltype(glBufferSubData) >("glBufferSubDataARB");
-	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
-	glGenVertexArrays = getProcAddr< decltype(glGenVertexArrays) >("glGenVertexArrays");
-	glDeleteVertexArrays = getProcAddr< decltype(glDeleteVertexArrays) >("glDeleteVertexArrays");
-	glGetBufferParameteriv = getProcAddr< decltype(glGetBufferParameteriv) >("glGetBufferParameterivARB");
-	
-	glMapBuffer = getProcAddr< decltype(glMapBuffer) >("glMapBuffer");
-	glUnmapBuffer = getProcAddr< decltype(glUnmapBuffer) >("glUnmapBuffer");
+	gl::BindVertexArray(0);
 }

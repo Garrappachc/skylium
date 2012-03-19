@@ -24,36 +24,36 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 typedef struct Position {
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
-	GLfloat w;
+	gl::Float x;
+	gl::Float y;
+	gl::Float z;
+	gl::Float w;
 	
 	Position();
 	Position(const Position&);
-	Position(GLfloat, GLfloat, GLfloat);
+	Position(gl::Float, gl::Float, gl::Float);
 } Position;
 
 typedef struct TexCoords {
-	GLfloat u;
-	GLfloat v;
+	gl::Float u;
+	gl::Float v;
 	
 	TexCoords();
 	TexCoords(const TexCoords&);
-	TexCoords(GLfloat, GLfloat);
+	TexCoords(gl::Float, gl::Float);
 } TexCoords;
 
 typedef struct Normal {
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
+	gl::Float x;
+	gl::Float y;
+	gl::Float z;
 	
 	Normal();
 	Normal(const Normal&);
-	Normal(GLfloat, GLfloat, GLfloat);
+	Normal(gl::Float, gl::Float, gl::Float);
 } Normal;
 
 

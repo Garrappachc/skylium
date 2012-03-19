@@ -30,10 +30,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <GL/glx.h>
-#include <GL/gl.h>
 #include <unistd.h>
 
 #include "../include/Skylium.h"
+
+#include "../include/glCalls.h"
 
 #include "../include/defines.h"
 #include "../include/config.h"
@@ -84,9 +85,7 @@ Skylium::Skylium() :
 	
 	__timer = new Timer();
 	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Skylium constructed.";
-	cout.flush();
+	log(CONSTRUCTOR, "Skylium constructed.");
 }
 
 Skylium::~Skylium() {
@@ -107,8 +106,7 @@ Skylium::~Skylium() {
 	while (!__extensions.empty())
 		delete __extensions.back(), __extensions.pop_back();
 	
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Skylium destructed." << endl;
+	log(DESTRUCTOR, "Skylium destructed.");
 }
 
 bool
@@ -146,12 +144,13 @@ Skylium::init(const string &_windowName) {
 	
 	swapBuffers();
 	
-	glViewport(0, 0, __GLXContext.winWidth, __GLXContext.winHeight); checkGLErrors(AT);
+	gl::initGLExtensionsPointers();
 	
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	gl::Viewport(0, 0, __GLXContext.winWidth, __GLXContext.winHeight); checkGLErrors(AT);
+	
+	gl::ClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	gl::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl::Enable(GL_DEPTH_TEST);
 	checkGLErrors(AT);
 	
 	
@@ -160,20 +159,9 @@ Skylium::init(const string &_windowName) {
 	
 	/* Construct and compile default shaders. */
 	identityShader = new Shader("default/identity");
-	if (!identityShader -> make())
-		return false;
-	
 	shadingShader = new Shader("default/shadow");
-	if (!shadingShader -> make())
-		return false;
-	
 	texturedShadingShader = new Shader("default/textured");
-	if (!texturedShadingShader -> make())
-		return false;
-	
 	normalMapShader = new Shader("default/normalmap");
-	if (!normalMapShader -> make())
-		return false;
 	
 	
 	__shaderList.push_back(identityShader);
@@ -243,8 +231,8 @@ Skylium::__catchEvents() {
 				if (__isMouseMotionEnabled) {
 					int x = xev.xmotion.x;
 					int y = xev.xmotion.y;
-					const GLfloat moveX = (__lastMousePositionX - x);
-					const GLfloat moveY = (__lastMousePositionY - y);
+					const gl::Float moveX = (__lastMousePositionX - x);
+					const gl::Float moveY = (__lastMousePositionY - y);
 					__sceneManagement->getActiveScene()->getActiveCamera()->rotateCamera(moveX, moveY, 0.0);
 					__lastMousePositionX = x;
 					__lastMousePositionY = y;
@@ -265,11 +253,8 @@ Skylium::__catchEvents() {
 void
 Skylium::__loadConfig(const string& _fileName) {
 	
-	if (!__fileExists(_fileName)) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "No config file found! Default values in use.";
-		return;
-	}
+	if (!__fileExists(_fileName))
+		log(WARN, "No config file found. Default values in use.");
 	
 	fstream configFile(_fileName.c_str(), ios::in);
 	
@@ -391,36 +376,31 @@ Skylium::__earlyInitGLXFnPointers() {
 	glXChooseFBConfig = getProcAddr< decltype(glXChooseFBConfig) >("glXChooseFBConfig");
 	glXGetVisualFromFBConfig = getProcAddr< decltype(glXGetVisualFromFBConfig) >("glXGetVisualFromFBConfig");
 	glXGetFBConfigAttrib = getProcAddr< decltype(glXGetFBConfigAttrib) >("glXGetFBConfigAttrib");
-	glGetStringi = getProcAddr< decltype(glGetStringi) >("glGetStringi");
 }
 
 void
 Skylium::__getExtensionList() {
 #if (OPENGL_VERSION_MAJOR == 3) || (OPENGL_VERSION_MAJOR == 4)
 	int n;
-	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+	gl::GetIntegerv(GL_NUM_EXTENSIONS, &n);
 	checkGLErrors(AT);
-	if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-		cout << LOG_INFO << "List of available extensions: " << n;
+
 	for (int i = 0; i < n; i++) {
-		const char *temp = (const char*)glGetStringi(GL_EXTENSIONS, i);
+		const char *temp = (const char*)gl::GetStringi(GL_EXTENSIONS, i);
 		__extensions.push_back(new string(temp));
-		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-			cout << LOG_INFO << "Found an extension: " << temp;
+		log(LOW_PARAM, "Found an extension: %s", temp);
 	}
 	checkGLErrors(AT);
 	
 #elif (OPENGL_VERSION_MAJOR == 2)
-	const char* pszExtensions = (const char*)glGetString(GL_EXTENSIONS);
+	const char* pszExtensions = (const char*)gl::GetString(GL_EXTENSIONS);
 	checkGLErrors(AT);
 	string tempExt(pszExtensions);
 	string temp = "";
 	for (unsigned i = 0; i < tempExt.length(); i++) {
 		if (tempExt[i] == ' ') {
 			__extensions.push_back(new string(temp));
-			if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-				cout << LOG_INFO << "Found an extension: " << temp;
-			cout.flush();
+			log(LOW_PARAM, "Found an extension: %s", temp.c_str());
 			temp = "";
 		} else {
 			temp += tempExt[i];
@@ -429,8 +409,7 @@ Skylium::__getExtensionList() {
 	             
 	if (temp != "") {
 		__extensions.push_back(new string(temp));
-		if ((sGlobalConfig::DEBUGGING & D_ALL_PARAMS) == D_ALL_PARAMS)
-			cout << LOG_INFO << "Found an extension: " << temp;
+		log(LOW_PARAM, "Found an extension: %s", temp.c_str());
 	}
 #endif
 
@@ -453,24 +432,17 @@ Skylium::__checkSupportedExtensions() {
 		"GL_ARB_vertex_program"
 	};
 	
-	for (const string& ext: extensions) {
-		if (!isSupported(ext)) {
-			if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-				cout << LOG_ERROR << "Extension " << ext << " is not supported on your system! Exiting.\n";
-			exit(1);
-		}
-	}
+	for (const string& ext: extensions)
+		if (!isSupported(ext))
+			log(ERROR, "Extension %s is not supported on your system. Sorry, we have to terminate.", ext.c_str());
 }
 
 bool
 Skylium::__openXServerConnection() {
 	/* Open connection with the X server */
 	__GLXContext.display = XOpenDisplay(NULL);
-	if (__GLXContext.display == NULL) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Connection with X server failed! Exiting.";
-		return false;
-	}
+	if (__GLXContext.display == NULL)
+		log(ERROR, "Failed to connect with the X server.");
 	return true;
 }
 
@@ -478,14 +450,10 @@ bool
 Skylium::__getGLXVersion() {
 	/* Get the GLX version */
 	glXQueryVersion(__GLXContext.display, &__GLXContext.GLXVersionMajor, &__GLXContext.GLXVersionMinor);
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "GLX version: " << __GLXContext.GLXVersionMajor << "." << __GLXContext.GLXVersionMinor << ".";
+	log(PARAM, "GLX version: %i.%i", __GLXContext.GLXVersionMajor, __GLXContext.GLXVersionMinor);
 	
-	if (__GLXContext.GLXVersionMajor <= 1 && __GLXContext.GLXVersionMinor < 3) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "GLX version too old. Exiting.";
-		return false;
-	}
+	if (__GLXContext.GLXVersionMajor <= 1 && __GLXContext.GLXVersionMinor < 3)
+		log(ERROR, "GLX version too old. Exiting.");
 	return true;
 }
 
@@ -509,11 +477,8 @@ Skylium::__getBestConfig(XVisualInfo*& _visualInfo, GLXFBConfig& _bestFbConfig) 
 		0 };
 	/* Gets new configuration */
 	fbConfigs = glXChooseFBConfig(__GLXContext.display, DefaultScreen(__GLXContext.display), fbAttribs, &numConfigs);
-	if (!fbConfigs) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Frame buffer configuration failed to be fetched! Exiting.";
-		return false;
-	}
+	if (!fbConfigs)
+		log(ERROR, "Frame buffer config failed to be fetched. Exiting.");
 	
 	/* Choose the best configuration */
 	int bestFbConfigNum = -1, worstFbConfigNum = -1, bestNumSamp = -1, worstNumSamp = 999;
@@ -590,10 +555,8 @@ Skylium::__openXWindow(XVisualInfo* _visualInfo, const string& _windowName) {
 
 bool
 Skylium::__createGLXContext(GLXFBConfig& _bestFbConfig) {
-	/* Create the new OpenGL context */
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Initializing OpenGL version " << OPENGL_VERSION_MAJOR
-			<< "." << OPENGL_VERSION_MINOR << "...";
+	/* Create the new OpenGL context */;
+	log(PARAM, "Initializing OpenGL version %i.%i...", OPENGL_VERSION_MAJOR, OPENGL_VERSION_MINOR);
 	
 	if (glXCreateContextAttribsARB) {
 		GLint attribs[] = {
@@ -607,8 +570,7 @@ Skylium::__createGLXContext(GLXFBConfig& _bestFbConfig) {
 		XSync(__GLXContext.display, False);
 		checkGLErrors(AT);
 	} else {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "glXCreateContextAttribsARB() not found. Older function in use.";
+		log(WARN, "glXCreateContextAttribsARB() not found. Older function in use.");
 		__GLXContext.context = glXCreateNewContext(__GLXContext.display, _bestFbConfig, GLX_RGBA_TYPE, 0, True);
 	}
 	

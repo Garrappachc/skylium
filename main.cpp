@@ -15,7 +15,7 @@ main() {
 	
 	/* create the main Skylium class instance */
 	Skylium *s_main = new Skylium();
-	
+	  
 	/* Init - create rendering context, initialize OpenGL, create window, etc etc.
 	 * As an argument we give the window title */
 	if (!s_main -> init("Skylium sample")) {

@@ -104,7 +104,7 @@ public:
 	
 	/* Struct that keeps info about the rendering context.
 	 * Context can be get by getContext() and getContextPtr() methods. */
-	typedef struct sContextStruct {
+	struct sContextStruct {
 		
 		/* Pointer to an active X server display */
 		Display *	display;
@@ -128,7 +128,7 @@ public:
 		
 		GLXContext	context;
 		
-	} sContextStruct;
+	};
 	
 	const sContextStruct & getContext() { return __GLXContext; }
 	const sContextStruct * getContextPtr() { return &__GLXContext; }
@@ -250,7 +250,6 @@ private:
 	GLXFBConfig *	(*glXChooseFBConfig)(Display*, int, const int*, int*);
 	XVisualInfo *	(*glXGetVisualFromFBConfig)(Display*, GLXFBConfig);
 	int		(*glXGetFBConfigAttrib)(Display*, GLXFBConfig, int, int*);
-	const GLubyte *	(*glGetStringi)(GLenum, GLuint);
 	
 };
 

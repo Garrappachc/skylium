@@ -36,8 +36,7 @@ using namespace std;
 ShaderDataHandler::ShaderDataHandler() :
 		__matrices(MatricesManager::GetSingleton()),
 		__isStreamOpen(false) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "ShaderDataHandler constructed.";
+	log(CONSTRUCTOR, "ShaderDataHandler constructed.");
 }
 
 void
@@ -80,7 +79,7 @@ ShaderDataHandler::updateData(const string& _uniformName, const sVector4D& _valu
 }
 
 void
-ShaderDataHandler::updateData(const string& _uniformName, GLfloat _value) {
+ShaderDataHandler::updateData(const string& _uniformName, gl::Float _value) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformFloat(_uniformName, _value);
 	} else {
@@ -93,7 +92,7 @@ ShaderDataHandler::updateData(const string& _uniformName, GLfloat _value) {
 }
 
 void
-ShaderDataHandler::updateSampler2D(const string& _uniformName, GLint _sampler) {
+ShaderDataHandler::updateSampler2D(const string& _uniformName, gl::Int _sampler) {
 	if (__isStreamOpen) {
 		__activeShader->setUniformInt(_uniformName, _sampler);
 	} else {

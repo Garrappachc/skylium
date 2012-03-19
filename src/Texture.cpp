@@ -51,39 +51,28 @@ Texture::Texture(const string &_fileName, Mode _mode) :
 		__mode(_mode),
 		__boss(TextureManager::GetSingletonPtr()),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Loading texture: " << _fileName << "... ";
-	
-	if (!__fileExists(_fileName))
-		throw "File " + _fileName + " not found!";
+	log(CONSTRUCTOR, "Loading texture %s...", _fileName.c_str());
 	
 	name = getName(_fileName);
 	
 	__texture = __loadTexture(_fileName);
 	
-	if (!__texture) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "Texture loading failed!";
-		throw "Texture loading failed!";
-	}
+	if (!__texture)
+		log(WARN, "Texture %s loading failed!", _fileName.c_str());
 	
 	__boss -> insert(this);
-	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << "Done.";
 }
 
 Texture::~Texture() {
-	glDeleteTextures(1, &__texture);
+	gl::DeleteTextures(1, &__texture);
 	checkGLErrors(AT);
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Texture (\"" << name << "\") destructed.";
+	log(DESTRUCTOR, "Texture (\"%s\") destructed.", name.c_str());
 }
 
 void
 Texture::setTexture(unsigned _number) {
-	glActiveTexture(GL_TEXTURE0 + _number);
-	glBindTexture(__type, __texture);
+	gl::ActiveTexture(GL_TEXTURE0 + _number);
+	gl::BindTexture(__type, __texture);
 	checkGLErrors(AT);
 
 	if (__mode == MODE_TEXTURE)
@@ -96,8 +85,8 @@ Texture::setTexture(unsigned _number) {
 
 void
 Texture::unsetTexture(unsigned _number) {
-	glActiveTexture(GL_TEXTURE0 + _number);
-	glBindTexture(__type, 0);
+	gl::ActiveTexture(GL_TEXTURE0 + _number);
+	gl::BindTexture(__type, 0);
 	checkGLErrors(AT);
 }
 
@@ -116,7 +105,7 @@ Texture::__fileExists(const string &_fileName) {
 		return 0;
 }
 
-GLuint
+gl::Uint
 Texture::__loadTexture(const string &_filename) {
 	/* Based on SOIL library */
 	unsigned char* img;
@@ -126,13 +115,13 @@ Texture::__loadTexture(const string &_filename) {
 	
 	if (!img) {
 		const char* result = stbi_failure_reason();
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Error while loading texture! Stb says:\n" << result;
+		log(WARN, "Error loading texture! Stb says:\n%s", result);
+		
 		return 0;
 	}
 	
-	GLint maxTextureSize;
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+	gl::Int maxTextureSize;
+	gl::GetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 	
 	if (sGlobalConfig::CREATE_MIPMAPS || (width > maxTextureSize) || (height > maxTextureSize)) {
 		int newWidth = 1, newHeight = 1;
@@ -174,8 +163,8 @@ Texture::__loadTexture(const string &_filename) {
 		height = newHeight;
 	}
 	
-	GLuint texID;
-	glGenTextures(1, &texID);
+	gl::Uint texID;
+	gl::GenTextures(1, &texID);
 	checkGLErrors(AT);
 	
 	if (!texID)
@@ -183,10 +172,10 @@ Texture::__loadTexture(const string &_filename) {
 	
 	unsigned originalTextureFormat = GL_RGBA, internalTextureFormat = GL_RGBA;
 	
-	glBindTexture(GL_TEXTURE_2D, texID);
+	gl::BindTexture(GL_TEXTURE_2D, texID);
 	checkGLErrors(AT);
 	
-	glTexImage2D(
+	gl::TexImage2D(
 			GL_TEXTURE_2D, 0,
 			internalTextureFormat, width, height, 0,
 			originalTextureFormat, GL_UNSIGNED_BYTE, img
@@ -200,7 +189,7 @@ Texture::__loadTexture(const string &_filename) {
 			mipmap_image(img, width, height, __channels, resampled,
 				(1 << MIPlevel), (1 << MIPlevel)
 			);
-			glTexImage2D(
+			gl::TexImage2D(
 				GL_TEXTURE_2D, MIPlevel,
 				internalTextureFormat, MIPwidth, MIPheight, 0,
 				originalTextureFormat, GL_UNSIGNED_BYTE, resampled
@@ -213,17 +202,17 @@ Texture::__loadTexture(const string &_filename) {
 		}
 		delete [] resampled;
 		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		checkGLErrors(AT);
 	} else {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		checkGLErrors(AT);
 	}
 	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, __wrapping);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, __wrapping);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, __wrapping);
 	checkGLErrors(AT);
 	
 	delete [] img;
@@ -233,7 +222,6 @@ Texture::__loadTexture(const string &_filename) {
 		
 
 
-/* TODO: Bump texture (normal map). */
 /* TODO: Cube map support. */
 
 

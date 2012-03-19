@@ -29,9 +29,9 @@
 #include <map>
 #include <string>
 
-#include <GL/gl.h>
-
 #include "Singleton.h"
+
+#include "glCalls.h"
 
 #include "Vectors.h"
 #include "Matrices.h"
@@ -53,7 +53,7 @@ public:
 	void updateData(const std::string&, const sVector2D&);
 	void updateData(const std::string&, const sVector3D&);
 	void updateData(const std::string&, const sVector4D&);
-	void updateData(const std::string&, GLfloat);
+	void updateData(const std::string&, gl::Float);
 	void updateSampler2D(const std::string&, GLint);
 	
 	/**
@@ -82,9 +82,9 @@ public:
 	
 	std::map< std::string, sVector4D > __4Dvectors;
 	
-	std::map< std::string, GLfloat > __values;
+	std::map< std::string, gl::Float > __values;
 	
-	std::map< std::string, GLint > __textures;
+	std::map< std::string, gl::Uint > __textures;
 	
 	MatricesManager& __matrices;
 	

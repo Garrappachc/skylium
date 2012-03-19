@@ -132,8 +132,7 @@ Object::Object(const string &_name) :
 		__content(0),
 		__matrices(MatricesManager::GetSingleton()),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Object (\"" << _name << "\") constructed.";
+	log(CONSTRUCTOR, "Object (\"%s\") constructed.", name.c_str());
 }
 
 Object::~Object() {
@@ -146,8 +145,7 @@ Object::~Object() {
 	for (auto it = __materials.begin(); it != __materials.end(); ++it)
 		delete it -> second;
 	
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Object (\"" << name << "\") destructed.";
+	log(DESTRUCTOR, "Object (\"%s\") destructed.", name.c_str());
 }
 
 void
@@ -181,22 +179,22 @@ Object::show() {
 }
 
 void
-Object::move(GLfloat _x, GLfloat _y, GLfloat _z) {
+Object::move(gl::Float _x, gl::Float _y, gl::Float _z) {
 	__mov += sVector3D( {_x, _y, _z} );
 }
 
 void
-Object::scale(GLfloat _x, GLfloat _y, GLfloat _z) {
+Object::scale(gl::Float _x, gl::Float _y, gl::Float _z) {
 	__scale += sVector3D( {_x, _y, _z} );
 }
 
 void
-Object::rotate(GLfloat _x, GLfloat _y, GLfloat _z) {
+Object::rotate(gl::Float _x, gl::Float _y, gl::Float _z) {
 	__rot += sVector3D( {_x, _y, _z} );
 }
 
 bool
-Object::setColor(GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
+Object::setColor(gl::Float _R, gl::Float _G, gl::Float _B, gl::Float _A) {
 	if (_R < 0 || _R > 1 || _G < 0 || _G > 1 || _B < 0 || _B > 1 || _A < 0 || _A > 1)
 		return false;
 	
@@ -205,14 +203,14 @@ Object::setColor(GLfloat _R, GLfloat _G, GLfloat _B, GLfloat _A) {
 }
 
 bool
-Object::setColor(int _R, int _G, int _B, GLfloat _A) {
+Object::setColor(int _R, int _G, int _B, gl::Float _A) {
 	if (_R < 0 || _R > 255 || _G < 0 || _G > 255 || _B < 0 || _B > 255 || _A < 0 || _A > 1)
 		return false;
 	
 	__defColor = sColor( {
-			static_cast< GLfloat >(_R) / 255,
-			static_cast< GLfloat >(_G) / 255,
-			static_cast< GLfloat >(_B) / 255,
+			static_cast< gl::Float >(_R) / 255,
+			static_cast< gl::Float >(_G) / 255,
+			static_cast< gl::Float >(_B) / 255,
 			_A
 		} );
 	return true;
@@ -220,12 +218,10 @@ Object::setColor(int _R, int _G, int _B, GLfloat _A) {
 
 bool
 Object::loadFromObj(const string &_objFile, unsigned _invert) {
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Loading object (" << name << ")... ";
+	log(PARAM, "Loading object (\"%s\")...", name.c_str());
 	
 	if (!__fileExists(_objFile)) {
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << name << ": error; file not found: " << _objFile;
+		log(WARN, "%s: file %s not found!", name.c_str(), _objFile.c_str());
 		return false;
 	}
 	
@@ -270,7 +266,7 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 	bool normalsChecked = false, textureChecked = false;
 	string buffer, temp;
 	long p = 0;
-	GLfloat x, y, z;
+	gl::Float x, y, z;
 	
 	Material* lastMtl = (Material*)NULL;
 	
@@ -378,22 +374,16 @@ Object::__parseObj(const string &_fileName, unsigned _invert) {
 	current -> closeMesh(lastMtl);
 	__meshes.insert(make_pair(current -> name, current));
 	
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
-		cout << LOG_INFO << "Detected: ";
-		if ((__content & (TEXTURE | NORMALS)) == (TEXTURE | NORMALS))
-			cout << "texture coordinates and normals.";
-		else if (__content & TEXTURE)
-			cout << "texture coordinates.";
-		else if (__content & NORMALS)
-			cout << "normals.";
-		else
-			cout << "only vertices.";
-	}
+	if ((__content & (TEXTURE | NORMALS)) == (TEXTURE | NORMALS))
+		log(PARAM, "Detected texture coordinates and normals.");
+	else if (__content & TEXTURE)
+		log(PARAM, "Detected texture coordinates.");
+	else if (__content & NORMALS)
+		log(PARAM, "Detected normals.");
+	else
+		log(PARAM, "Detected only vertices.");
 
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS) {
-		cout << LOG_INFO << p << " vertices loaded. ";
-		cout << "Time: " << (objTime.update(MICROSECONDS) - now) << " ms.";
-	}
+	log(PARAM, "%i vertices loaded. Time: %i ms.", p, objTime.update(MICROSECONDS) - now);
 }
 
 void
@@ -545,7 +535,7 @@ Object::__parseMtl(const string &_fileName) {
 			param[3] = 1.0;
 			current -> loadMaterial(param, MATERIAL_SPECULAR);
 		} else if (paramName == "Ns") {
-			GLfloat param;
+			gl::Float param;
 			line >> param;
 			param /= 128;
 			param = 128 - param;
@@ -561,9 +551,7 @@ Object::__parseMtl(const string &_fileName) {
 				continue;
 			}
 			if (!__fileExists("texture/" + texfile)) {
-				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
-				exit(1);
+				log(ERROR, "Error: texture file not found: %s", texfile.c_str());
 			}
 			newTex = new Texture("texture/" + texfile);
 			current -> appendTexture(newTex);
@@ -578,9 +566,7 @@ Object::__parseMtl(const string &_fileName) {
 				continue;
 			}
 			if (!__fileExists("texture/" + texfile)) {
-				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
-				exit(1);
+				log(ERROR, "Error: texture file not found: %s", texfile.c_str());
 			}
 			newTex = new Texture("texture/" + texfile, MODE_NORMAL_MAP);
 			current -> appendTexture(newTex);
@@ -596,9 +582,7 @@ Object::__parseMtl(const string &_fileName) {
 				continue;
 			}
 			if (!__fileExists("texture/" + texfile)) {
-				if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-					cout << LOG_WARN << "Texture not found: " << "texture/" << texfile;
-				exit(1);
+				log(ERROR, "Error: texture file not found: %s", texfile.c_str());
 			}
 			newTex = new Texture("texture/" + texfile, MODE_SPECULAR_MAP);
 			current -> appendTexture(newTex);

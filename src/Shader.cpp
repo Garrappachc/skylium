@@ -26,7 +26,6 @@
 #include <fstream>
 
 #include <sys/stat.h>
-#include <GL/gl.h>
 
 #include "../include/Shader.h"
 
@@ -49,18 +48,15 @@ Shader::Shader(const string& _fileName) :
 		__fragCode(""),
 		__isRunning(false),
 		__isCompiled(false) {
-
-	__initGLExtensionsPointers();
 	
 	__vertFile = "shaders/" + __vertFile;
 	
 	__fragFile = "shaders/" + __fragFile;
 	
-	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	__vertexShader = gl::CreateShader(GL_VERTEX_SHADER);
+	__fragmentShader = gl::CreateShader(GL_FRAGMENT_SHADER);
 	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Shader (\"" << __vertFile << "\", \"" << __fragFile << "\") constructed.";
+	log(CONSTRUCTOR, "Shader (\"%s\", \"%s\") constructed.", __vertFile.c_str(), __fragFile.c_str());
 }
 
 Shader::Shader(const string& _vertexCode, const string& _fragmentCode) :
@@ -70,34 +66,30 @@ Shader::Shader(const string& _vertexCode, const string& _fragmentCode) :
 		__fragCode(_fragmentCode),
 		__isRunning(false),
 		__isCompiled(false) {
+			
+	__vertexShader = gl::CreateShader(GL_VERTEX_SHADER);
+	__fragmentShader = gl::CreateShader(GL_FRAGMENT_SHADER);
 	
-	__initGLExtensionsPointers();
-	
-	__vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	__fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Shader constructed (from source code).";
+	log(CONSTRUCTOR, "Shader constructed (from source code).");
 }
 
 Shader::~Shader() {
-	glDetachShader(__shaderProgram, __vertexShader);
-	glDetachShader(__shaderProgram, __fragmentShader);
+	gl::DetachShader(__shaderProgram, __vertexShader);
+	gl::DetachShader(__shaderProgram, __fragmentShader);
 
-	glDeleteProgram(__shaderProgram);
+	gl::DeleteProgram(__shaderProgram);
 
-	glDeleteShader(__vertexShader);
-	glDeleteShader(__fragmentShader);
+	gl::DeleteShader(__vertexShader);
+	gl::DeleteShader(__fragmentShader);
 	checkGLErrors(AT);
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Shader (\"" << __vertFile << "\", \"" << __fragFile << "\") destructed.";
-
+	
+	log(DESTRUCTOR, "Shader (\"%s\", \"%s\") destructed.", __vertFile.c_str(), __fragFile.c_str());
 }
 
 bool
-Shader::make(GLuint _var1, const string& _param1,
-		GLuint _var2, const string& _param2,
-		GLuint _var3, const string& _param3) {
+Shader::make(gl::Uint _var1, const string& _param1,
+		   gl::Uint _var2, const string& _param2,
+		   gl::Uint _var3, const string& _param3) {
 	const char *vert;
 	const char *frag;
 	
@@ -149,18 +141,12 @@ Shader::make(GLuint _var1, const string& _param1,
 	
 	if (!__vertFile.empty() && !__fragFile.empty()) {
 		if (!__fileExists(__vertFile)) {
-			if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-				cout << LOG_ERROR << "File \"" << __vertFile << "\" not found!";
-			return false;
+			log(ERROR, "File \"%s\" not found!", __vertFile.c_str());
 		}
 		if (!__fileExists(__fragFile)) {
-			if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-				cout << LOG_ERROR << "File \"" << __fragFile << "\" not found!";
-			return false;
+			log(ERROR, "File \"%s\" not found!", __fragFile.c_str());
 		}
-	
-		if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
-			cout << LOG_INFO << "Reading shaders' sources... ";
+
 		ifstream vertFile(__vertFile.c_str());
 		__vertCode = HEADER + VERTEX_HEADER;
 		while (!vertFile.eof()) {
@@ -181,102 +167,82 @@ Shader::make(GLuint _var1, const string& _param1,
 			__fragCode += "\n";
 		}
 		fragFile.close();
-		
-			
-		if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
-			cout << "Done. ";
 	} else if (!__vertCode.empty() && !__fragCode.empty()) {
 		__vertCode = HEADER + VERTEX_HEADER + __vertCode;
 		__fragCode = HEADER + FRAGMENT_HEADER + __fragCode;
 	} else {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Shader source could not be obtained!\n";
-		exit(1);
-	}
-	
-	if (sGlobalConfig::DEBUGGING & D_SHADERS) {
-		cout << LOG_INFO << "Compiling shaders' sources... ";
+		log(ERROR, "Shader source could not be obtained!");
 	}
 
 	vert = __vertCode.c_str();
 	frag = __fragCode.c_str();
 
-	GLint vlength = __vertCode.length();
-	GLint flength = __fragCode.length();
+	gl::Int vlength = __vertCode.length();
+	gl::Int flength = __fragCode.length();
 	
-	glShaderSource(__vertexShader, 1, (const GLchar**)&vert, &vlength);
+	gl::ShaderSource(__vertexShader, 1, (const GLchar**)&vert, &vlength);
 	checkGLErrors(AT);
-	glShaderSource(__fragmentShader, 1, (const GLchar**)&frag, &flength);
+	gl::ShaderSource(__fragmentShader, 1, (const GLchar**)&frag, &flength);
 	checkGLErrors(AT);
 
 	int result;
 
-	glCompileShader(__vertexShader);
+	gl::CompileShader(__vertexShader);
 	checkGLErrors(AT);
-	glGetShaderiv(__vertexShader, GL_COMPILE_STATUS, &result);
-	checkGLErrors(AT);
-	if (!result) {
-		char msg[MAX_LOG_SIZE];
-		glGetShaderInfoLog(__vertexShader, MAX_LOG_SIZE, NULL, msg);
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Error compiling vertex shader! Compilation log:\n" << msg << endl;
-		return 0;
-	}
-
-	glCompileShader(__fragmentShader);
-	checkGLErrors(AT);
-	glGetShaderiv(__fragmentShader, GL_COMPILE_STATUS, &result);
+	gl::GetShaderiv(__vertexShader, GL_COMPILE_STATUS, &result);
 	checkGLErrors(AT);
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
-		glGetShaderInfoLog(__fragmentShader, MAX_LOG_SIZE, NULL, msg);
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Error compiling fragment shader! Compilation log:\n" << msg << endl;
-		return 0;
+		gl::GetShaderInfoLog(__vertexShader, MAX_LOG_SIZE, NULL, msg);
+		
+		log(ERROR, "Error compiling vertex shader! Compilation log:\n%s", msg);
 	}
 
-	__shaderProgram = glCreateProgram();
+	gl::CompileShader(__fragmentShader);
 	checkGLErrors(AT);
-	if (!__shaderProgram) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Error creating the shader program!" << endl;
-		return false;
-	} 
+	gl::GetShaderiv(__fragmentShader, GL_COMPILE_STATUS, &result);
+	checkGLErrors(AT);
+	if (!result) {
+		char msg[MAX_LOG_SIZE];
+		gl::GetShaderInfoLog(__fragmentShader, MAX_LOG_SIZE, NULL, msg);
+		
+		log(ERROR, "Error compiling fragment shader! Compilation log:\n%s", msg);
+	}
+
+	__shaderProgram = gl::CreateProgram();
+	checkGLErrors(AT);
+	if (!__shaderProgram)
+		log(ERROR, "Error creating shader program!");
 	
-	glAttachShader(__shaderProgram, __vertexShader);
+	gl::AttachShader(__shaderProgram, __vertexShader);
 	checkGLErrors(AT);
-	glAttachShader(__shaderProgram, __fragmentShader);
+	gl::AttachShader(__shaderProgram, __fragmentShader);
 	checkGLErrors(AT);
 	
 	if (!_param1.empty())
-		glBindAttribLocation(__shaderProgram, _var1, _param1.c_str());
+		gl::BindAttribLocation(__shaderProgram, _var1, _param1.c_str());
 	if (!_param2.empty())
-		glBindAttribLocation(__shaderProgram, _var2, _param2.c_str());
+		gl::BindAttribLocation(__shaderProgram, _var2, _param2.c_str());
 	if (!_param3.empty())
-		glBindAttribLocation(__shaderProgram, _var3, _param3.c_str());
+		gl::BindAttribLocation(__shaderProgram, _var3, _param3.c_str());
 
-	glLinkProgram(__shaderProgram);
+	gl::LinkProgram(__shaderProgram);
 	checkGLErrors(AT);
 
-	glGetProgramiv(__shaderProgram, GL_LINK_STATUS, &result);
+	gl::GetProgramiv(__shaderProgram, GL_LINK_STATUS, &result);
 	checkGLErrors(AT);
 	if (!result) {
 		char msg[MAX_LOG_SIZE];
-		glGetProgramInfoLog(__shaderProgram, MAX_LOG_SIZE, NULL, msg);
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Error linking shader program! Link log:\n" << msg << endl;
-		return false;
+		gl::GetProgramInfoLog(__shaderProgram, MAX_LOG_SIZE, NULL, msg);
+		
+		log(ERROR, "Error linking shader program! Linking log:\n%s", msg);
 	}
 	checkGLErrors(AT);
 	
-	if (glIsProgram(__shaderProgram) == GL_FALSE) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Shader program could not be created!";
-		return false;
-	}
+	if (gl::IsProgram(__shaderProgram) == GL_FALSE)
+		log(ERROR, "Error creating shader program!");
 
-	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
-		cout << "Done. No errors reported.";
+	log(SHADER, "Shader compiled. No errors reported.");
 	
 	__isCompiled = true;
 	
@@ -286,16 +252,12 @@ Shader::make(GLuint _var1, const string& _param1,
 
 void
 Shader::toggle() {
-	if (!__isCompiled)
-		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
-			cout << LOG_WARN << "\nWarning: this shader is not compiled!";
-		
 	if (!__isRunning) {
-		glUseProgram(__shaderProgram);
+		gl::UseProgram(__shaderProgram);
 		checkGLErrors(AT);
 		__isRunning = true;
 	} else {
-		glUseProgram(0);
+		gl::UseProgram(0);
 		checkGLErrors(AT);
 		__isRunning = false;
 	}
@@ -303,9 +265,12 @@ Shader::toggle() {
 
 void
 Shader::bind(Object *_dest) {
+	if (!__isCompiled)
+		make();
+	
 	_dest -> __shader = this;
-	if ((sGlobalConfig::DEBUGGING & D_SHADERS) == D_SHADERS)
-		cout << LOG_INFO << "Shader bound to " << _dest -> name << ".";
+	
+	log(SHADER, "Shader bound to %s.", _dest -> name.c_str());
 }
 
 void
@@ -322,71 +287,43 @@ Shader::isBound(Object *_dest) {
 }
 
 void
-Shader::setUniformFloat(const string& _name, const sVectorBase< GLfloat >& _params) const {
-	GLint location = glGetUniformLocation(__shaderProgram, _name.c_str());
+Shader::setUniformFloat(const string& _name, const sVectorBase< gl::Float >& _params) const {
+	gl::Int location = gl::GetUniformLocation(__shaderProgram, _name.c_str());
 	checkGLErrors(AT);
 	
 	switch (_params.size()) {
 		case 2:
-			glUniform2f(location, _params[0], _params[1]);
+			gl::Uniform2f(location, _params[0], _params[1]);
 		case 3:
-			glUniform3f(location, _params[0], _params[1], _params[2]);
+			gl::Uniform3f(location, _params[0], _params[1], _params[2]);
 		case 4:
-			glUniform4f(location, _params[0], _params[1], _params[2], _params[3]);
+			gl::Uniform4f(location, _params[0], _params[1], _params[2], _params[3]);
 	}
 	checkGLErrors(AT);
 }
 
 void
-Shader::setUniformFloat(const string& _name, GLfloat _param) const {
-	glUniform1f(glGetUniformLocation(__shaderProgram, _name.c_str()), _param);
+Shader::setUniformFloat(const string& _name, gl::Float _param) const {
+	gl::Uniform1f(gl::GetUniformLocation(__shaderProgram, _name.c_str()), _param);
 	checkGLErrors(AT);
 }
 
 void
-Shader::setUniformInt(const string& _name, GLint _value) const {
-	glUniform1i(glGetUniformLocation(__shaderProgram, _name.c_str()), _value);
+Shader::setUniformInt(const string& _name, gl::Int _value) const {
+	gl::Uniform1i(gl::GetUniformLocation(__shaderProgram, _name.c_str()), _value);
 	checkGLErrors(AT);
 }
 
 void
 Shader::setMatrixFloat(const string& _name, const sMat16& _matrix) const {
-	glUniformMatrix4fv(glGetUniformLocation(__shaderProgram, _name.c_str()), 1, GL_FALSE, _matrix);
+	gl::UniformMatrix4fv(gl::GetUniformLocation(__shaderProgram, _name.c_str()), 1, GL_FALSE, _matrix);
 	checkGLErrors(AT);
 }
 
 void
 Shader::setMatrixFloat(const string& _name, const sMat9& _matrix) const {
-	glUniformMatrix3fv(glGetUniformLocation(__shaderProgram, _name.c_str()), 1, GL_FALSE, _matrix);
+	gl::UniformMatrix3fv(gl::GetUniformLocation(__shaderProgram, _name.c_str()), 1, GL_FALSE, _matrix);
 	checkGLErrors(AT);
-}
-
-void
-Shader::__initGLExtensionsPointers() {
-	glCreateShader = getProcAddr< decltype(glCreateShader) >("glCreateShader");
-	glDetachShader = getProcAddr< decltype(glDetachShader) >("glDetachShader");
-	glDeleteProgram = getProcAddr< decltype(glDeleteProgram) >("glDeleteProgram");
-	glDeleteShader = getProcAddr< decltype(glDeleteShader) >("glDeleteShader");
-	glShaderSource = getProcAddr< decltype(glShaderSource) >("glShaderSource");
-	glCompileShader = getProcAddr< decltype(glCompileShader) >("glCompileShader");
-	glGetShaderiv = getProcAddr< decltype(glGetShaderiv) >("glGetShaderiv");
-	glGetShaderInfoLog = getProcAddr< decltype(glGetShaderInfoLog) >("glGetShaderInfoLog");
-	glIsProgram = getProcAddr< decltype(glIsProgram) >("glIsProgram");
-	glCreateProgram = getProcAddr< decltype(glCreateProgram) >("glCreateProgram");
-	glAttachShader = getProcAddr< decltype(glAttachShader) >("glAttachShader");
-	glBindAttribLocation = getProcAddr< decltype(glBindAttribLocation) >("glBindAttribLocation");
-	glLinkProgram = getProcAddr< decltype(glLinkProgram) >("glLinkProgram");
-	glGetProgramiv = getProcAddr< decltype(glGetProgramiv) >("glGetProgramiv");
-	glGetProgramInfoLog = getProcAddr< decltype(glGetProgramInfoLog) >("glGetProgramInfoLog");
-	glUseProgram = getProcAddr< decltype(glUseProgram) >("glUseProgram");
-	glGetUniformLocation = getProcAddr< decltype(glGetUniformLocation) >("glGetUniformLocation");
-	glUniform1i = getProcAddr< decltype(glUniform1i) >("glUniform1i");
-	glUniform1f = getProcAddr< decltype(glUniform1f) >("glUniform1f");
-	glUniform2f = getProcAddr< decltype(glUniform2f) >("glUniform2f");
-	glUniform3f = getProcAddr< decltype(glUniform3f) >("glUniform3f");
-	glUniform4f = getProcAddr< decltype(glUniform4f) >("glUniform4f");
-	glUniformMatrix4fv = getProcAddr< decltype(glUniformMatrix4fv) >("glUniformMatrix4fv");
-	glUniformMatrix3fv = getProcAddr< decltype(glUniformMatrix3fv) >("glUniformMatrix3fv");
 }
 
 bool

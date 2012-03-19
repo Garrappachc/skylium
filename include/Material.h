@@ -24,7 +24,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include <string>
 #include <vector>
@@ -74,13 +74,13 @@ public:
 	 * Sets mAlpha parameter.
 	 * @param alpha Transparency ([0; 1]).
 	 */
-	void loadAlpha(GLfloat);
+	void loadAlpha(gl::Float);
 	
 	/**
 	 * Sets shininess.
 	 * @param shininess Shininess value.
 	 */
-	void loadShininess(GLfloat);
+	void loadShininess(gl::Float);
 	
 	/**
 	 * Checks whether the particular material has any texture or not.
@@ -122,8 +122,8 @@ private:
 	sColor			__mDiffuse;
 	sColor			__mSpecular;
 	sColor			__mEmission;
-	GLfloat			__mAlpha;
-	GLfloat			__mShininess;
+	gl::Float			__mAlpha;
+	gl::Float			__mShininess;
 	
 	/* Textures */
 	std::vector< Texture* >	__textures;

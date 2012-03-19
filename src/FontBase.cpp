@@ -53,10 +53,6 @@ FontBase::FontBase(const string &_fontName, int _characters) :
 			if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
 				cout << LOG_WARN << "Loaded: \"fixed\".";
 		} else throw;
-	} else {
-		if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-			cout << LOG_INFO << "Font " << _fontName << " loaded.";
-		cout.flush();
 	}
 	
 	__font = fontInfo -> fid;
@@ -73,13 +69,11 @@ FontBase::FontBase(const FontBase &_orig) :
 		__characters(_orig.__characters) {}
 
 FontBase::~FontBase() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Font destructed";
 	glDeleteLists(__base, __characters);
 }
 
 void
-FontBase::print(GLfloat _x, GLfloat _y, const string &_text) const {
+FontBase::print(gl::Float _x, gl::Float _y, const string &_text) const {
 	glPushAttrib(GL_LIST_BIT);
 			glListBase(__base - ' ');
 			glRasterPos3f(_x, _y, 0.0f);
