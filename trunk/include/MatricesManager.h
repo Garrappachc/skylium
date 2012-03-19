@@ -27,7 +27,7 @@
 
 #include <stack>
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include "Singleton.h"
 #include "Matrices.h"
@@ -65,7 +65,7 @@ public:
 	 * @param zNear Specifies the distance from the viewer to the near clipping plane (>0).
 	 * @param zFar Specifies the distance from the viewer to the far clipping plane (>0).
 	 */
-	void sPerspective(GLfloat, GLfloat, GLfloat, GLfloat);
+	void sPerspective(gl::Float, gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Generates a pararell projection.
@@ -76,7 +76,7 @@ public:
 	 * @param nearVal Specify the distances to the nearer depth clipping planes.
 	 * @param farVal Specify the distances to the farther depth clipping planes.
 	 */
-	void sOrtho(GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
+	void sOrtho(gl::Float, gl::Float, gl::Float, gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Generates the Normal Matrix.
@@ -106,7 +106,7 @@ public:
 	 * http://www.opengl.org/sdk/docs/man/xhtml/glRotate.xml
 	 * @param rotation Rotation vector.
 	 */
-	void rotate(GLfloat, Axis);
+	void rotate(gl::Float, Axis);
 	
 	/**
 	 * Pushes the current matrix on the stack.

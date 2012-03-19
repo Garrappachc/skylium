@@ -77,3 +77,73 @@ string getErrorString(GLenum _err) {
 			return "unknown error code";
 	}
 }
+
+void log(LogType _type, const std::string& _out, ...) {
+	va_list ap;
+	va_start(ap, _out);
+	
+	string msg;
+	
+	for (unsigned i = 0; i < _out.length(); ++i) {
+		switch (_out[i]) {
+			case '%':
+				switch (_out[i + 1]) {
+					case 'i':
+					case 'd':
+						msg += T2String< int >(va_arg(ap, int));
+						break;
+					case 'f':
+						msg += T2String< double >(va_arg(ap, double));
+						break;
+					case 's':
+						msg += va_arg(ap, char*);
+						break;
+					case 'u':
+						msg += T2String< unsigned >(va_arg(ap, unsigned));
+						break;
+				}
+				i += 1;
+				break;
+			default:
+				msg += _out[i];
+		}
+		
+	}
+	
+	va_end(ap);
+	
+	switch (_type) {
+		case CONSTRUCTOR:
+			if (sGlobalConfig::DEBUGGING & D_CONSTRUCTORS)
+				std::cout << LOG_INFO << msg << std::endl;
+			break;
+		case DESTRUCTOR:
+			if (sGlobalConfig::DEBUGGING & D_DESTRUCTORS)
+				std::cout << LOG_INFO << msg << std::endl;
+			break;
+		case PARAM:
+			if (sGlobalConfig::DEBUGGING & D_PARAMS)
+				std::cout << LOG_INFO << msg << std::endl;
+			break;
+		case LOW_PARAM:
+			if (sGlobalConfig::DEBUGGING & D_ALL_PARAMS)
+				std::cout << LOG_INFO << msg << std::endl;
+			break;
+		case SHADER:
+			if (sGlobalConfig::DEBUGGING & D_SHADERS)
+				std::cout << LOG_INFO << msg << std::endl;
+			break;
+		case BUFFER:
+			if (sGlobalConfig::DEBUGGING & D_BUFFER)
+				std::cout << LOG_INFO << msg << std::endl;
+			break;
+		case WARN:
+			if (sGlobalConfig::DEBUGGING & D_WARNINGS)
+				std::cout << LOG_WARN << msg << std::endl;
+			break;
+		case ERROR:
+			if (sGlobalConfig::DEBUGGING & D_ERRORS)
+				std::cout << LOG_ERROR << msg << std::endl;
+			exit(1);
+	}
+}

@@ -25,7 +25,7 @@
 
 #include <stack>
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include "Vectors.h"
 #include "Matrices.h"
@@ -63,7 +63,7 @@ public:
 	 * @param z Z coord.
 	 * @param type Camera type. FPP, TPP, SPHERICAL
 	 */
-	Camera(GLfloat, GLfloat, GLfloat, const cType& = FPP);
+	Camera(gl::Float, gl::Float, gl::Float, const cType& = FPP);
 	
 	/**
 	 * Destructor just sends some output.
@@ -94,7 +94,7 @@ public:
 	 * @param movY Y axis.
 	 * @param movZ Z axis.
 	 */
-	void moveCamera(GLfloat, GLfloat, GLfloat);
+	void moveCamera(gl::Float, gl::Float, gl::Float);
 
 	/**
 	 * Rotates the camera - mouse support.
@@ -102,7 +102,7 @@ public:
 	 * @param y Y rotation.
 	 * @param z Z rotation.
 	 */
-	void rotateCamera(GLfloat, GLfloat, GLfloat);
+	void rotateCamera(gl::Float, gl::Float, gl::Float);
 
 	/**
 	 * Sets the "lookAt" point.
@@ -110,13 +110,13 @@ public:
 	 * @param y Y coord.
 	 * @param z Z coord.
 	 */
-	void lookAt(GLfloat, GLfloat, GLfloat);
+	void lookAt(gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Sets camera range in SPHERICAL mode.
 	 * @param range Range.
 	 */
-	void setRange(GLfloat _range) { __range = _range; }
+	void setRange(gl::Float _range) { __range = _range; }
 	
 	/**
 	 * @return The __eye's coords.
@@ -131,7 +131,7 @@ public:
 	/**
 	 * @return Range.
 	 */
-	GLfloat getRange() { return __range; }
+	gl::Float getRange() { return __range; }
 
 
 private:
@@ -140,9 +140,9 @@ private:
 	cType __type;
 	
 	/*** setProjection ***/
-	GLfloat __fovy;
-	GLfloat __zNear;
-	GLfloat __zFar;
+	gl::Float __fovy;
+	gl::Float __zNear;
+	gl::Float __zFar;
 
 	/*** setView ***/
 	
@@ -159,11 +159,11 @@ private:
 	sVector3D __angle;
 	
 	/* Range of the SPHERICAL camera type */
-	GLfloat __range;
+	gl::Float __range;
 	
 	/* Window dimensions */
-	int __windowHeight;
-	int __windowWidth;
+	gl::Sizei __windowHeight;
+	gl::Sizei __windowWidth;
 	
 	MatricesManager& __matrices;
 };

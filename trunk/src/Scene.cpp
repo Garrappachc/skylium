@@ -44,19 +44,18 @@ Scene::Scene(const string &_name) :
 		__lightIterator(),
 		__lightModelAmbient({0.2, 0.2, 0.2, 1.0}),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Scene (\"" << _name << "\") constructed.";
+	log(CONSTRUCTOR, "Scene (\"%s\") constructed.", name.c_str());
 }
 
 Scene::~Scene() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Scene (\"" << name << "\") destructed.";
 	while (!__objectList.empty())
 		delete __objectList.back(), __objectList.pop_back();
 	while (!__cameraList.empty())
 		delete __cameraList.back(), __cameraList.pop_back();
 	while (!__lightList.empty())
 		delete __lightList.back(), __lightList.pop_back();
+	
+	log(DESTRUCTOR, "Scene (\"%s\") destructed.", name.c_str());
 }
 
 void
@@ -97,7 +96,7 @@ Scene::getObjectByName(const string &_name) {
 }
 
 Camera *
-Scene::createCamera(GLfloat _x, GLfloat _y, GLfloat _z, const cType &_cType) {
+Scene::createCamera(gl::Float _x, gl::Float _y, gl::Float _z, const cType &_cType) {
 	Camera *newCamera = new Camera(_x, _y, _z, _cType);
 	if (!__activeCamera) {
 		__activeCamera = newCamera;
@@ -124,7 +123,7 @@ Scene::setActiveCamera(Camera *_camera, bool _checking) {
 }
 
 Light *
-Scene::createLight(GLfloat _x, GLfloat _y, GLfloat _z) {
+Scene::createLight(gl::Float _x, gl::Float _y, gl::Float _z) {
 	Light* newLight = new Light(sVector3D({_x, _y, _z}));
 	__lightList.push_back(newLight);
 	return newLight;

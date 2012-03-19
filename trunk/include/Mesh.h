@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include "Vertex.h"
 #include "Material.h"
@@ -126,8 +126,6 @@ public:
 	
 private:
 	
-	void __initGLExtensionsPointers();
-	
 	BufferObject __buffer;
 	
 	/* Vertices' vector */
@@ -151,14 +149,7 @@ private:
 	GPUMemory& __gpu;
 	
 	bool __isShown;
-	
-	/* GL's extensions' pointers */
-	void	(*glBindVertexArray) (GLuint);
-	void	(*glBindBuffer) (GLenum, GLuint);
-	void	(*glVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid*);
-	void	(*glEnableVertexAttribArray) (GLuint);
-	void	(*glDisableVertexAttribArray) (GLuint);
-	
+
 };
 
 #endif // MESH_H

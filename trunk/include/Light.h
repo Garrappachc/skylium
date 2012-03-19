@@ -24,7 +24,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include "Vectors.h"
 
@@ -53,7 +53,7 @@ public:
 	 * @param y Y coord.
 	 * @param z Z coord.
 	 */
-	Light(GLfloat, GLfloat, GLfloat);
+	Light(gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Just some output.

@@ -29,6 +29,8 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 
+#include "glCalls.h"
+
 class FontBase {
 	
 public:
@@ -54,7 +56,7 @@ public:
 	 * @param y The Y coord.
 	 * @param text Text to be written.
 	 */
-	void print(GLfloat, GLfloat, const std::string&) const;
+	void print(gl::Float, gl::Float, const std::string&) const;
 	
 private:
 	

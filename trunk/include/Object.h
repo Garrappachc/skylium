@@ -28,6 +28,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "glCalls.h"
+
 #include "Vectors.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -58,7 +60,7 @@ typedef std::unordered_map< Index, long, HashMyIndex > indicesMap;
 typedef std::unordered_map< std::string, Mesh* > meshesMap;
 typedef std::unordered_map< std::string, Material* > materialsMap;
 
-typedef std::vector< GLfloat > s3DVector;
+typedef std::vector< gl::Float > s3DVector;
 
 class Object {
 	
@@ -87,7 +89,7 @@ public:
 	 * @param y factor;
 	 * @param z factor.
 	 */
-	void move(GLfloat, GLfloat, GLfloat);
+	void move(gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Scales the object.
@@ -95,7 +97,7 @@ public:
 	 * @param y;
 	 * @param z.
 	 */
-	void scale(GLfloat, GLfloat, GLfloat);
+	void scale(gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Rotates the object.
@@ -103,7 +105,7 @@ public:
 	 * @param rotY Y angle;
 	 * @param rotZ Z angle.
 	 */
-	void rotate(GLfloat, GLfloat, GLfloat);
+	void rotate(gl::Float, gl::Float, gl::Float);
 	
 	/**
 	 * Sets the object general colour.
@@ -113,7 +115,7 @@ public:
 	 * @param A Alpha.
 	 * @return False if one of the values given is not between [0; 1].
 	 */
-	bool setColor(GLfloat, GLfloat, GLfloat, GLfloat = 1.0);
+	bool setColor(gl::Float, gl::Float, gl::Float, gl::Float = 1.0);
 	
 	/**
 	 * Sets the object general colour.
@@ -123,7 +125,7 @@ public:
 	 * @param A Alpha.
 	 * @return False if one of the values given is not between [0; 255] or alpha is not between [0; 1].
 	 */
-	bool setColor(int, int, int, GLfloat = 1.0);
+	bool setColor(int, int, int, gl::Float = 1.0);
 	
 	/**
 	 * Loads the object form .obj and .mtl.

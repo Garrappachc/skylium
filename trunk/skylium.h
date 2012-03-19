@@ -49,6 +49,7 @@
 #include <skylium/Vertex.h>
 
 /* Other includes */
+#include <skylium/glCalls.h>
 #include <skylium/config.h>
 #include <skylium/keysdef.h>
 #include <skylium/keysfunc.h>

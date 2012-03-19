@@ -35,14 +35,14 @@ INCDIR = $(prefix)/include
 OBJS = BufferObject.o Camera.o FontBase.o GPUMemory.o Hud.o HudData.o Light.o \
 	Material.o MatricesManager.o Mesh.o Object.o Scene.o SceneManager.o \
 	Shader.o ShaderDataHandler.o Skylium.o Texture.o TextureManager.o \
-	Timer.o Vertex.o config.o imgUtils.o keysfunc.o utils.o
+	Timer.o Vertex.o config.o glCalls.o imgUtils.o keysfunc.o utils.o
 
 COBJS = stb_image.o
 
 D = include
 
 INCLUDES = $(D)/BufferObject.h $(D)/Camera.h $(D)/config.h $(D)/defines.h \
-	$(D)/FontBase.h	$(D)/GPUMemory.h $(D)/Hud.h $(D)/HudData.h $(D)/keysdef.h \
+	$(D)/FontBase.h	$(D)/glCalls.h $(D)/GPUMemory.h $(D)/Hud.h $(D)/HudData.h $(D)/keysdef.h \
 	$(D)/keysfunc.h $(D)/Light.h $(D)/Material.h $(D)/Matrices.h \
 	$(D)/MatricesManager.h $(D)/Mesh.h $(D)/Object.h $(D)/Scene.h $(D)/SceneManager.h \
 	$(D)/Shader.h $(D)/ShaderDataHandler.h $(D)/Singleton.h $(D)/Skylium.h $(D)/Texture.h \

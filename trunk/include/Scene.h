@@ -26,6 +26,8 @@
 
 #include <vector>
 
+#include "glCalls.h"
+
 #include "Object.h"
 #include "Camera.h"
 #include "Light.h"
@@ -80,7 +82,7 @@ public:
 	 * @param z Z coord.
 	 * @return Pointer to the newly created camera.
 	 */
-	Camera * createCamera(GLfloat, GLfloat, GLfloat, const cType& = FPP);
+	Camera * createCamera(gl::Float, gl::Float, gl::Float, const cType& = FPP);
 	
 	/**
 	 * Sets the active camera pointer to the camera given as an argument.
@@ -109,7 +111,7 @@ public:
 	 * @param z Z coord.
 	 * @return Index of the new light.
 	 */
-	Light * createLight(GLfloat = 0, GLfloat = 0, GLfloat = 0);
+	Light * createLight(gl::Float = 0, gl::Float = 0, gl::Float = 0);
 	
 	/**
 	 * Removes light from the scene.

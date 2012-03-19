@@ -41,8 +41,7 @@ Light::Light() :
 		__specularLight({1.0, 1.0, 1.0, 0.0}),
 		__lightSrc({0.0, 0.0, 0.0}),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Light (0, 0, 0) constructed.";
+	log(CONSTRUCTOR, "Light (0, 0, 0) constructed.");
 }
 
 Light::Light(const sVector3D &_position) :
@@ -52,70 +51,48 @@ Light::Light(const sVector3D &_position) :
 		__specularLight({1.0, 1.0, 1.0, 0.0}),
 		__lightSrc(_position),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Light ( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ") constructed.";
+	log(CONSTRUCTOR, "Light (%f, %f, %f) constructed.", __lightSrc.x, __lightSrc.y, __lightSrc.z);
 }
 
-Light::Light(GLfloat _x, GLfloat _y, GLfloat _z) :
+Light::Light(gl::Float _x, gl::Float _y, gl::Float _z) :
 		__working(true),
 		__ambientLight({1.0, 1.0, 1.0, 0.0}),
 		__diffuseLight({1.0, 1.0, 1.0, 0.0}),
 		__specularLight({1.0, 1.0, 1.0, 0.0}),
 		__lightSrc({_x, _y, _z}),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Light( " << __lightSrc[0] << ", " << __lightSrc[1] << ", " << __lightSrc[2] << ") constructed.";
+	log(CONSTRUCTOR, "Light (%f, %f, %f) constructed.", __lightSrc.x, __lightSrc.y, __lightSrc.z);
 
 }
 
 Light::~Light() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Light destroyed.";
+	log(DESTRUCTOR, "Light destructed.");
 	
 }
 
 void
 Light::setAmbient(const sColor& _col) {
 	__ambientLight = _col;
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Ambient colour set ("
-				<< __ambientLight[0] << ", "
-				<< __ambientLight[1] << ", "
-				<< __ambientLight[2] << ", "
-				<< __ambientLight[3] << ").";
+	log(PARAM, "Ambient colour set (%f, %f, %f, %f).", _col.r, _col.g, _col.b, _col.a);
 
 }
 
 void
 Light::setDiffuse(const sColor& _col) {
 	__diffuseLight = _col;
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Diffuse colour set ("
-				<< __diffuseLight[0] << ", "
-				<< __diffuseLight[1] << ", "
-				<< __diffuseLight[2] << ", "
-				<< __diffuseLight[3] << ").";
+	log(PARAM, "Diffuse colour set (%f, %f, %f, %f).", _col.r, _col.g, _col.b, _col.a);
 }
 
 void
 Light::setSpecular(const sColor& _col) {
 	__specularLight = _col;
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Specular colour set ("
-				<< __specularLight[0] << ", "
-				<< __specularLight[1] << ", "
-				<< __specularLight[2] << ", "
-				<< __specularLight[3] << ").";
+	log(PARAM, "Specular colour set (%f, %f, %f, %f).", _col.r, _col.g, _col.b, _col.a);
 }
 
 void
 Light::setSrcPos(const sVector3D& _pos) {
 	__lightSrc = _pos;
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Light source set ("
-				<< __lightSrc[0] << ", "
-				<< __lightSrc[1] << ", "
-				<< __lightSrc[2] << ").";
+	log(PARAM, "Light source set (%f, %f, %f).", _pos.x, _pos.y, _pos.z);
 }
 
 void

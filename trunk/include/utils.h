@@ -30,6 +30,9 @@
 #include <string>
 #include <vector>
 
+#include <cstdarg>
+
+
 #include <GL/gl.h>
 #include <GL/glx.h>
 
@@ -39,6 +42,17 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define AT __FILE__ " : " TOSTRING(__LINE__)
+
+enum LogType {
+	CONSTRUCTOR,
+	DESTRUCTOR,
+	PARAM,
+	LOW_PARAM,
+	SHADER,
+	BUFFER,
+	WARN,
+	ERROR
+};
 
 /* Some helpful functions */
 
@@ -52,7 +66,7 @@ inline T string2T(const std::string &_s) {
 }
 
 template < typename T >
-std::string T2String(const T &_orig) {
+inline std::string T2String(const T &_orig) {
 	std::stringstream ss;
 	std::string output;
 	ss << _orig;
@@ -61,7 +75,7 @@ std::string T2String(const T &_orig) {
 }
 
 template< typename T >
-T getProcAddr(const std::string &_procName) {
+inline T getProcAddr(const std::string &_procName) {
 	T temp = (T)glXGetProcAddress((GLubyte*)_procName.c_str());
 	if (temp == (T)NULL) {
 		if ((sGlobalConfig::DEBUGGING & D_WARNINGS) == D_WARNINGS)
@@ -76,5 +90,7 @@ void explode(const std::string&, char, std::vector< std::string >&);
 void checkGLErrors(const std::string&);
 
 std::string getErrorString(GLenum);
+
+void log(LogType, const std::string&, ...);
 
 #endif // UTILS_H

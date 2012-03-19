@@ -36,7 +36,7 @@ class HudData {
 	
 public:
 	
-	sVector2D				position;
+	sVector2D			position;
 	sColor			color;
 	std::string		text;
 	const FontBase *	font;

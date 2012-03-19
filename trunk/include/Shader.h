@@ -26,6 +26,8 @@
 
 #include <string>
 
+#include "glCalls.h"
+
 #include "Object.h"
 #include "Vectors.h"
 #include "Matrices.h"
@@ -64,9 +66,9 @@ public:
 	 * Compiles and links the shader program.
 	 * @return False if something went wrong.
 	 */
-	bool make(GLuint = 0, const std::string& = "sVertex",
-			GLuint = 1, const std::string& = "sTexCoord",
-			GLuint = 2, const std::string& = "sNormal"
+	bool make(gl::Uint = 0, const std::string& = "sVertex",
+			gl::Uint = 1, const std::string& = "sTexCoord",
+			gl::Uint = 2, const std::string& = "sNormal"
     		);
 
 	/**
@@ -95,9 +97,9 @@ public:
 	 * @param name Name of variable in the shader.
 	 * @param params Vector of N float to be sent.
 	 */
-	void setUniformFloat(const std::string&, const sVectorBase< GLfloat >&) const;
-	void setUniformFloat(const std::string&, GLfloat) const;
-	void setUniformInt(const std::string&, GLint) const;	
+	void setUniformFloat(const std::string&, const sVectorBase< gl::Float >&) const;
+	void setUniformFloat(const std::string&, gl::Float) const;
+	void setUniformInt(const std::string&, gl::Int) const;	
 	/**
 	 * Sends a matrix to the shader.
 	 * @param name Name of variable in the shader.
@@ -113,44 +115,16 @@ private:
 	std::string __vertCode;
 	std::string __fragCode;
 
-	GLuint __vertexShader;
-	GLuint __fragmentShader;
+	gl::Uint __vertexShader;
+	gl::Uint __fragmentShader;
 
-	GLuint __shaderProgram;
+	gl::Uint __shaderProgram;
 
-	GLboolean __isRunning;
+	gl::Boolean __isRunning;
 	
 	bool __isCompiled;
-	
-	void __initGLExtensionsPointers();
 
 	bool __fileExists(const std::string&);
-	
-	/* Pointer to GL's extensions. */
-	GLuint	(*glCreateShader) (GLenum);
-	void		(*glDetachShader) (GLuint, GLuint);
-	void		(*glDeleteProgram) (GLuint);
-	void		(*glDeleteShader) (GLuint);
-	void		(*glShaderSource) (GLuint, GLsizei, const GLchar**, const GLint*);
-	void		(*glCompileShader) (GLuint);
-	void		(*glGetShaderiv) (GLuint, GLenum, GLint*);
-	void		(*glGetShaderInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
-	GLuint	(*glCreateProgram) (void);
-	void		(*glAttachShader) (GLuint, GLuint);
-	void		(*glBindAttribLocation) (GLuint, GLuint, const GLchar*);
-	void		(*glLinkProgram) (GLuint);
-	void		(*glGetProgramiv) (GLuint, GLenum, GLint*);
-	void		(*glGetProgramInfoLog) (GLuint, GLsizei, GLsizei*, GLchar*);
-	GLboolean	(*glIsProgram) (GLuint);
-	void		(*glUseProgram) (GLuint);
-	GLint	(*glGetUniformLocation) (GLuint, const GLchar*);
-	void		(*glUniform1i) (GLint, GLint);
-	void		(*glUniform1f) (GLint, GLfloat);
-	void		(*glUniform2f) (GLint, GLfloat, GLfloat);
-	void		(*glUniform3f) (GLint, GLfloat, GLfloat, GLfloat);
-	void		(*glUniform4f) (GLint, GLfloat, GLfloat, GLfloat, GLfloat);
-	void		(*glUniformMatrix4fv) (GLint, GLsizei, GLboolean, const GLfloat*);
-	void		(*glUniformMatrix3fv) (GLint, GLsizei, GLboolean, const GLfloat*);
 	
 };
 

@@ -46,9 +46,7 @@ Material::Material(const string &_name) :
 		__mShininess(0),
 		__textures(0),
 		__shaders(ShaderDataHandler::GetSingleton()) {
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Material (\"" << name << "\") constructed.";
-	cout.flush();
+	log(CONSTRUCTOR, "Material (\"%s\") constructed.", name.c_str());
 }
 
 Material::Material(const Material &_orig) :
@@ -62,15 +60,11 @@ Material::Material(const Material &_orig) :
 		__textures(0),
 		__shaders(ShaderDataHandler::GetSingleton()) {
 	__textures = _orig.__textures;
-	if ((sGlobalConfig::DEBUGGING & D_ALL_CONSTRUCTORS) == D_ALL_CONSTRUCTORS)
-		cout << LOG_INFO << "Material (\"" << name << "\") constructed as a copy.";
-	cout.flush();
+	log(CONSTRUCTOR, "Material (\"%s\") constructed as a copy.", name.c_str());
 }
 
 Material::~Material() {
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Material (\"" << name << "\") destructed.";
-	cout.flush();
+	log(DESTRUCTOR, "Material (\"%s\") destructed.", name.c_str());
 }
 
 void
@@ -84,12 +78,12 @@ Material::loadMaterial(const sColor &_param, unsigned _type) {
 }
 
 void
-Material::loadAlpha(GLfloat _alpha) {
+Material::loadAlpha(gl::Float _alpha) {
 	__mAlpha = _alpha;
 }
 
 void
-Material::loadShininess(GLfloat _shininess) {
+Material::loadShininess(gl::Float _shininess) {
 	__mShininess = _shininess;
 }
 

@@ -27,7 +27,7 @@
 
 #include <vector>
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include "Singleton.h"
 
@@ -127,26 +127,10 @@ public:
 	size_t getVBOUsage() { return __vboUsage; }
 	
 private:
-	
-	void __initGLExtensionsPointers();
-	
 	/* Buffers vectors */
 	std::vector< BufferObject* > __buffers;
 	
 	size_t __vboUsage;
-	
-	void	(*glBindBuffer) (GLenum, GLuint);
-	void	(*glGenBuffers) (GLsizei, GLuint*);
-	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
-	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
-	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
-	void	(*glBindVertexArray) (GLuint);
-	void	(*glGenVertexArrays) (GLsizei, GLuint*);
-	void	(*glDeleteVertexArrays) (GLsizei, const GLuint*);
-	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
-	
-	void * (*glMapBuffer) (GLenum, GLenum);
-	GLboolean (*glUnmapBuffer) (GLenum);
 	
 };
 

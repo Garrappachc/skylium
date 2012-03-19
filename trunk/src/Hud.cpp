@@ -50,16 +50,12 @@ Hud::Hud() :
 		__hudShader(NULL),
 		__matrices(MatricesManager::GetSingleton()) {
 			
-	__initGLExtensionsPointers();
-	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Hud constructed.";
+	log(CONSTRUCTOR, "Hud constructed.");
 }
 
 Hud::~Hud() {
 	delete __hudShader;
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Hud destructed.";
+	log(DESTRUCTOR, "Hud destructed.");
 }
 
 void
@@ -70,20 +66,20 @@ Hud::draw() {
 	__hudShader -> toggle();
 	__hudShader -> setUniformFloat("sDefColor", __background);
 	
-	glBindVertexArray(__vaoID);
-	glDrawArrays(GL_QUADS, 0, 4);
+	gl::BindVertexArray(__vaoID);
+	gl::DrawArrays(GL_QUADS, 0, 4);
 	checkGLErrors(AT);
 	
 	__hudShader -> setUniformFloat("sDefColor", __border);
-	glLineWidth(2.0f);
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
+	gl::LineWidth(2.0f);
+	gl::DrawArrays(GL_LINE_LOOP, 0, 4);
 	checkGLErrors(AT);
 	
 	__hudShader -> toggle();
 	
 	__displayList = __toDisplay.begin();
 	while (__displayList != __toDisplay.end()) {
-		glColor4f(
+		gl::Color4f(
 				(*__displayList) -> color.r,
 				(*__displayList) -> color.g,
 				(*__displayList) -> color.b,
@@ -100,7 +96,7 @@ Hud::draw() {
 	
 	__hudMode(false);
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 	checkGLErrors(AT);
 }
 
@@ -113,8 +109,7 @@ Hud::toggle() {
 void
 Hud::attachData(HudData *_newdata) {
 	__toDisplay.push_back(_newdata);
-	if ((sGlobalConfig::DEBUGGING & D_PARAMS) == D_PARAMS)
-		cout << LOG_INFO << "Hud: attached (\"" << _newdata -> text << "\")";
+	log(PARAM, "Hud: attached \"%s\".", _newdata -> text.c_str());
 }
 
 void
@@ -131,28 +126,26 @@ Hud::prepare() {
 	
 	__hudShader = new Shader(vertexCode, fragmentCode);
 	if (!__hudShader -> make(0, "sVertex", 0, "", 0, "")) {
-		if ((sGlobalConfig::DEBUGGING & D_ERRORS) == D_ERRORS)
-			cout << LOG_ERROR << "Hud: shader compilation error occured; exiting.\n";
-		exit(1);
+		log(ERROR, "Hud: shader compilation error occured; exiting.\n");
 	}
 	
-	glGenVertexArrays(1, &__vaoID);
-	glGenBuffers(1, &__vboID);
+	gl::GenVertexArrays(1, &__vaoID);
+	gl::GenBuffers(1, &__vboID);
 	checkGLErrors(AT);
 	
-	glBindVertexArray(__vaoID);
-	glBindBuffer(GL_ARRAY_BUFFER, __vboID);
+	gl::BindVertexArray(__vaoID);
+	gl::BindBuffer(GL_ARRAY_BUFFER, __vboID);
 	checkGLErrors(AT);
 	
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * 16, __vertices);
+	gl::BufferData(GL_ARRAY_BUFFER, sizeof(gl::Float) * 16, NULL, GL_STATIC_DRAW);
+	gl::BufferSubData(GL_ARRAY_BUFFER, 0, sizeof(gl::Float) * 16, __vertices);
 	checkGLErrors(AT);
 	
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(0);
+	gl::VertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	gl::EnableVertexAttribArray(0);
 	checkGLErrors(AT);
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 }
 
 void
@@ -161,29 +154,12 @@ Hud::__hudMode(bool flag) {
 		__matrices.storeProjectionMatrix();
 		__matrices.sOrtho(-1.0, 1.0, 1.0, -1.0, 0.0, 1.0);
 		
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gl::Enable(GL_BLEND);
+		gl::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	} else {
-		glDisable(GL_BLEND);
+		gl::Disable(GL_BLEND);
 		
 		__matrices.restoreProjectionMatrix();
 	}
 	checkGLErrors(AT);
 }
-
-void
-Hud::__initGLExtensionsPointers() {
-	glGenVertexArrays = getProcAddr< decltype(glGenVertexArrays) >("glGenVertexArrays");
-	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
-	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
-	glDeleteBuffers = getProcAddr< decltype(glDeleteBuffers) >("glDeleteBuffersARB");
-	glDeleteVertexArrays = getProcAddr< decltype(glDeleteVertexArrays) >("glDeleteVertexArrays");
-	glGenBuffers = getProcAddr< decltype(glGenBuffers) >("glGenBuffersARB");
-	glBufferData = getProcAddr< decltype(glBufferData) >("glBufferDataARB");
-	glBufferSubData = getProcAddr< decltype(glBufferSubData) >("glBufferSubDataARB");
-	glGetBufferParameteriv = getProcAddr< decltype(glGetBufferParameteriv) >("glGetBufferParameterivARB");
-	glVertexAttribPointer = getProcAddr< decltype(glVertexAttribPointer) >("glVertexAttribPointer");
-	glEnableVertexAttribArray = getProcAddr< decltype(glEnableVertexAttribArray) >("glEnableVertexAttribArray");
-	glDisableVertexAttribArray = getProcAddr< decltype(glDisableVertexAttribArray) >("glDisableVertexAttribArray");
-}
-

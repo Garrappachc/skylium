@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include <GL/gl.h>
+#include "glCalls.h"
 
 #include "Singleton.h"
 #include "Vectors.h"
@@ -86,14 +86,12 @@ private:
 	 */
 	void __hudMode(bool);
 	
-	void __initGLExtensionsPointers();
-	
 	/* Hud vertices for rendering (GL_QUADS) */
-	GLfloat __vertices[16];
+	gl::Float __vertices[16];
 	
 	bool __visible;
 	
-	GLuint __vaoID, __vboID;
+	gl::Uint __vaoID, __vboID;
 	
 	/* Contains data */
 	std::vector< HudData* > __toDisplay;
@@ -107,20 +105,6 @@ private:
 	Shader* __hudShader;
 	
 	MatricesManager& __matrices;
-	
-	/* GL's extensions' pointers */
-	void (*glGenVertexArrays) (GLsizei, GLuint*);
-	void	(*glGenBuffers) (GLsizei, GLuint*);
-	void (*glBindVertexArray) (GLuint);
-	void	(*glBindBuffer) (GLenum, GLuint);
-	void	(*glBufferData) (GLenum, int, const GLvoid*, GLenum);
-	void	(*glDeleteBuffers) (GLsizei, const GLuint*);
-	void (*glDeleteVertexArrays) (GLsizei, const GLuint*);
-	void	(*glBufferSubData) (GLenum, GLintptr, GLsizeiptr, GLvoid*);
-	void	(*glGetBufferParameteriv) (GLenum, GLenum, GLint*);
-	void (*glVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid*);
-	void (*glEnableVertexAttribArray) (GLuint);
-	void (*glDisableVertexAttribArray) (GLuint);
 	
 };
 

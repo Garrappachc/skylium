@@ -49,20 +49,17 @@ Mesh::Mesh(const string &_name) :
 		__mode(GL_TRIANGLES),
 		__gpu(GPUMemory::GetSingleton()),
 		__isShown(true) {
-	__initGLExtensionsPointers();
 	
 	__materials[0].begin = 0;
 	
-	if ((sGlobalConfig::DEBUGGING & D_CONSTRUCTORS) == D_CONSTRUCTORS)
-		cout << LOG_INFO << "Mesh (\"" << name << "\") constructed.";
+	log(CONSTRUCTOR, "Mesh (\"%s\") constructed.", name.c_str());
 
 }
 
 Mesh::~Mesh() {
 	__buffer.deleteBuffers();
 	checkGLErrors(AT);
-	if ((sGlobalConfig::DEBUGGING & D_DESTRUCTORS) == D_DESTRUCTORS)
-		cout << LOG_INFO << "Mesh (\"" << name << "\") destructed.";
+	log(DESTRUCTOR, "Mesh (\"%s\") destructed.", name.c_str());
 }
 
 void
@@ -70,7 +67,7 @@ Mesh::show() {
 	if (!__isShown)
 		return;
 	// there we go!
-	glBindVertexArray(__buffer.vaoID);
+	gl::BindVertexArray(__buffer.vaoID);
 	checkGLErrors(AT);
 	
 	for (MeshRange& m: __materials) {
@@ -80,7 +77,7 @@ Mesh::show() {
 		if (m.material)
 			m.material -> setMaterial();
 		
-		glDrawElements(
+		gl::DrawElements(
 				__mode,
 				m.end,
 				GL_UNSIGNED_INT,
@@ -93,7 +90,7 @@ Mesh::show() {
 	
 	}
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 }
 
 void
@@ -108,28 +105,25 @@ Mesh::loadIntoVbo() {
 	__buffer.sendData(ELEMENTS_ARRAY, &__indices[0]);
 	__buffer.sendData(DATA_ARRAY, &__vertices[0]);
 	
-	if ((sGlobalConfig::DEBUGGING & D_BUFFER) == D_BUFFER) {
-		cout << LOG_INFO << "Mesh (" << name << "): in the VBO. Size: " << __buffer.getBufferSize() << " B.";
-		cout.flush();
-	}
+	log(BUFFER, "Mesh (\"%s\") in the VBO. Size: %u B.", name.c_str(), __buffer.getBufferSize());
 	
 	__buffer.bind(ELEMENTS_ARRAY);
 	__buffer.bind(DATA_ARRAY);
 	
-	glBindVertexArray(__buffer.vaoID);
+	gl::BindVertexArray(__buffer.vaoID);
 	checkGLErrors(AT);
 	
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(0)); // vertex
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(16)); // texture
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(24)); // normal
+	gl::VertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(0)); // vertex
+	gl::VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(16)); // texture
+	gl::VertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(24)); // normal
 	checkGLErrors(AT);
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
+	gl::EnableVertexAttribArray(0);
+	gl::EnableVertexAttribArray(1);
+	gl::EnableVertexAttribArray(2);
 	checkGLErrors(AT);
 	
-	glBindVertexArray(0);
+	gl::BindVertexArray(0);
 }
 
 void
@@ -198,11 +192,3 @@ Mesh::raise() {
 	__buffer.unmapBuffer(DATA_ARRAY);
 }
 
-void
-Mesh::__initGLExtensionsPointers() {
-	glBindVertexArray = getProcAddr< decltype(glBindVertexArray) >("glBindVertexArray");
-	glBindBuffer =	getProcAddr< decltype(glBindBuffer) >("glBindBufferARB");
-	glVertexAttribPointer = getProcAddr< decltype(glVertexAttribPointer) >("glVertexAttribPointer");
-	glEnableVertexAttribArray = getProcAddr< decltype(glEnableVertexAttribArray) >("glEnableVertexAttribArray");
-	glDisableVertexAttribArray = getProcAddr< decltype(glDisableVertexAttribArray) >("glDisableVertexAttribArray");
-}
